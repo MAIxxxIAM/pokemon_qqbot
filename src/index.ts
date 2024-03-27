@@ -766,26 +766,22 @@ ${(h('at', { id: (session.userId) }))}
           const chooseMonster = await session.prompt(config.捕捉等待时间)
           let poke
           let reply: string
-          if (!chooseMonster) {//未输入
+          if (!chooseMonster) {
+            await ctx.database.set('pokebattle', { id: session.userId }, {
+              captureTimes: { $subtract: [{ $: 'captureTimes' }, catchCose] }
+            })//未输入
             return `哎呀！宝可梦们都逃跑了！精灵球-1`
           }
           switch (chooseMonster) {//选择宝可梦
             case '1':
               poke = pokeM[0]
-              reply = `
-【1】✨【${(pokemonCal.pokemonlist(poke))}】✨\r【2】⬛（${(pokemonCal.pokemonlist(pokeM[1]))}）⬛\r【3】⬛（${(pokemonCal.pokemonlist(pokeM[2]))}）⬛\r恭喜${(h('at', { id: (session.userId) }))}获得${(pokemonCal.pokemonlist(poke))}
-`
               break;
             case '2':
               poke = pokeM[1]
-              reply = `
-【1】⬛（${(pokemonCal.pokemonlist(pokeM[0]))}）⬛\r【2】✨【${(pokemonCal.pokemonlist(poke))}】✨\r【3】⬛（${(pokemonCal.pokemonlist(pokeM[2]))}）⬛\r恭喜${(h('at', { id: (session.userId) }))}获得${(pokemonCal.pokemonlist(poke))}`
               break;
             case '3':
               poke = pokeM[2]
-              reply = `
-【1】⬛（${(pokemonCal.pokemonlist(pokeM[0]))}）⬛\r【2】⬛（${(pokemonCal.pokemonlist(pokeM[1]))}）⬛\r【3】✨【${(pokemonCal.pokemonlist(poke))}】✨\r恭喜${(h('at', { id: (session.userId) }))}获得${(pokemonCal.pokemonlist(poke))}`
-              break;
+               break;
             default:
               await ctx.database.set('pokebattle', { id: session.userId }, {
                 captureTimes: { $subtract: [{ $: 'captureTimes' }, catchCose] }
@@ -807,11 +803,10 @@ ${(h('at', { id: (session.userId) }))}
               userArr[0].ultramonster = Array.from(ultramonsterSet)
 
               await ctx.database.set('pokebattle', { id: session.userId }, {
+                captureTimes: { $subtract: [{ $: 'captureTimes' }, catchCose] },
                 ultramonster: userArr[0].ultramonster,
               })
-              await ctx.database.set('pokebattle', { id: session.userId }, {
-                captureTimes: { $subtract: [{ $: 'captureTimes' }, catchCose] }
-              })
+
               return `${h('at', { id: session.userId })}恭喜你获得了传说宝可梦【${pokemonCal.pokemonlist(poke)}】`
             }
           } else if (banID.includes(poke) && userArr[0].lapTwo) {
