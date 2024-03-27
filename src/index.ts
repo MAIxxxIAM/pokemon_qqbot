@@ -2,7 +2,7 @@ import { Schema, h, $, Context, is, Session } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
-import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams } from './utils/mothed'
+import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb } from './utils/mothed'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import * as fs from 'fs'
@@ -74,7 +74,7 @@ export const Config = Schema.intersect([
     是否开启文本审核: Schema.boolean().default(false).description('是否开启文本审核'),
   }),
   Schema.object({
-    图片源:Schema.string().default('https://gitee.com/maikama/pokemon-fusion-image/raw/master').description(`
+    图片源: Schema.string().default('https://gitee.com/maikama/pokemon-fusion-image/raw/master').description(`
 # 使用网络图片：
 
 
@@ -147,7 +147,7 @@ export let shop: any[]
 export let config: Config
 
 
-export async function apply (ctx, conf: Config) {
+export async function apply(ctx, conf: Config) {
   config = conf
   if (config.是否开启文本审核) {
     ctx.on('before-send', async (session: Session) => {
@@ -156,48 +156,48 @@ export async function apply (ctx, conf: Config) {
     })
   }
   ctx.on('before-send', async (session: Session) => {
-    const {message} = session.event
-    if(session.scope!=='commands.help.messages'||session.platform!=='qq'){return}
-    let content=message.elements[0].attrs.content.split('\n')
-    content.splice(0,2)
-    content=content.map((item)=>{
-      const a= item.split('  ')
-      a.splice(0,2)
+    const { message } = session.event
+    if (session.scope !== 'commands.help.messages' || session.platform !== 'qq') { return }
+    let content = message.elements[0].attrs.content.split('\n')
+    content.splice(0, 2)
+    content = content.map((item) => {
+      const a = item.split('  ')
+      a.splice(0, 2)
       return a
     })
-    let mdparam=`
+    let mdparam = `
 指令  说明`
-    for(let i=0;i<content.length;i++){
-      mdparam+=`
+    for (let i = 0; i < content.length; i++) {
+      mdparam += `
 ---
 [${content[i][0]}](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`${content[i][0]}`)}&reply=false&enter=true) ${content[i][1]}
 `
     }
 
-    mdparam+=`
+    mdparam += `
 
 > 点击即可发送指令`
-   const b= getMarkdownParams(mdparam)
+    const b = getMarkdownParams(mdparam)
     const userArr = await ctx.database.get('pokebattle', { id: session.userId })
     try {
-     const a=await sendMsg(session)
-     const {id}=a
+      const a = await sendMsg(session)
+      const { id } = a
       await session.bot.internal.sendMessage(session.channelId, {
         content: "111",
         msg_type: 2,
         markdown: {
-          custom_template_id:'102072441_1711377105',
-          params:b
+          custom_template_id: '102072441_1711377105',
+          params: b
         },
         msg_id: id,
         timestamp: session.timestamp,
       })
-      session.event.message.elements=[]
+      session.event.message.elements = []
       return
-    }catch(e){
+    } catch (e) {
       return
     }
-    
+
   })
 
   model(ctx)
@@ -444,29 +444,20 @@ export async function apply (ctx, conf: Config) {
           })
           const { src } = dataUrl.attrs
           try {
+            const md = `<@${session.userId}>签到成功
+
+![img#512 #763](${await toUrl(ctx, session, src)})
+
+---
+每人都有一次初始改名机会 [改名](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/改名`)}&reply=false&enter=true)
+`
+            const b = getMarkdownParams(md)
             await session.bot.internal.sendMessage(session.guildId, {
               content: "111",
               msg_type: 2,
               markdown: {
-                custom_template_id: config.MDid,
-                params: [
-                  {
-                    key: config.key1,
-                    values: [`<@${session.userId}>签到成功`]
-                  },
-                  {
-                    key: config.key2,
-                    values: ["[img#512px #763px]"]
-                  },
-                  {
-                    key: config.key3,
-                    values: [await toUrl(ctx, session, src)]
-                  },
-                  {
-                    key: config.key4,
-                    values: [`每人都有一次初始的改名机会~输入【/改名】即可改名`]
-                  },
-                ]
+                custom_template_id: '102072441_1711377105',
+                params: b
               },
               keyboard: {
                 content: {
@@ -553,75 +544,16 @@ export async function apply (ctx, conf: Config) {
           ctx.fillText(`初始资金:3000`, 375, 260)
           ctx.fillText(`扭蛋机币+${(config.签到获得个数)}`, 375, 285)
           ctx.fillText(`你的第一只宝可梦【${pokemonCal.pokemonlist(firstMonster)}】`, 375, 310)
-          ctx.fillStyle = 'red';
-          ctx.fillText(`输入【/宝可梦】获取详细指令`, 256, 351)
-          ctx.fillStyle = 'black';
         })
         const { src } = replyImg.attrs
         //图片服务
         try {
-          await session.bot.internal.sendMessage(session.guildId, {
-            content: "111",
-            msg_type: 2,
-            markdown: {
-              custom_template_id: config.MDid,
-              params: [
-                {
-                  key: config.key1,
-                  values: [`<@${session.userId}>注册成功`]
-                },
-                {
-                  key: config.key2,
-                  values: ["[img#512px #384px]"]
-                },
-                {
-                  key: config.key3,
-                  values: [await toUrl(ctx, session, src)]
-                },
-              ]
-            },
-            keyboard: {
-              content: {
-                "rows": [
-                  {
-                    "buttons": [
-                      button(2, "🖊签到", "/签到", session.userId, "1"),
-                      button(2, "💳查看", "/查看信息", session.userId, "2"),
-                      button(2, "🔖帮助", "/宝可梦", session.userId, "3"),
-                      button(2, "🔈公告", "/notice", session.userId, "ntc"),
-                    ]
-                  },
-                  {
-                    "buttons": [
-                      button(2, "⚔️对战", "/对战", session.userId, "4"),
-                      button(2, "♂杂交", "/杂交宝可梦", session.userId, "5"),
-                      button(2, "👐放生", "/放生", session.userId, "6"),
-                      button(2, "💻接收", "/接收", session.userId, "p", false),
-                    ]
-                  },
-                  {
-                    "buttons": [
-                      button(2, "📷捕捉", "/捕捉宝可梦", session.userId, "7"),
-                      button(2, "📕属性", "/属性", session.userId, "8"),
-                      button(2, "🛒商店", "/购买", session.userId, "9"),
-                      button(2, "🏆兑换", "/使用", session.userId, "x", false),
-                    ]
-                  },
-                  {
-                    "buttons": [
-                      urlbutton(2, "反馈", "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=CEqeK9q1yilezUrsSX9L3kO0hK5Wpi_7&authKey=SBuSSQtld6nFctvq9d4Xm1lW%2B0C3QuFZ6FLhCJk8ELCbtOqiR4drHcrbfRLVmcvz&noverify=0&group_code=836655539", session.userId, "10"),
-                      urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),
-                      button(2, "📃问答", "/宝可问答", session.userId, "12"),
-                      button(2, "VIP", '/vip查询', session.userId, "VIP"),
-                    ]
-                  },
-                  config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
-                ]
-              },
-            },
-            msg_id: session.messageId,
-            timestamp: session.timestamp,
-          })
+          const md = `# <@${session.userId}>成功进入宝可梦的世界
+
+![img#512 #384](${await toUrl(ctx, session, src)})
+---
+- [点击获取宝可梦帮助](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`
+          await sendMarkdown(md, session)
         } catch (e) {
           return h.image(src)
         }
@@ -636,7 +568,6 @@ export async function apply (ctx, conf: Config) {
       const userArr: Array<Pokebattle> = await ctx.database.get('pokebattle', { id: session.userId })
       const vip = isVip(userArr[0])
       const vipReward = vip ? 1.5 : 1
-      const vipName = vip ? "[💎VIP]" : ''
       const pokeDex = new Pokedex(userArr[0])
       let usedCoords = []
       if (userArr.length == 0) {
@@ -665,7 +596,6 @@ export async function apply (ctx, conf: Config) {
               black[i] = "✨" + black[i] + "✨"
             }
           }
-
 
           let poke_img = []
           let bg_img = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', 'catchBG.png')}`)
@@ -705,52 +635,20 @@ export async function apply (ctx, conf: Config) {
           const { src } = catchpockmon_img.attrs
           //创建图片
           try {
-            await session.bot.internal.sendMessage(session.guildId, {
-              content: "111",
-              msg_type: 2,
-              markdown: {
-                custom_template_id: config.MDid,
-                params: [
-                  {
-                    key: config.key1,
-                    values: [`<@${session.userId}>捕捉宝可梦`]
-                  },
-                  {
-                    key: config.key2,
-                    values: ["[img#300px #300px]"]
-                  },
-                  {
-                    key: config.key3,
-                    values: [await toUrl(ctx, session, src)]
-                  },
-                  {
-                    key: config.key4,
-                    values: [`tip:"⬛"的个数，表示的是宝可梦名字的长度`]
-                  },
-                  {
-                    key: config.key5,
-                    values: [`例如：大岩蛇就是⬛⬛⬛`]
-                  },
-                  {
-                    key: config.key6,
-                    values: [`一周目时，传说中的宝可梦是不会放进背包的哦`]
-                  },
-                  {
-                    key: config.key7,
-                    values: [`你当前的精灵球：${userArr[0].captureTimes}`]
-                  },
-                  {
-                    key: config.key10,
-                    values: [`如果实在不知道选哪个可以点这里👉[/随机捕捉]\t(mqqapi://aio/inlinecmd?command=${Math.floor(Math.random() * 3) + 1}&reply=false&enter=true)👈`]
-                  },
-                ]
-              },
-              keyboard: {
-                content: catchbutton(black[0], black[1], black[2], session.userId),
-              },
-              msg_id: session.messageId,
-              timestamp: session.timestamp,
-            })
+            const md = `<@${session.userId}>正在捕捉宝可梦
+![img #512 #512](${await toUrl(ctx, session, src)})
+
+---
+
+- 当前的精灵球：${userArr[0].captureTimes}
+- [随机捕捉](mqqapi://aio/inlinecmd?command=${Math.floor(Math.random() * 3) + 1}&reply=false&enter=true)
+
+---
+**一周目时，传说中的宝可梦(神兽)是不会放进背包的哦**
+
+> tip:"⬛"的个数，表示的是宝可梦名字的长度
+`
+            await sendMarkdown(md, session, { keyboard: { content: catchbutton(black[0], black[1], black[2], session.userId), }, })
           } catch (e) {
             await session.send(`${h.image(src)}
 \n
@@ -781,7 +679,7 @@ ${(h('at', { id: (session.userId) }))}
               break;
             case '3':
               poke = pokeM[2]
-               break;
+              break;
             default:
               await ctx.database.set('pokebattle', { id: session.userId }, {
                 captureTimes: { $subtract: [{ $: 'captureTimes' }, catchCose] }
@@ -822,52 +720,19 @@ ${(h('at', { id: (session.userId) }))}
               await ctx.database.set('pokebattle', { id: session.userId }, {
                 captureTimes: { $subtract: [{ $: 'captureTimes' }, catchCose] }
               })
-              if (platform != 'qq' || !config.QQ官方使用MD)
-                return `${pokemonCal.pokemomPic(poke, false)}
-${h('at', { id: session.userId })}恭喜你收集到了传说宝可梦————${pokemonCal.pokemonlist(poke)}\r传说收集值+1，当前【${pokemonCal.pokemonlist(poke)}】收集值为${userArr[0].ultra[poke] * 10}%`
               try {
-                await session.bot.internal.sendMessage(session.channelId, {
-                  content: "111",
-                  msg_type: 2,
-                  markdown: {
-                    custom_template_id: config.MDid,
-                    params: [
-                      {
-                        key: config.key1,
-                        values: [`<@${session.userId}>收集度+10%`]
-                      },
-                      {
-                        key: config.key2,
-                        values: ["[img#512px #512px]"]
-                      },
-                      {
-                        key: config.key3,
-                        values: [await toUrl(ctx, session, `${(pokemonCal.pokemomPic(poke, false)).toString().match(/src="([^"]*)"/)[1]}`)]
-                      },
-                      {
-                        key: config.key5,
-                        values: [`恭喜你收集到了传说宝可梦——${pokemonCal.pokemonlist(poke)}`]
-                      },
-                      {
-                        key: config.key4,
-                        values: [`当前收集值${userArr[0].ultra[poke] * 10}%`]
-                      },
-                    ]
-                  },
-                  keyboard: {
-                    content: {
-                      "rows": [
-                        { "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },
-                      ]
-                    },
-                  },
-                  msg_id: session.messageId,
-                  timestamp: session.timestamp,
-                  msg_seq: Math.floor(Math.random() * 1000000),
-                })
+                const md = `<@${session.userId}>收集度+10%
+![img#512 #512](${await toUrl(ctx, session, `${(pokemonCal.pokemomPic(poke, false)).toString().match(/src="([^"]*)"/)[1]}`)})
+---
+![img#20 #20](${await toUrl(ctx, session, `${config.图片源}/sr/${poke.split('.')[0]}.png`)}) : ${userArr[0].ultra[poke] * 10}% ${'🟩'.repeat(Math.floor(userArr[0].ultra[poke] / 2)) + '🟨'.repeat(userArr[0].ultra[poke] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(userArr[0].ultra[poke] / 2))}
+                
+---
+**传说宝可梦——${pokemonCal.pokemonlist(poke)}**`
+                await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },] }, }, })
                 return
               } catch (e) {
-                return `网络繁忙，再试一次`
+                return `${pokemonCal.pokemomPic(poke, false)}
+                ${h('at', { id: session.userId })}恭喜你收集到了传说宝可梦————${pokemonCal.pokemonlist(poke)}\r传说收集值+1，当前【${pokemonCal.pokemonlist(poke)}】收集值为${userArr[0].ultra[poke] * 10}%`
               }
             }
             if (userArr[0].ultra[poke] >= 9) {
@@ -899,53 +764,13 @@ ${h('at', { id: session.userId })}恭喜你收集到了传说宝可梦———�
           const title: string = result ? `<@${session.userId}>成功捕捉了${pokemonCal.pokemonlist(poke)}` : `<@${session.userId}>被${pokemonCal.pokemonlist(poke)}打败了`
           const picture = userArr[0].monster_1 == '0' ? (pokemonCal.pokemomPic(poke, false)).toString().match(/src="([^"]*)"/)[1] : await getWildPic(ctx, log, userArr[0], poke)
           try {
-            await session.bot.internal.sendMessage(session.channelId, {
-              content: "111",
-              msg_type: 2,
-              markdown: {
-                custom_template_id: config.MDid,
-                params: [
-                  {
-                    key: config.key1,
-                    values: [title]
-                  },
-                  {
-                    key: config.key2,
-                    values: ["[img#512px #512px]"]
-                  },
-                  {
-                    key: config.key3,
-                    values: [await toUrl(ctx, session,picture)]
-                  },
-                  userArr[0].lapTwo ? {
-                    key: config.key4,
-                    values: ["你集齐了5只传说宝可梦\r据说多遇到几次就可以捕捉他们了"]
-                  } :
-                    {
-                      key: config.key4,
-                      values: ["tips: “大灾变” 事件后的宝可梦好像并不能进行战斗了"]
-                    },
-                  userArr[0].level > 99 ? {
-                    key: config.key5,
-                    values: [`满级后，无法获得经验\r金币+${getGold}`]
-                  } : {
-                    key: config.key5,
-                    values: [`你获得了${expGet}点经验值\rEXP:${pokemonCal.exp_bar(lvNew, expNew)}`]
-                  },
-                ]
-              },
-              keyboard: {
-                content: {
-                  "rows": [
-                    { "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },
-                    userArr[0].AllMonster.length === 5 ? { "buttons": [button(2, `背包已满，放生宝可梦`, "/放生", session.userId, "2")] } : null,
-                  ]
-                },
-              },
-              msg_id: session.messageId,
-              timestamp: session.timestamp,
-              msg_seq: Math.floor(Math.random() * 1000000),
-            })
+            const md = `${title}
+![img#512 #512](${await toUrl(ctx, session, picture)})
+
+---
+> ${userArr[0].lapTwo ? "你集齐了5只传说宝可梦\n据说多遇到几次就可以捕捉他们了" : "tips: “大灾变” 事件后的宝可梦好像并不能进行战斗了"}
+${userArr[0].level > 99 ? `满级后，无法获得经验\n金币+${getGold}` : `你获得了${expGet}点经验值\nEXP:${pokemonCal.exp_bar(lvNew, expNew)}`}`
+            await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] }, userArr[0].AllMonster.length === 5 ? { "buttons": [button(2, `背包已满，放生宝可梦`, "/放生", session.userId, "2")] } : null,] }, }, })
           } catch (e) {
             await session.send(`${h.image(picture)}
 ${result ? '恭喜你捕捉到了宝可梦！' : '很遗憾，宝可梦逃走了！'}
@@ -997,44 +822,23 @@ ${result ? '恭喜你捕捉到了宝可梦！' : '很遗憾，宝可梦逃走了
             const { src } = img.attrs
             //图片服务
             try {
-              await session.bot.internal.sendMessage(session.guildId, {
-                content: "111",
-                msg_type: 2,
-                markdown: {
-                  custom_template_id: config.MDid,
-                  params: [
-                    {
-                      key: config.key1,
-                      values: [`<@${session.userId}>的宝可梦背包已经满了`]
-                    },
-                    {
-                      key: config.key2,
-                      values: ["[img#512px #381px]"]
-                    },
-                    {
-                      key: config.key3,
-                      values: [await toUrl(ctx, session, src)]
-                    },
-                    {
-                      key: config.key4,
-                      values: [`<@${session.userId}>请你选择需要替换的宝可梦`]
-                    },
-                  ]
-                },
+              const md = `<@${session.userId}>的宝可梦背包已经满了
+![img#512 #381](${await toUrl(ctx, session, src)})
+---
+> **请你选择需要替换的宝可梦**`
+
+              const kb = {
                 keyboard: {
                   content: {
                     "rows": [
                       { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[0]), "1", session.userId, "1"), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[1]), "2", session.userId, "2")] },
                       { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[2]), "3", session.userId, "3"), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[3]), "4", session.userId, "4")] },
                       { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[4]), "5", session.userId, "5"), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[5]), "6", session.userId, "6")] },
-                      { "buttons": [button(0, '放生', "/放生", session.userId, "7")] },
-                    ]
+                      { "buttons": [button(0, '放生', "/放生", session.userId, "7")] },]
                   },
                 },
-                msg_id: session.messageId,
-                timestamp: session.timestamp,
-                msg_seq: Math.floor(Math.random() * 1000000),
-              })
+              }
+              await sendMarkdown(md, session,kb)
             } catch (e) {
               await session.send(`\n
 你的背包中已经有6只原生宝可梦啦
@@ -1120,44 +924,21 @@ ${(h('at', { id: (session.userId) }))}
         const { src } = image.attrs
         //图片服务
         try {
-          await session.bot.internal.sendMessage(session.guildId, {
-            content: "111",
-            msg_type: 2,
-            markdown: {
-              custom_template_id: config.MDid,
-              params: [
-                {
-                  key: config.key1,
-                  values: [`请<@${session.userId}>选择两个宝可梦`]
-                },
-                {
-                  key: config.key2,
-                  values: ["[img#512px #381px]"]
-                },
-                {
-                  key: config.key3,
-                  values: [await toUrl(ctx, session, src)]
-                },
-                {
-                  key: config.key10,
-                  values: [`如果无法使用按钮可以\r点击👉[这里]\t(mqqapi://aio/inlinecmd?command=&reply=true&enter=false)👈后\r输入@麦麦子MaiBot 编号 编号，注意编号之间有空格，发送即可`]
-                },
+          const md=`# <@${session.userId}>选择两只宝可梦
+![img#512 #381](${await toUrl(ctx, session, src)})
+---
+> 听说相同宝可梦也可以杂交，似乎就是会出现基因缺陷`
+          const kb={ keyboard: {
+            content: {
+              "rows": [
+                { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[0]), `1`, session.userId, '1'), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[1]), `2`, session.userId, '2')] },
+                { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[2]), `3`, session.userId, '3'), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[3]), `4`, session.userId, '4')] },
+                { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[4]), `5`, session.userId, '5'), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[5]), `6`, session.userId, '6')] },
+
               ]
             },
-            keyboard: {
-              content: {
-                "rows": [
-                  { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[0]), `1`, session.userId, '1'), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[1]), `2`, session.userId, '2')] },
-                  { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[2]), `3`, session.userId, '3'), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[3]), `4`, session.userId, '4')] },
-                  { "buttons": [button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[4]), `5`, session.userId, '5'), button(0, pokemonCal.pokemonlist(userArr[0].AllMonster[5]), `6`, session.userId, '6')] },
-
-                ]
-              },
-            },
-            msg_id: session.messageId,
-            timestamp: session.timestamp,
-            msg_seq: Math.floor(Math.random() * 10000)
-          })
+          },}
+          await sendMarkdown(md, session,kb)
         } catch (e) {
           await session.send(`\n${image}
 回复【编号】 【编号】进行杂交
@@ -1437,7 +1218,7 @@ ${(h('at', { id: (session.userId) }))}`
           ctx.font = 'normal 25px zpix'
           ctx.fillText('：' + infoId, 61, 72)
 
-          ctx.fillText('：' + (vip ?'👑':'') + infoName, 86, 122)
+          ctx.fillText('：' + (vip ? '👑' : '') + infoName, 86, 122)
           ctx.fillText('：' + userArr[0].gold, 137, 168)
           ctx.fillText('：' + userArr[0].captureTimes, 137, 218)
           ctx.fillText('：' + userArr[0].coin, 137, 263)
@@ -1456,84 +1237,18 @@ ${(h('at', { id: (session.userId) }))}`
         const { src } = infoImgSelfClassic.attrs
         //图片服务
         try {
-          await session.bot.internal.sendMessage(session.guildId, {
-            content: "111",
-            msg_type: 2,
-            markdown: {
-              custom_template_id: config.MDid,
-              params: [
-                {
-                  key: config.key1,
-                  values: [`<@${userId}>的训练师卡片`]
-                },
-                {
-                  key: config.key2,
-                  values: ["[img#485px #703px]"]
-                },
-                {
-                  key: config.key3,
-                  values: [await toUrl(ctx, session, src)]
-                },
-                // {
-                //   key: config.key4,
-                //   values: [`当前体力：${userArr[0].battleToTrainer}`]
-                // },
-                {
-                  key: config.key5,
-                  values: [`宝可梦属性：${getType(userArr[0].monster_1).join(' ')}`]
-                },
-                {
-                  key: config.key6,
-                  values: [`你今天的金币获取上限剩余${playerLimit.resource.goldLimit}`]
-                },
-                {
-                  key: config.key10,
-                  values: [`邀请麦麦子到其他群做客\r就可以增加3w金币获取上限哦~\rヾ(≧▽≦*)o`]
-                },
-              ]
-            },
-            keyboard: {
-              content: {
-                "rows": [
-                  {
-                    "buttons": [
-                      button(2, "🖊签到", "/签到", session.userId, "1"),
-                      button(2, "💳查看", "/查看信息", session.userId, "2"),
-                      button(2, "🔖帮助", "/宝可梦", session.userId, "3"),
-                      button(2, "🔈公告", "/notice", session.userId, "ntc"),
-                    ]
-                  },
-                  {
-                    "buttons": [
-                      button(2, "⚔️对战", "/对战", session.userId, "4"),
-                      button(2, "♂杂交", "/杂交宝可梦", session.userId, "5"),
-                      button(2, "👐放生", "/放生", session.userId, "6"),
-                      button(2, "💻接收", "/接收", session.userId, "p", false),
-                    ]
-                  },
-                  {
-                    "buttons": [
-                      button(2, "📷捕捉", "/捕捉宝可梦", session.userId, "7"),
-                      button(2, "📕属性", "/属性", session.userId, "8"),
-                      button(2, "🛒商店", "/购买", session.userId, "9"),
-                      button(2, "🏆兑换", "/使用", session.userId, "x", false),
-                    ]
-                  },
-                  {
-                    "buttons": [
-                      urlbutton(2, "反馈", "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=CEqeK9q1yilezUrsSX9L3kO0hK5Wpi_7&authKey=SBuSSQtld6nFctvq9d4Xm1lW%2B0C3QuFZ6FLhCJk8ELCbtOqiR4drHcrbfRLVmcvz&noverify=0&group_code=836655539", session.userId, "10"),
-                      urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),
-                      button(2, "📃问答", "/宝可问答", session.userId, "12"),
-                      button(2, "VIP", '/vip查询', session.userId, "VIP"),
-                    ]
-                  },
-                  config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
-                ]
-              },
-            },
-            msg_id: session.messageId,
-            timestamp: session.timestamp,
-          })
+          const md = `# <@${userId}>的训练师卡片
+![img#485 #703](${await toUrl(ctx, session, src)})
+
+---
+
+- 金币获取剩余：${playerLimit.resource.goldLimit}
+- 宝可梦属性：${getType(userArr[0].monster_1).join(' ')}
+
+---
+
+> *邀请麦麦子到其他群做客可以增加3w获取上限哦~o(*////▽////*)q`
+          await sendMarkdown(md, session,normalKb(session,userArr as Pokebattle[]))
         } catch (e) {
           return `${h.image(src)}
 ${(h('at', { id: (session.userId) }))}`
@@ -1550,14 +1265,14 @@ ${(h('at', { id: (session.userId) }))}`
     })
 
 
+
+    //md重构checkPoint
   ctx.command('宝可梦').subcommand('放生 <pokemon>', '放生宝可梦')
     .action(async ({ session }, pokemon: string) => {
       let choose: string
       const userArr = await ctx.database.get('pokebattle', { id: session.userId })
       const vip = isVip(userArr[0])
       const vipReward = vip ? 1.5 : 1
-      const vipRGold = vip ? 3000 : 0
-      const vipName = vip ? "[💎VIP]" : ''
       if (userArr.length == 0) {
         try {
           await session.execute(`签到`)
@@ -1741,61 +1456,61 @@ ${(h('at', { id: (session.userId) }))}
       if (userArr[0].base[0]) {
         toDo = `\r能力值：\r生命：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[0]}\r攻击：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[1]}\r防御：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[2]}\r特攻：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[3]}\r特防：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[4]}\r速度：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[5]}`
       }
-        try {
-          const src = await toUrl(ctx, session, `${config.图片源}/fusion/${img.split('.')[0]}/${img}.png`)
-          await session.bot.internal.sendMessage(session.guildId, {
-            content: "111",
-            msg_type: 2,
-            markdown: {
-              custom_template_id: config.MDid,
-              params: [
-                {
-                  key: config.key1,
-                  values: [`${userArr[0].battlename}的属性`]
-                },
-                {
-                  key: config.key2,
-                  values: ["[img#512 #512]"]
-                },
-                {
-                  key: config.key3,
-                  values: [src]
-                },
-                {
-                  key: config.key4,
-                  values: [`${(toDo)}`]
-                },
-                {
-                  key: config.key5,
-                  values: [`宝可梦属性：${getType(userArr[0].monster_1).join(' ')}`]
-                },
-                {
-                  key: config.key10,
-                  values: [`父本：${pokemonCal.pokemonlist(fath)}\r母本：${pokemonCal.pokemonlist(math)}`]
-                }
+      try {
+        const src = await toUrl(ctx, session, `${config.图片源}/fusion/${img.split('.')[0]}/${img}.png`)
+        await session.bot.internal.sendMessage(session.guildId, {
+          content: "111",
+          msg_type: 2,
+          markdown: {
+            custom_template_id: config.MDid,
+            params: [
+              {
+                key: config.key1,
+                values: [`${userArr[0].battlename}的属性`]
+              },
+              {
+                key: config.key2,
+                values: ["[img#512 #512]"]
+              },
+              {
+                key: config.key3,
+                values: [src]
+              },
+              {
+                key: config.key4,
+                values: [`${(toDo)}`]
+              },
+              {
+                key: config.key5,
+                values: [`宝可梦属性：${getType(userArr[0].monster_1).join(' ')}`]
+              },
+              {
+                key: config.key10,
+                values: [`父本：${pokemonCal.pokemonlist(fath)}\r母本：${pokemonCal.pokemonlist(math)}`]
+              }
+            ]
+          },
+          keyboard: {
+            content: {
+              "rows": [
+                { "buttons": [button(0, "♂ 杂交宝可梦", "/杂交宝可梦", session.userId, "1"), button(0, "📷 捕捉宝可梦", "/捕捉宝可梦", session.userId, "2")] },
+                { "buttons": [button(0, "💳 查看信息", "/查看信息", session.userId, "3"), button(0, "⚔️ 对战", "/对战", session.userId, "4")] },
               ]
             },
-            keyboard: {
-              content: {
-                "rows": [
-                  { "buttons": [button(0, "♂ 杂交宝可梦", "/杂交宝可梦", session.userId, "1"), button(0, "📷 捕捉宝可梦", "/捕捉宝可梦", session.userId, "2")] },
-                  { "buttons": [button(0, "💳 查看信息", "/查看信息", session.userId, "3"), button(0, "⚔️ 对战", "/对战", session.userId, "4")] },
-                ]
-              },
-            },
-            msg_id: session.messageId,
-            timestamp: session.timestamp,
-            msg_seq: 5145
-          })
-        } catch (e) {
-return `\u200b
+          },
+          msg_id: session.messageId,
+          timestamp: session.timestamp,
+          msg_seq: 5145
+        })
+      } catch (e) {
+        return `\u200b
 ============
 ${userArr[0].battlename}
 ${(toDo)}
 ============
 tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
       `
-        }
+      }
     })
 
 
@@ -2175,7 +1890,7 @@ ${skilllist.join('\n')}
           timestamp: session.timestamp,
           msg_seq: Math.floor(Math.random() * 1000000),
         })
-      } catch(e){
+      } catch (e) {
         await session.send(`${trainerImg}
 恭喜你获得了训练师
 请输入新训练师的名字:________`)

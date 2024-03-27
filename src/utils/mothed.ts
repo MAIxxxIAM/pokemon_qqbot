@@ -1,15 +1,15 @@
 import { resolve } from 'path'
-import { Pokebattle,logger,config,shop,testcanvas,Config } from '..'
-import { type,battleType} from './data'
+import { Pokebattle, logger, config, shop, testcanvas, Config } from '..'
+import { type, battleType } from './data'
 import { Context, Session } from 'koishi'
 import { WildPokemon } from '../battle'
 
 
-export async function isResourceLimit (userId:string,ctx:Context) {
-  const resources = await ctx.database.get('pokemon.resourceLimit',{id:userId})
+export async function isResourceLimit(userId: string, ctx: Context) {
+  const resources = await ctx.database.get('pokemon.resourceLimit', { id: userId })
   if (resources.length == 0) {
-   return await ctx.database.create('pokemon.resourceLimit',{id:userId})
-  }else{
+    return await ctx.database.create('pokemon.resourceLimit', { id: userId })
+  } else {
     return resources[0]
   }
 }
@@ -17,7 +17,7 @@ export async function isResourceLimit (userId:string,ctx:Context) {
 export async function getPic(ctx, log, user, tar) {
   try {
     let att: Pokebattle, def: Pokebattle
-    if (Number(user.power[5]) >Number( tar.power[5])) { att = user; def = tar } else { att = tar; def = user }
+    if (Number(user.power[5]) > Number(tar.power[5])) { att = user; def = tar } else { att = tar; def = user }
     const attPerson = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/trainer/${att.trainer[0]}.png`)}`)
     const defPerson = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/trainer/${def.trainer[0]}.png`)}`)
     const attPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${att.monster_1.split('.')[0]}/${att.monster_1}.png`)
@@ -57,21 +57,21 @@ export async function getPic(ctx, log, user, tar) {
   }
 }
 
-export async function sendMsg(session){
+export async function sendMsg(session) {
   return await session.bot.internal.sendMessage(session.channelId, {
     content: "111",
     msg_type: 0,
-    msg_id:'0',
+    msg_id: '0',
   })
 }
 
-export function getMarkdownParams(markdown:string){
+export function getMarkdownParams(markdown: string) {
   markdown = markdown.replace(/[\n\r]/g, '\\r')
   markdown = markdown.replace(/"/g, '\\"')
   try {
-  markdown = JSON.parse(`"${markdown}"`)
+    markdown = JSON.parse(`"${markdown}"`)
   } catch (error) {
-  return '解析失败'
+    return '解析失败'
   }
   markdown = markdown.replace(/\n/g, '\r')
   markdown = markdown.replace(/^# /g, '#§ ')
@@ -87,10 +87,10 @@ export function getMarkdownParams(markdown:string){
   markdown = markdown.replace(/\*([^§]+?)(?=\*)/g, '*$1§')
   markdown = markdown.replace(/`([^§]+?)(?=`)/g, '`$1§')
   const params = markdown.split('§')
-return Array(100).fill(null).map((_, index) => ({ key: `text${index + 1}`, values: [params[index] ?? ' '] }))
+  return Array(100).fill(null).map((_, index) => ({ key: `text${index + 1}`, values: [params[index] ?? ' '] }))
 }
 
-export async function getWildPic(ctx, log:string, user:Pokebattle, tar:string) {
+export async function getWildPic(ctx, log: string, user: Pokebattle, tar: string) {
   try {
     let player: Pokebattle, wild: string
     player = user
@@ -152,51 +152,113 @@ export function moveToFirst(array: any[], element: any) {
   }
   return array
 }
-export async function toUrl(ctx,session,img) {
+
+export function normalKb(session: Session, userArr: Pokebattle[]){
+  return {
+    keyboard: {
+      content: {
+        "rows": [
+          {
+            "buttons": [
+              button(2, "🖊签到", "/签到", session.userId, "1"),
+              button(2, "💳查看", "/查看信息", session.userId, "2"),
+              button(2, "🔖帮助", "/宝可梦", session.userId, "3"),
+              button(2, "🔈公告", "/notice", session.userId, "ntc"),
+            ]
+          },
+          {
+            "buttons": [
+              button(2, "⚔️对战", "/对战", session.userId, "4"),
+              button(2, "♂杂交", "/杂交宝可梦", session.userId, "5"),
+              button(2, "👐放生", "/放生", session.userId, "6"),
+              button(2, "💻接收", "/接收", session.userId, "p", false),
+            ]
+          },
+          {
+            "buttons": [
+              button(2, "📷捕捉", "/捕捉宝可梦", session.userId, "7"),
+              button(2, "📕属性", "/属性", session.userId, "8"),
+              button(2, "🛒商店", "/购买", session.userId, "9"),
+              button(2, "🏆兑换", "/使用", session.userId, "x", false),
+            ]
+          },
+          {
+            "buttons": [
+              urlbutton(2, "反馈", "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=CEqeK9q1yilezUrsSX9L3kO0hK5Wpi_7&authKey=SBuSSQtld6nFctvq9d4Xm1lW%2B0C3QuFZ6FLhCJk8ELCbtOqiR4drHcrbfRLVmcvz&noverify=0&group_code=836655539", session.userId, "10"),
+              urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),
+              button(2, "📃问答", "/宝可问答", session.userId, "12"),
+              button(2, "VIP", '/vip查询', session.userId, "VIP"),
+            ]
+          },
+          config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
+        ]
+      },
+    },
+  }
+}
+
+
+export async function sendMarkdown(a: string, session: Session, button = null) {
+  const b = getMarkdownParams(a)
+  await session.bot.internal.sendMessage(session.guildId, Object.assign({
+    content: "111",
+    msg_type: 2,
+    markdown: {
+      custom_template_id: '102072441_1711377105',
+      params: b
+    },
+    msg_id: session.messageId,
+    timestamp: session.timestamp,
+    msg_seq: Math.floor(Math.random() * 1000000),
+  }, button))
+}
+
+export async function toUrl(ctx, session, img) {
   // if(ctx.get('server.temp')?.upload){
   //   const url = await ctx.get('server.temp').upload(img)
   //   return url.replace(/_/g, "%5F")
   // }
   // const { url } = await ctx.get('server.temp').create(img)
   // return url
-  try{
-    let a = await session.bot.internal.sendFileGuild(session.channelId,{
-    file_type: 1,
-    file_data:Buffer.from((await ctx.http.file(img)).data).toString('base64'),
-    srv_send_msg:false
-  })
-  const url=`http://multimedia.nt.qq.com/download?appid=1407&fileid=${a.file_uuid.replace(/_/g, "%5F")}&rkey=CAQSKAB6JWENi5LMtWVWVxS2RfZbDwvOdlkneNX9iQFbjGK7q7lbRPyD1v0&spec=0`
-  return url
-}catch(e){
-  if(ctx.get('server.temp')?.upload){
-    const url = await ctx.get('server.temp').upload(img)
-    return url.replace(/_/g, "%5F")
+  try {
+    let a = await session.bot.internal.sendFileGuild(session.channelId, {
+      file_type: 1,
+      file_data: Buffer.from((await ctx.http.file(img)).data).toString('base64'),
+      srv_send_msg: false
+    })
+    const url = `http://multimedia.nt.qq.com/download?appid=1407&fileid=${a.file_uuid.replace(/_/g, "%5F")}&rkey=CAQSKAB6JWENi5LMtWVWVxS2RfZbDwvOdlkneNX9iQFbjGK7q7lbRPyD1v0&spec=0`
+    return url
+  } catch (e) {
+    if (ctx.get('server.temp')?.upload) {
+      const url = await ctx.get('server.temp').upload(img)
+      return url.replace(/_/g, "%5F")
+    }
+    const { url } = await ctx.get('server.temp').create(img)
+    return url
   }
-  const { url } = await ctx.get('server.temp').create(img)
-  return url
 }
-}
-export function typeEffect(a:string,b:string,skillType:string){
-  const [a1,a2] = getType(a)
-  const [b1,b2] = getType(b)
-  const effect  = battleType.data[skillType][b1]*battleType.data[skillType][b2]*([a1,a2].includes(skillType)?1.5:1)
-return effect
+export function typeEffect(a: string, b: string, skillType: string) {
+  const [a1, a2] = getType(a)
+  const [b1, b2] = getType(b)
+  const effect = battleType.data[skillType][b1] * battleType.data[skillType][b2] * ([a1, a2].includes(skillType) ? 1.5 : 1)
+  return effect
 
 }
 
-export function isVip(a: Pokebattle):boolean {
+export function isVip(a: Pokebattle): boolean {
   return a?.vip > 0
 }
 
-export function getType(a:string){
-  try{const pokemon = a.split('.')
-  const [p_f,p_m] = pokemon
-  const type1 = type[Number(p_f)-1].type.split(':')[0]
-  let type2 = type[Number(p_m)-1].type.split(':')[1]
-  type2==''?type2= type[Number(p_m)-1].type.split(':')[0]:type2
-  if (type1==type2){type2=''}
-  return [type1,type2]
-}catch(e){return ['','']}
+export function getType(a: string) {
+  try {
+    const pokemon = a.split('.')
+    const [p_f, p_m] = pokemon
+    const type1 = type[Number(p_f) - 1].type.split(':')[0]
+    let type2 = type[Number(p_m) - 1].type.split(':')[1]
+    type2 == '' ? type2 = type[Number(p_m) - 1].type.split(':')[0] : type2
+    if (type1 == type2) { type2 = '' }
+    return [type1, type2]
+  } catch (e) { return ['', ''] }
 }
 
 export function catchbutton(a: string, b: string, c: string, d: string) {
