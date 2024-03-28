@@ -144,16 +144,17 @@ const pokemonCal = {
   },
 
   skillbag(a: string[]) {
+   const b=a.map(Number).sort((a, b) => a - b)
     let skill = []
-    for (let i = 0; i < a.length; i++) {
-      skill.push(skillMachine.skill[Number(a[i])].skill)
+    for (let i = 0; i < b.length; i++) {
+      skill.push(skillMachine.skill[b[i]].skill)
       if ((i + 1) % 5 === 0 && i !== 0) {
         skill.splice(i, 1, skill[i] + '💿\n')
       } else {
         skill.splice(i, 1, skill[i] + '💿')
       }
     }
-    return skill.join('')
+    return skill.join('\n')
   },
 
   findskillId(a: string) {
