@@ -1,7 +1,7 @@
 import { Context, Schema } from 'koishi'
 
 import { Pokebattle, config, Config } from '../index';
-import { button, getMarkdownParams, toUrl } from '../utils/mothed';
+import { button, getChance, getMarkdownParams, sendMarkdown, toUrl } from '../utils/mothed';
 import pokemonCal from '../utils/pokemon';
 
 export const name = 'lapTwo'
@@ -19,8 +19,102 @@ export function apply(ctx: Context) {
       type: 'json',
       initial: {},
       nullable: false,
+    },
+    advanceChance: {
+      type: 'boolean',
+      initial: false,
+      nullable: false,
+    },
+    lap: {
+      type: 'unsigned',
+      initial: 1,
+      nullable: false,
     }
   })
+
+  ctx.command('宝可梦').subcommand('getchance','领取下一周目资格').action(async ({ session }) => {
+    const [player]=await ctx.database.get('pokebattle',session.userId)
+    const chance=getChance(player)
+    if(chance){
+      await ctx.database.set('pokebattle',session.userId,{
+        advanceChance:true
+      })
+      return `领取成功,在三周目开启后，即可通过相应指令进入，当前状态：未开启`
+    }
+    return `条件不满足`
+  })
+
+  ctx.command('宝可梦').subcommand('刷新字段',{authority: 4}).action(async () => {
+    await ctx.database.set('pokebattle', {lapTwo:true},{
+      lap:2
+    })
+    return '刷新成功'
+  })
+  ctx.command('宝可梦').subcommand('lapnext', '进入下一周目', { authority: 4 })
+    .alias('下周目').action(async ({ session }) => {
+      const { userId } = session
+      const [user] = await ctx.database.get('pokebattle', userId)
+      if (!user) {
+        await session.execute('签到')
+        return
+      }
+      const advanceChance = user.advanceChance
+      if (!user.lapTwo) {
+        await session.execute('lapTwo')
+        return
+      }
+      if (!advanceChance) {
+        await session.execute('宝可梦.getchance')
+        return
+      }
+      try {
+        const md = `<@${userId}> 是否进入下一周目
+
+---
+- 进入下一周目,你的等级将会清空
+- 但是你的宝可梦将会保留
+- 将会开启420只除神兽外的宝可梦捕捉
+
+---
+- **如果你的金币大于300万，将会只保留300万金币**`
+        const kb = {
+          keyboard: {
+            content: {
+              "rows": [
+                { "buttons": [button(0, "✔️Yes", `Y`, userId, "1"), button(2, "❌No", "N", userId, "2")] },
+              ]
+            },
+          },
+        }
+        await sendMarkdown(md, session, kb)
+      } catch {
+        await session.send(`\u200b是否进入下一周目
+进入下一周目,你的等级将会清空
+但是你的宝可梦将会保留
+将会开启420只除神兽外的宝可梦捕捉
+如果你的金币大于300万，将会只保留300万金币
+请输入Y/N`)
+      }
+      const inThree = await session.prompt(config.捕捉等待时间)
+      switch (inThree.toLowerCase()) {
+        case 'y':
+          await ctx.database.set('pokebattle', userId, {
+            lap: 3,
+            level: 5,
+            exp: 0,
+            gold: user.gold >= 3000000 ? 3000000 : user.gold,
+            base: pokemonCal.pokeBase(user.monster_1),
+            power: pokemonCal.power(user.base, 5),
+            advanceChance: false,
+          })
+          return `你成功进入了三周目`
+        case 'n':
+          return `你取消了操作`
+        default:
+          return `输入错误`
+      }
+
+    })
 
   ctx.command('宝可梦').subcommand('lapTwo', '进入二周目')
     .action(async ({ session }) => {
@@ -80,17 +174,18 @@ export function apply(ctx: Context) {
       }
 
       const inTwo = await session.prompt(config.捕捉等待时间)
-      switch (inTwo) {
-        case 'Y' || 'y':
+      switch (inTwo.toLowerCase()) {
+        case 'y':
           await ctx.database.set('pokebattle', userId, {
             lapTwo: true,
+            lap: 2,
             level: 5,
             exp: 0,
             base: pokemonCal.pokeBase(user.monster_1),
             power: pokemonCal.power(user.base, 5),
           })
           return `你成功进入了二周目`
-        case 'N' || 'n':
+        case 'n':
           return `你取消了操作`
         default:
           return `输入错误`
@@ -113,8 +208,8 @@ export function apply(ctx: Context) {
 ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(ultra[poke] / 2)) + '🟨'.repeat(ultra[poke] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(ultra[poke] / 2))}`)
         mdStr.push(`![${pokemonCal.pokemonlist(poke)}#40 #40](${img}) : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(ultra[poke] / 2)) + '🟨'.repeat(ultra[poke] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(ultra[poke] / 2))}`)
       }
-      const md= mdStr.join('\n')
-      const b =getMarkdownParams(md)
+      const md = mdStr.join('\n')
+      const b = getMarkdownParams(md)
       if (!ultra) return `你还没有进入二周目`
       if (mdStr.length == 0) return `你还没有收集到传说中的宝可梦`
 
@@ -123,9 +218,9 @@ ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(u
           content: "111",
           msg_type: 2,
           markdown: {
-              custom_template_id:'102072441_1711377105',
-              params:b
-            },
+            custom_template_id: '102072441_1711377105',
+            params: b
+          },
           keyboard: {
             content: {
               "rows": [

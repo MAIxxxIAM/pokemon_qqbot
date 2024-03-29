@@ -143,6 +143,8 @@ export interface Pokebattle {
     trainerNum?: number
     trainerName?: string[]
     lapTwo?: boolean
+    advanceChance?: boolean
+    lap?: number
     ultra?: object
 }
 

@@ -245,6 +245,13 @@ export function typeEffect(a: string, b: string, skillType: string) {
 
 }
 
+export function getChance(player:Pokebattle){
+  if(player.lap==3||player.advanceChance) return false
+  const flatArrayA = [].concat(...player?.pokedex?.dex)
+  const flatArray = [...new Set(flatArrayA)]
+  return flatArray.length==251
+}
+
 export function isVip(a: Pokebattle): boolean {
   return a?.vip > 0
 }

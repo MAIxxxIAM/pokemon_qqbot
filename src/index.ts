@@ -2,7 +2,7 @@ import { Schema, h, $, Context, is, Session } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
-import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb } from './utils/mothed'
+import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb,  getChance } from './utils/mothed'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import * as fs from 'fs'
@@ -155,7 +155,7 @@ export async function apply(ctx, conf: Config) {
       session.event.message.elements = a
     })
   }
-  ctx.on('before-send', async (session: Session) => {
+  ctx.on('before-send', async (session: Session,msg_id) => {
     const { message } = session.event
     if (session.scope !== 'commands.help.messages' || session.platform !== 'qq') { return }
     let content = message.elements[0].attrs.content.split('\n')
@@ -178,10 +178,9 @@ export async function apply(ctx, conf: Config) {
 
 > 点击即可发送指令`
     const b = getMarkdownParams(mdparam)
-    const userArr = await ctx.database.get('pokebattle', { id: session.userId })
     try {
-      const a = await sendMsg(session)
-      const { id } = a
+      // const a = await sendMsg(session)
+      const id  = msg_id.session.event._data.d.id
       await session.bot.internal.sendMessage(session.channelId, {
         content: "111",
         msg_type: 2,
@@ -317,7 +316,8 @@ export async function apply(ctx, conf: Config) {
     }
   ]
 
-  const banID = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245']
+  const banID = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245','378.378','379.379','340.340','341.341','342.342','381.381','380.380','343.343','344.344','345.345','346.346','347.347','315.315','349.349','348.348','350.350','351.351']
+  const lapThree=['378.378','379.379','340.340','341.341','342.342','381.381','380.380','343.343','344.344','345.345','346.346','347.347','315.315','349.349','348.348','350.350','351.351']
 
   ctx.plugin(lapTwo)
 
@@ -349,6 +349,8 @@ export async function apply(ctx, conf: Config) {
               })
             }
           }
+          
+          const chance=getChance(userArr[0])
           let expGet: number
           if (userArr[0].monster_1 == '0') {
             //更改
@@ -450,6 +452,10 @@ export async function apply(ctx, conf: Config) {
 
 ---
 每人都有一次初始改名机会 [改名](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/改名`)}&reply=false&enter=true)
+
+${chance?`你当前可以领取三周目资格
+
+[领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)`:' '} 
 `
             const b = getMarkdownParams(md)
             await session.bot.internal.sendMessage(session.guildId, {
@@ -583,10 +589,12 @@ export async function apply(ctx, conf: Config) {
         if (userArr[0].captureTimes > 0) {
 
           for (let i = 0; i < 3; i++) {
-            grassMonster[i] = pokemonCal.mathRandomInt(1, userArr[0].lapTwo ? 251 : 151)
-            while (banID.includes(`${grassMonster[i]}.${grassMonster[i]}`) && (userArr[0].lapTwo ? Math.random() > userArr[0].level / 100 : false)) {
-              grassMonster[i] = pokemonCal.mathRandomInt(1, userArr[0].lapTwo ? 251 : 151);
+            grassMonster[i] = pokemonCal.mathRandomInt(1, (userArr[0].lap==3)?420:(userArr[0].lapTwo) ? 251 : 151)
+            while(lapThree.includes(`${grassMonster[i]}.${grassMonster[i]}`)){
+              while (banID.includes(`${grassMonster[i]}.${grassMonster[i]}`) && (userArr[0].lapTwo ? Math.random() > userArr[0].level / 100 : false)) {
+              grassMonster[i] = pokemonCal.mathRandomInt(1, (userArr[0].lap==3)?420:(userArr[0].lapTwo) ? 251 : 151);
             }
+          }
             pokeM[i] = grassMonster[i] + '.' + grassMonster[i]
             for (let j = 0; j < pokemonCal.pokemonlist(pokeM[i]).length; j++) {
               black[i] = black[i] + ('⬛')
@@ -711,6 +719,19 @@ ${(h('at', { id: (session.userId) }))}
             if (userArr[0].ultra?.[poke] < 9 || !userArr[0].ultra?.[poke]) {
               if (userArr[0]?.ultra[poke] === undefined) {
                 userArr[0].ultra[poke] = 0
+              }
+              const catchResults = catchPokemon(userArr[0], poke)
+              let result = catchResults[1] as boolean
+              if (!result) {
+                const log = catchResults[0] as string
+                const img=await getWildPic(ctx, log, userArr[0], poke)
+                const md =`${pokemonCal.pokemonlist(poke)}将你打败了
+![img#512 #512](${await toUrl(ctx, session, img)})
+
+---
+> <@${session.userId}>再接再厉`
+                await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },] }, }, })
+                return
               }
               userArr[0].ultra[poke] = userArr[0]?.ultra[poke] + 1
               await ctx.database.set('pokebattle', { id: session.userId }, {
@@ -1209,6 +1230,7 @@ ${(h('at', { id: (session.userId) }))}`
         const { src } = infoImgSelfClassic.attrs
         //图片服务
         try {
+          const chance=getChance(userArr[0])
           const md = `# <@${userId}>的训练师卡片
 ![img#485 #703](${await toUrl(ctx, session, src)})
 
@@ -1218,6 +1240,9 @@ ${(h('at', { id: (session.userId) }))}`
 - 宝可梦属性：${getType(userArr[0].monster_1).join(' ')}
 
 ---
+${chance?`你当前可以领取三周目资格
+
+[领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)`:' '} 
 
 > *邀请麦麦子到其他群做客可以增加3w获取上限哦~o(*////▽////*)q`
           await sendMarkdown(md, session, normalKb(session, userArr as Pokebattle[]))
@@ -1626,7 +1651,7 @@ ${jli}`}
       await ctx.database.set('pokebattle', { id: session.userId }, {
         skillbag: userArr[0].skillbag
       })
-      const point = '```'
+try{      const point = '```'
       const md =`# <@${session.userId}> 扭蛋结果
 你抽取了${count}个技能
 重复技能将被换成金币
@@ -1642,7 +1667,9 @@ ${point}
 ---
 > 点击后输入数字
 即可连续抽取技能👉 [技能扭蛋机](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/技能扭蛋机`)}&reply=false&enter=false)`
-      await sendMarkdown(md, session)
+      await sendMarkdown(md, session)}catch{
+        await session.send(`你抽取了${count}个技能\n重复技能将被换成金币\n${skilllist.join('\n')}\n金币+${getgold}`)
+      }
     })
 
 

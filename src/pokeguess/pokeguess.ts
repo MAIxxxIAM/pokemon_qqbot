@@ -18,7 +18,7 @@ export class PokeGuess implements IPokeGuess {
         let m=[]
         let randomNumber: number
         while (n.length < 4) {
-                randomNumber = Math.floor(Math.random() * 251) + 1;
+                randomNumber = Math.floor(Math.random() * 420) + 1;
             const randomPokemon = randomNumber + '.' + randomNumber
             if (n.indexOf(randomPokemon) === -1) {
                 n.push(randomPokemon);
@@ -29,7 +29,7 @@ export class PokeGuess implements IPokeGuess {
         this.which = randomIndex
         this.name = m
         this.options = n
-        this.other = (Math.floor(Math.random() * 251) + 1)+'.'+ n[randomIndex].split('.')[0] 
+        this.other = (Math.floor(Math.random() * 420) + 1)+'.'+ n[randomIndex].split('.')[0] 
     }
     async q(ctx) {
         const { options, which ,other} = this
