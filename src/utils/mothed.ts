@@ -246,8 +246,8 @@ export function typeEffect(a: string, b: string, skillType: string) {
 }
 
 export function getChance(player:Pokebattle){
-  if(player.lap==3||player.advanceChance) return false
-  const flatArrayA = [].concat(...player?.pokedex?.dex)
+  if(player.lap==3||player.advanceChance||!player?.pokedex?.dex) return false
+  const flatArrayA = [].concat(...player.pokedex.dex)
   const flatArray = [...new Set(flatArrayA)]
   return flatArray.length==251
 }

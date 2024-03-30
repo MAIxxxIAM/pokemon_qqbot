@@ -174,7 +174,7 @@ export function apply(ctx: Context) {
       }
 
       const inTwo = await session.prompt(config.捕捉等待时间)
-      switch (inTwo.toLowerCase()) {
+      switch (inTwo?.toLowerCase()) {
         case 'y':
           await ctx.database.set('pokebattle', userId, {
             lapTwo: true,
