@@ -1692,7 +1692,11 @@ ${point}
 ${point}
 ${bag}
 ${point}`
-      await sendMarkdown(md, session)
+      try{await sendMarkdown(md, session)}catch{
+        return `\u200b
+你当前的技能：
+${bag.replace(/\n/g, '||')}`
+      }
     })
 
 
