@@ -1353,7 +1353,7 @@ ${(h('at', { id: (session.userId) }))}`
 ![img#512 #512](${await toUrl(ctx, session, src)})
 
 ---
-**Lv.${lvNew}**${(pokemonCal.exp_bar(lvNew, expNew))}
+》 **Lv.${lvNew}**${(pokemonCal.exp_bar(lvNew, expNew))}
 
 ---
 > ${userArr[0].level > 99 ? `金币+${getGold}` : `经验+${expGet}`}`
