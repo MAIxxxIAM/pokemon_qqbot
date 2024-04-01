@@ -3,6 +3,7 @@ import { Context, Schema } from 'koishi'
 import { Pokebattle, config, Config } from '../index';
 import { button, getChance, getMarkdownParams, sendMarkdown, toUrl } from '../utils/mothed';
 import pokemonCal from '../utils/pokemon';
+import { Resource } from '../model';
 
 export const name = 'lapTwo'
 
@@ -32,16 +33,25 @@ export function apply(ctx: Context) {
     }
   })
 
-  ctx.command('宝可梦').subcommand('getchance','领取下一周目资格').action(async ({ session }) => {
+  ctx.command('宝可梦').subcommand('getChance','领取下一周目资格').action(async ({ session }) => {
     const [player]=await ctx.database.get('pokebattle',session.userId)
-    const chance=getChance(player)
+    const chance=await getChance(player,ctx)
     if(chance){
       await ctx.database.set('pokebattle',session.userId,{
         advanceChance:true
       })
-      return `领取成功,在三周目开启后，即可通过相应指令进入，当前状态：未开启`
+      const md=`<@${session.userId}>领取成功
+三周目当前状态：开启中(部分)
+- [进入](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/lapnext`)}&reply=false&enter=true)
+
+---
+## 三周目开启条件
+- 非全图鉴玩家需要满级玩家对战积分排行前十名（每两天排行一次）
+- 每个传说宝可梦至少遇到一次`
+      await sendMarkdown(md,session)
+      return
     }
-    return `条件不满足`
+    return `条件不满足，非全图鉴玩家需要满级玩家对战积分排行前十名（每两天排行一次），且每个传说宝可梦至少遇到一次`
   })
 
   ctx.command('宝可梦').subcommand('刷新字段',{authority: 4}).action(async () => {
@@ -50,7 +60,7 @@ export function apply(ctx: Context) {
     })
     return '刷新成功'
   })
-  ctx.command('宝可梦').subcommand('lapnext', '进入下一周目', { authority: 4 })
+  ctx.command('宝可梦').subcommand('lapnext', '进入下一周目')
     .alias('下周目').action(async ({ session }) => {
       const { userId } = session
       const [user] = await ctx.database.get('pokebattle', userId)
@@ -64,7 +74,7 @@ export function apply(ctx: Context) {
         return
       }
       if (!advanceChance) {
-        await session.execute('宝可梦.getchance')
+        await session.execute('getChance')
         return
       }
       try {
@@ -236,5 +246,16 @@ ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(u
         return str.join('\n')
       }
     })
+
+    // ctx.command('test').action(async ({session})=>{
+    //   const unplayer:Pokebattle[]=await ctx.database.get('pokebattle',{advanceChance:true})
+    //   const ban=unplayer.map((item)=>item.id)
+    //   console.log(ban)
+    //  const player:Resource[]= await ctx.database.select('pokemon.resourceLimit')
+    //  .where({id:{$nin:ban}})
+    //  .orderBy('rankScore', 'desc').limit(10)
+    //   .execute()
+    //   console.log(player)
+    // })
 
 }

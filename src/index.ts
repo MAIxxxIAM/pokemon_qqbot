@@ -18,7 +18,7 @@ import { Robot } from './utils/robot'
 import { expToLv, expBase, skillMachine } from './utils/data'
 import { Pokedex } from './pokedex/pokedex'
 import { pokebattle } from './battle/pvp'
-import { AddGroup, Pokebattle, PrivateResource, model } from './model'
+import { AddGroup, Pokebattle, PrivateResource, Resource, model } from './model'
 import { catchPokemon } from './battle/pve'
 
 
@@ -219,6 +219,21 @@ export async function apply(ctx, conf: Config) {
       battleTimes: $.add(row.battleTimes, 3),
     }))
   })
+  ctx.cron('0 0 */2 * *', async () => {
+    const unplayer:Pokebattle[]=await ctx.database.get('pokebattle',{advanceChance:true})
+    
+    const ban=unplayer.map((item)=>item.id)
+   const player:Resource[]= await ctx.database.select('pokemon.resourceLimit')
+   .where({id:{$nin:ban}})
+   .orderBy('rankScore', 'desc').limit(10)
+    .execute()
+
+    for (let i = 0; i < player.length; i++) {
+      await ctx.database.set('pokemon.resourceLimit', { id: player[i].id }, row => ({
+        rank:i+1,
+      }))
+    }
+  })
 
   ctx.on('guild-added', async (session) => {
     const { group_openid, op_member_openid } = session.event._data.d
@@ -350,7 +365,7 @@ export async function apply(ctx, conf: Config) {
             }
           }
           
-          const chance=getChance(userArr[0])
+          const chance=await getChance(userArr[0],ctx)
           let expGet: number
           if (userArr[0].monster_1 == '0') {
             //更改
@@ -453,6 +468,9 @@ export async function apply(ctx, conf: Config) {
 ---
 每人都有一次初始改名机会 [改名](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/改名`)}&reply=false&enter=true)
 
+${userArr[0].advanceChance?`你当前可以进入三周目
+
+[三周目](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/lapnext`)}&reply=false&enter=true)`:' '}
 ${chance?`你当前可以领取三周目资格
 
 [领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)`:' '} 
@@ -1230,7 +1248,7 @@ ${(h('at', { id: (session.userId) }))}`
         const { src } = infoImgSelfClassic.attrs
         //图片服务
         try {
-          const chance=getChance(userArr[0])
+          const chance=await getChance(userArr[0],ctx)
           const md = `# <@${userId}>的训练师卡片
 ![img#485 #703](${await toUrl(ctx, session, src)})
 
@@ -1240,6 +1258,9 @@ ${(h('at', { id: (session.userId) }))}`
 - 宝可梦属性：${getType(userArr[0].monster_1).join(' ')}
 
 ---
+${userArr[0].advanceChance?`你当前可以进入三周目
+
+[三周目](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/lapnext`)}&reply=false&enter=true)`:' '}
 ${chance?`你当前可以领取三周目资格
 
 [领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)`:' '} 
@@ -1549,6 +1570,15 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let battlelog = battle[0]
         let winner = battle[1]
         let loser = battle[2]
+        await ctx.database.set('pokemon.resourceLimit', { id: winner},row=>({
+          rankScore: $.add(row.rankScore, 2),
+        })
+        )
+        await ctx.database.set('pokemon.resourceLimit', { id: loser,rankScore:{$gt:0}},row=>
+        ({
+          rankScore: $.sub(row.rankScore, 1),
+        })
+        )
         let loserArr = loser.substring(0, 5) == 'robot' ? [robot] : await ctx.database.get('pokebattle', { id: loser })
         let winnerArr = winner.substring(0, 5) == 'robot' ? [robot] : await ctx.database.get('pokebattle', { id: winner })
         let getgold = pokemonCal.mathRandomInt(1000, 1500) + (isVip(winnerArr[0]) ? 500 : 0)
@@ -1573,12 +1603,12 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
 
 ---
 获胜者:${winName + (winnerArr[0].name || winnerArr[0].battlename)}
-${winner == session.userId ? `金币+${getgold}
+${winner == session.userId ? `金币+${getgold}  对战积分+2
 
 ---
-> ${loserlog}` : `
+> ${loserlog} 对战积分-1` : `
 ---
-> ${loseName}<@${session.userId}>你输了已返还一半金币`}`
+> ${loseName}<@${session.userId}>你输了已返还一半金币 对战积分-1`}`
 const kb={
   keyboard: {
     content: {

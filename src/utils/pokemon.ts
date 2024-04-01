@@ -3,6 +3,7 @@ import { expToLv, skillMachine, pokemonBase, battleType } from './data'
 import {config,Config} from '../index';
 
 import { h } from "koishi"
+import { baseFusion } from './mothed';
 
 const exptolv = expToLv
 const Base = pokemonBase
@@ -37,21 +38,13 @@ const pokemonCal = {
       let pokeF = poke[0]
       let pokeM = poke[1]
       let BaseList = []
-      if (pokeF !== pokeM) {
         BaseList = [
-          String(Math.floor(Number(Base.Base[pokeF].hp) < Number(Base.Base[pokeM].hp) ? Number(Base.Base[pokeF].hp) * 0.2 + Number(Base.Base[pokeM].hp) * 0.8 : Number(Base.Base[pokeF].hp) * 0.8 + Number(Base.Base[pokeM].hp) * 0.2)),
-          String(Math.floor(Number(Base.Base[pokeF].att) < Number(Base.Base[pokeM].att) ? Number(Base.Base[pokeF].att) * 0.2 + Number(Base.Base[pokeM].att) * 0.8 : Number(Base.Base[pokeF].att) * 0.8 + Number(Base.Base[pokeM].att) * 0.2)),
-          String(Math.floor(Number(Base.Base[pokeF].def) < Number(Base.Base[pokeM].def) ? Number(Base.Base[pokeF].def) * 0.2 + Number(Base.Base[pokeM].def) * 0.8 : Number(Base.Base[pokeF].def) * 0.8 + Number(Base.Base[pokeM].def) * 0.2)),
-          String(Math.floor(Number(Base.Base[pokeF].spa) < Number(Base.Base[pokeM].spa) ? Number(Base.Base[pokeF].spa) * 0.2 + Number(Base.Base[pokeM].spa) * 0.8 : Number(Base.Base[pokeF].spa) * 0.8 + Number(Base.Base[pokeM].spa) * 0.2)),
-          String(Math.floor(Number(Base.Base[pokeF].spd) < Number(Base.Base[pokeM].spd) ? Number(Base.Base[pokeF].spd) * 0.2 + Number(Base.Base[pokeM].spd) * 0.8 : Number(Base.Base[pokeF].spd) * 0.8 + Number(Base.Base[pokeM].spd) * 0.2)),
-          String(Math.floor(Number(Base.Base[pokeF].spe) < Number(Base.Base[pokeM].spe) ? Number(Base.Base[pokeF].spe) * 0.2 + Number(Base.Base[pokeM].spe) * 0.8 : Number(Base.Base[pokeF].spe) * 0.8 + Number(Base.Base[pokeM].spe) * 0.2))]
-      } else { BaseList = [
-        String(Math.floor((Number(Base.Base[pokeF].hp) + Number(Base.Base[pokeM].hp)) * 0.4)), 
-        String((Math.floor(Number(Base.Base[pokeF].att) + Number(Base.Base[pokeM].att)) * 0.4)), 
-        String(Math.floor((Number(Base.Base[pokeF].def) + Number(Base.Base[pokeM].def)) * 0.4)), 
-        String(Math.floor((Number(Base.Base[pokeF].spa) + Number(Base.Base[pokeM].spa)) * 0.4)), 
-        String(Math.floor((Number(Base.Base[pokeF].spd) + Number(Base.Base[pokeM].spd)) * 0.4)), 
-        String(Math.floor((Number(Base.Base[pokeF].spe) + Number(Base.Base[pokeM].spe)) * 0.4))] }
+          String(baseFusion(Number(Base.Base[pokeF].hp), Number(Base.Base[pokeM].hp))),
+          String(baseFusion(Number(Base.Base[pokeF].att), Number(Base.Base[pokeM].att))),
+          String(baseFusion(Number(Base.Base[pokeF].def), Number(Base.Base[pokeM].def))),
+          String(baseFusion(Number(Base.Base[pokeF].spa), Number(Base.Base[pokeM].def))),
+          String(baseFusion(Number(Base.Base[pokeF].spd), Number(Base.Base[pokeM].def))),
+          String(baseFusion(Number(Base.Base[pokeF].spe), Number(Base.Base[pokeM].def))),]
       return BaseList
     } catch {
       return []

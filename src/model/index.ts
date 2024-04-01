@@ -34,7 +34,7 @@ export class PrivateResource {
             gold = this.goldLimit
             this.goldLimit = 0
         }
-        await ctx.database.set('pokemon.resourceLimit', {id:userId}, {rankScore: 0, resource: this })
+        await ctx.database.set('pokemon.resourceLimit', {id:userId}, {resource: this })
 
         await ctx.database.set('pokebattle', {id:userId}, (data) => ({
             gold: $.add(data.gold, gold)
@@ -58,6 +58,7 @@ export class PrivateResource {
 export interface Resource {
     id: string
     rankScore: number
+    rank: number
     resource: PrivateResource
 }
 
@@ -198,6 +199,7 @@ export async function model(ctx: Context) {
     ctx.model.extend('pokemon.resourceLimit', {
         id: 'string',
         rankScore: 'unsigned',
+        rank: 'unsigned',
         resource: {
             type: 'json',
             initial: new PrivateResource(config.金币获取上限),

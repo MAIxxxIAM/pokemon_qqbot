@@ -245,7 +245,31 @@ export function typeEffect(a: string, b: string, skillType: string) {
 
 }
 
-export function getChance(player:Pokebattle){
+export function baseFusion(a:number,b:number,){
+  let max = Math.max(a, b)
+  let min = Math.min(a, b)
+  let c=(1-(Math.abs(max - min+1) / max))/2
+  if(max==min){c=0}
+  max *= 0.8
+  min *= 0.2
+  return (max+min)*(1+c)
+
+}
+
+function arraysEqual(a: any[], b: any[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < b.length; i++) {
+    if (!a.includes(b[i])) return false;
+  }
+  return true;
+}
+
+export async function getChance(player:Pokebattle,ctx:Context){
+  const banID = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245']
+  const keys=Object.keys(player.ultra)
+  const [battle]= await ctx.database.get('pokemon.resourceLimit', { id: player.id })
+  const isBattle=battle?.rank>0&&battle?.rankScore<=10
+  if(isBattle&&player.lap!==3&&!player.advanceChance&&player.level>99&&arraysEqual(banID, keys)) return true
   if(player.lap==3||player.advanceChance||!player?.pokedex?.dex) return false
   const flatArrayA = [].concat(...player.pokedex.dex)
   const flatArray = [...new Set(flatArrayA)]

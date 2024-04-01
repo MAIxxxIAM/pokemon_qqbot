@@ -1,6 +1,6 @@
 import { Context } from "koishi";
 import { config,Config  } from "..";
-import { button, urlbutton } from "../utils/mothed";
+import { button, urlbutton } from "../utils/mothed"
 
 
 export async function apply(ctx: Context) {
@@ -86,4 +86,14 @@ ${notice}`
         }
 
     })
+
+    ctx.command('账户绑定 <text>').action(async ({ session },text) => {
+        if (!text) return '请输入绑定账户的access_token'
+        const [player]= await ctx.database.get('intellegentBody' as any, { open_token: text,id:{$ne:session.userId} })
+        if(player){
+          await ctx.database.set('intellegentBody' as any, { open_token: text }, { group_open_id:session.userId,open_token: null,token:3000 })
+          return '绑定成功'
+        }
+        return '绑定失败。未找到对应账户'
+      })
 }
