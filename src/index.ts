@@ -609,9 +609,7 @@ ${chance?`你当前可以领取三周目资格
           for (let i = 0; i < 3; i++) {
             grassMonster[i] = pokemonCal.mathRandomInt(1, (userArr[0].lap==3)?420:(userArr[0].lapTwo) ? 251 : 151)
             while(lapThree.includes(`${grassMonster[i]}.${grassMonster[i]}`) || banID.includes(`${grassMonster[i]}.${grassMonster[i]}`)) {
-              if (banID.includes(`${grassMonster[i]}.${grassMonster[i]}`) && (userArr[0].lapTwo ? Math.random() > userArr[0].level / 100 : false)) {
                 grassMonster[i] = pokemonCal.mathRandomInt(1, (userArr[0].lap==3)?420:(userArr[0].lapTwo) ? 251 : 151);
-              }
             }
             pokeM[i] = grassMonster[i] + '.' + grassMonster[i]
             for (let j = 0; j < pokemonCal.pokemonlist(pokeM[i]).length; j++) {
