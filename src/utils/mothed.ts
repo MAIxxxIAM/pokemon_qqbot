@@ -253,7 +253,6 @@ export function baseFusion(a:number,b:number,){
   max *= 0.8
   min *= 0.2
   return (max+min)*(1+c)
-
 }
 
 function arraysEqual(a: any[], b: any[]): boolean {

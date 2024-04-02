@@ -42,9 +42,9 @@ const pokemonCal = {
           String(baseFusion(Number(Base.Base[pokeF].hp), Number(Base.Base[pokeM].hp))),
           String(baseFusion(Number(Base.Base[pokeF].att), Number(Base.Base[pokeM].att))),
           String(baseFusion(Number(Base.Base[pokeF].def), Number(Base.Base[pokeM].def))),
-          String(baseFusion(Number(Base.Base[pokeF].spa), Number(Base.Base[pokeM].def))),
-          String(baseFusion(Number(Base.Base[pokeF].spd), Number(Base.Base[pokeM].def))),
-          String(baseFusion(Number(Base.Base[pokeF].spe), Number(Base.Base[pokeM].def))),]
+          String(baseFusion(Number(Base.Base[pokeF].spa), Number(Base.Base[pokeM].spa))),
+          String(baseFusion(Number(Base.Base[pokeF].spd), Number(Base.Base[pokeM].spd))),
+          String(baseFusion(Number(Base.Base[pokeF].spe), Number(Base.Base[pokeM].spe))),]
       return BaseList
     } catch {
       return []
