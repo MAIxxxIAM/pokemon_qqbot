@@ -333,6 +333,7 @@ export async function apply(ctx, conf: Config) {
 
   const banID = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245','378.378','379.379','340.340','341.341','342.342','381.381','380.380','343.343','344.344','345.345','346.346','347.347','315.315','349.349','348.348','350.350','351.351']
   const lapThree=['378.378','379.379','340.340','341.341','342.342','381.381','380.380','343.343','344.344','345.345','346.346','347.347','315.315','349.349','348.348','350.350','351.351']
+  const banLapTwo = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245']
 
   ctx.plugin(lapTwo)
 
@@ -610,6 +611,9 @@ ${chance?`你当前可以领取三周目资格
             grassMonster[i] = pokemonCal.mathRandomInt(1, (userArr[0].lap==3)?420:(userArr[0].lapTwo) ? 251 : 151)
             while(lapThree.includes(`${grassMonster[i]}.${grassMonster[i]}`) || banID.includes(`${grassMonster[i]}.${grassMonster[i]}`)) {
                 grassMonster[i] = pokemonCal.mathRandomInt(1, (userArr[0].lap==3)?420:(userArr[0].lapTwo) ? 251 : 151);
+                if(banLapTwo.includes(`${grassMonster[i]}.${grassMonster[i]}`) && (userArr[0].lapTwo ? Math.random() < userArr[0].level / 100 : true)){
+                  break
+                }
             }
             pokeM[i] = grassMonster[i] + '.' + grassMonster[i]
             for (let j = 0; j < pokemonCal.pokemonlist(pokeM[i]).length; j++) {

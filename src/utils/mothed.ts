@@ -248,11 +248,11 @@ export function typeEffect(a: string, b: string, skillType: string) {
 export function baseFusion(a:number,b:number,){
   let max = Math.max(a, b)
   let min = Math.min(a, b)
-  let c=(1-(Math.abs(max - min+1) / max))/6
+  let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
   if(max==min){c=0}
   max *= 0.8
   min *= 0.2
-  return (max+min)*(0.5+c)
+  return (max+min)*(1+c)
 
 }
 
