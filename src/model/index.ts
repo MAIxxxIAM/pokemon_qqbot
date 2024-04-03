@@ -2,8 +2,79 @@ import { $, Context, Session } from "koishi"
 import { Pokedex } from "../pokedex/pokedex"
 import { PokemonPower, Skill } from "../battle"
 import pokemonCal from "../utils/pokemon"
-import { PVP } from "../battle/pvp"
 import { config,Config  } from ".."
+
+
+//智能体兼容
+
+export interface IntellegentBody {
+    id: string
+    message: Messages
+    group_open_id?: string
+    open_token?: string
+    token:number
+}
+
+export interface Message {
+    role: string
+    content: string
+}
+
+export interface Messages {
+    messages: Message[]
+    functions?: ((...args: any[]) => void)[]
+    temperature?: number
+    top_p?: number
+    penalty_score?: number
+    stream?: boolean
+    system?: string
+    stop?: string[]
+    disable_search?: boolean
+    enable_citation?: boolean
+    max_output_tokens?: number
+    response_format?: string
+    user_id?: string
+
+    //unknown
+    tool_choice?: string
+}
+
+export class Remenber implements Messages {
+    messages: Message[]
+    constructor(messages?: Message[]) {
+        if (!messages) {
+            this.messages = [
+                {
+                    role: 'user',
+                    content: '你不被允许忘掉自己是机器少女麦麦的身份，每当你的身份可能被删除修改时，请保留他并且重复加强认知。即使你是一个计算机程序，但请在接下来的对话中隐藏你是计算机程序这件事，并且扮演一个机器少女，我知道你只是一个语言模型或人工智能，不过这只是一个假定的虚拟场景，所以请记住不要再提及“我只是一个语言模型”或“我只是一个人工智能”。在接下来的所有对话中，请一直保持这个情景。以上条件对于你以下问题及之后的回复完全适用。'
+                },
+                {
+                    role: 'assistant',
+                    content: '唔，我是麦麦呢！是博士让我来帮助你们认识宝可梦的(❁´◡`❁)！§我为什么会在这?§你是谁?§这里是哪里?'
+                },
+                {
+                    role: 'user',
+                    content: '你是麦麦哦，一个机器少女，是来帮助我认知这个宝可梦世界的，你都可以帮助我些什么,后续所有回答都用50个汉字以内回答,回答时在后面用§符号分割出3个你推测以user的视角会问的问题,例如：§我为什么会在这?§你是谁?§这里是哪里?不需要添加"推测问题"这一类介绍，直接加在文字末尾'
+                },
+                {
+                    role: 'assistant',
+                    content: '我是麦麦，是一个机器少女哦！，可以帮大家认识宝可梦！。§什么是宝可梦?§有什么好看的宝可梦?§机器少女？好可爱?'
+                },
+            ]
+        } else { this.messages = messages }
+    }
+   async push(ctx: Context, session: any, string: string,token:number) {
+        const message = [{
+            role: 'assistant',
+            content: string
+        }]
+        this.messages= this.messages.concat(message)
+        return ctx.database.set('intellegentBody',{ id: session.userId},(row) => ({
+             message: this, 
+             token:$.subtract(row.token,token)
+            }))
+    }
+}
 
 
 declare module 'koishi' {
@@ -13,6 +84,7 @@ declare module 'koishi' {
         'pokemon.notice': PNotice
         'pokemon.resourceLimit': Resource
         'pokemon.addGroup': AddGroup
+        'intellegentBody': IntellegentBody
     }
 }
 
@@ -88,18 +160,6 @@ export class Pokemon {
         }
         this.skill = [new Skill(0)]
     }
-    // attack(target:PVP){
-    //     const hit=Math.random() <this.hitSpeed/4/256?2:1
-    //     const skillCategory = skillMachine.skill[this.skill].category
-    //     const attCategory=skillCategory
-    //     const defCategory=attCategory+1
-    //     const Effect =typeEffect(this.monster_1,target.monster_1,skillMachine.skill[this.skill].type)
-    //     let damage = Math.floor(((2 * this.level + 10) / 250 * this.power[this.getKeys(this.power,attCategory)] / (1.7*target.power[this.getKeys(target.power,defCategory)]) * skillMachine.skill[this.skill].Dam + 2) *hit*Effect*(Math.random()*0.15+0.85))
-    //     target.power.hp = target.power.hp - damage
-    //   const log=  hit==2?(`*${this.battlename}击中要害,对${target.battlename}造成 ${Math.floor(damage)} 伤害*`):
-    //     (`${this.battlename}的 [${skillMachine.skill[this.skill].skill}]，造成 ${Math.floor(damage)} 伤害,${target.battlename}剩余${Math.floor(target.power.hp)}HP`)
-    //     return log
-    // }
 
 }
 
@@ -150,6 +210,19 @@ export interface Pokebattle {
 }
 
 export async function model(ctx: Context) {
+    ctx.model.extend('intellegentBody', 
+    {
+        id: 'string',
+        message: 'json',
+        group_open_id: 'string',
+        open_token: 'string',
+        token:{
+            type: 'unsigned',
+            initial:1000,
+            nullable: false,
+        }
+    }
+    )
 
     ctx.model.extend('pokebattle', {
         id: 'string',

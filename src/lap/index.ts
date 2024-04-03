@@ -1,4 +1,4 @@
-import { Context, Schema } from 'koishi'
+import { Context, Schema,$ } from 'koishi'
 
 import { Pokebattle, config, Config } from '../index';
 import { button, getChance, getMarkdownParams, sendMarkdown, toUrl } from '../utils/mothed';
@@ -248,7 +248,8 @@ ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(u
     })
 
     // ctx.command('test').action(async ({session})=>{
-    //   const unplayer:Pokebattle[]=await ctx.database.get('pokebattle',{advanceChance:true})
+    //   console.log('test')
+    //   const unplayer:Pokebattle[]=await ctx.database.select('pokebattle').where(row=>$.or(row.advanceChance,$.eq(row.lap,3))).execute()
     //   const ban=unplayer.map((item)=>item.id)
     //   console.log(ban)
     //  const player:Resource[]= await ctx.database.select('pokemon.resourceLimit')

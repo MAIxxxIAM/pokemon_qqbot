@@ -1,8 +1,9 @@
 import { resolve } from 'path'
 import { Pokebattle, logger, config, shop, testcanvas, Config } from '..'
 import { type, battleType } from './data'
-import { Context, Session } from 'koishi'
+import { Context, Session ,Element} from 'koishi'
 import { WildPokemon } from '../battle'
+import { } from 'koishi-plugin-cron'
 
 
 export async function isResourceLimit(userId: string, ctx: Context) {
@@ -220,22 +221,22 @@ export async function toUrl(ctx, session, img) {
   // }
   // const { url } = await ctx.get('server.temp').create(img)
   // return url
-  try {
-    let a = await session.bot.internal.sendFileGuild(session.channelId, {
-      file_type: 1,
-      file_data: Buffer.from((await ctx.http.file(img)).data).toString('base64'),
-      srv_send_msg: false
-    })
-    const url = `http://multimedia.nt.qq.com/download?appid=1407&fileid=${a.file_uuid.replace(/_/g, "%5F")}&rkey=CAQSKAB6JWENi5LMtWVWVxS2RfZbDwvOdlkneNX9iQFbjGK7q7lbRPyD1v0&spec=0`
-    return url
-  } catch (e) {
+  // try {
+  //   let a = await session.bot.internal.sendFileGuild(session.channelId, {
+  //     file_type: 1,
+  //     file_data: Buffer.from((await ctx.http.file(img)).data).toString('base64'),
+  //     srv_send_msg: false
+  //   })
+  //   const url = `http://multimedia.nt.qq.com/download?appid=1407&fileid=${a.file_uuid.replace(/_/g, "%5F")}&rkey=CAQSKAB6JWENi5LMtWVWVxS2RfZbDwvOdlkneNX9iQFbjGK7q7lbRPyD1v0&spec=0`
+  //   return url
+  // } catch (e) {
     if (ctx.get('server.temp')?.upload) {
       const url = await ctx.get('server.temp').upload(img)
       return url.replace(/_/g, "%5F")
     }
     const { url } = await ctx.get('server.temp').create(img)
     return url
-  }
+  // }
 }
 export function typeEffect(a: string, b: string, skillType: string) {
   const [a1, a2] = getType(a)
@@ -245,14 +246,21 @@ export function typeEffect(a: string, b: string, skillType: string) {
 
 }
 
+export async function censorText(ctx,text: string) {
+  const a:Element[]=[Element('text',{content:text})]
+  const [b]=await ctx.censor.transform(a)
+  return b.attrs.content
+}
+
 export function baseFusion(a:number,b:number,){
   let max = Math.max(a, b)
   let min = Math.min(a, b)
   let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
-  if(max==min){c=0}
+  if((max - min) / max >=0.25) c=0
+  if(max==min){c=0.2}
   max *= 0.8
   min *= 0.2
-  return (max+min)*(1+c)
+  return Math.floor((max+min)*(1+c))
 }
 
 function arraysEqual(a: any[], b: any[]): boolean {
@@ -267,8 +275,7 @@ export async function getChance(player:Pokebattle,ctx:Context){
   const banID = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245']
   const keys=Object.keys(player.ultra)
   const [battle]= await ctx.database.get('pokemon.resourceLimit', { id: player.id })
-  const isBattle=battle?.rank>0&&battle?.rankScore<=10
-  if(isBattle&&player.lap!==3&&!player.advanceChance&&player.level>99&&arraysEqual(banID, keys)) return true
+  if(player.lap!==3&&!player.advanceChance&&player.level>99&&arraysEqual(banID, keys)&&battle?.rank>0&&battle?.rank<=10) return true
   if(player.lap==3||player.advanceChance||!player?.pokedex?.dex) return false
   const flatArrayA = [].concat(...player.pokedex.dex)
   const flatArray = [...new Set(flatArrayA)]
@@ -356,6 +363,28 @@ export function catchbutton(a: string, b: string, c: string, d: string) {
               "click_limit": 10,
               "unsupport_tips": "请输入@Bot 3",
               "data": "3",
+              "enter": true
+            }
+          }
+        ]
+      },
+      {
+        "buttons": [
+          {
+            "id": "4",
+            "render_data": {
+              "label": "随意一丢（放弃捕捉）",
+              "visited_label": "真的很随意"
+            },
+            "action": {
+              "type": 2,
+              "permission": {
+                "type": 0,
+                "specify_user_ids": [d]
+              },
+              "click_limit": 10,
+              "unsupport_tips": "",
+              "data": "若无其事的一丢",
               "enter": true
             }
           }

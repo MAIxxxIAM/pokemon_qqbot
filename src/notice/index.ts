@@ -87,7 +87,7 @@ ${notice}`
 
     })
 
-    ctx.command('账户绑定 <text>').action(async ({ session },text) => {
+    ctx.command('领取麦麦 <text>').action(async ({ session },text) => {
         if (!text) return '请输入绑定账户的access_token'
         const [player]= await ctx.database.get('intellegentBody' as any, { open_token: text,id:{$ne:session.userId} })
         if(player){

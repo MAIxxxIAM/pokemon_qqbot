@@ -2,7 +2,8 @@ import { Context, h } from "koishi"
 import { Pokebattle, config, testcanvas,Config  } from ".."
 import { resolve } from "path"
 import pokemonCal from "../utils/pokemon"
-import { button, toUrl } from "../utils/mothed"
+import { button, sendMarkdown, toUrl } from "../utils/mothed"
+import { expBase } from "../utils/data"
 
 export class Pokedex {
     dex: number[][]
@@ -47,7 +48,32 @@ export class Pokedex {
                 return true
             }
         }
+        const id=expBase.exp.find((Pid)=>Pid.name===pokemon)
+        for (let box in this.dex) {
+            if (this.dex[box].includes(parseInt(id?.id))) {
+                return true
+            }
+        }
         return false
+    }
+    find(lap:number=1){
+        const dex=[151,251,420]
+        let allDex=Array.from({length:dex[lap-1]},(_,k)=>k+1)
+        const flatArrayA = [].concat(...this.dex)
+        const flatArray = [...new Set(flatArrayA)]
+        let missingpokemon=[]
+        missingpokemon=allDex.filter((x)=>!flatArray.includes(x))
+        let missingpokemonName:string=''
+        let count=0
+        for(let pokemon in missingpokemon){
+            count++
+            missingpokemonName+=(pokemonCal.pokemonlist(`${missingpokemon[pokemon]}.${missingpokemon[pokemon]}`)+`> ${missingpokemon[pokemon]}  `)
+            if(count>=30){
+                break
+            }
+            if(count%3==0) missingpokemonName+='\n\n'
+        }
+       return [missingpokemonName,missingpokemon.length]
     }
 }
 
@@ -120,6 +146,7 @@ export async function apply(ctx) {
                         "rows": [
                             { "buttons": [button(2, '📖 我的图鉴', '/查看图鉴', session.userId, 'cmd'),button(2, '💻 接收宝可梦', '/接收', session.userId, 'cmd',false), ] },
                             { "buttons": [button(2, "🖊 签到", "/签到", session.userId, "1"), button(2, "💳 信息", "/查看信息", session.userId, "1")] },
+                            { "buttons": [button(2, "🔍 图鉴检查", "/图鉴检查", session.userId, "1")] },
 
                             page < 2 ? { "buttons": [button(0, "下一页", `/查看图鉴 ${page + 1}`, session.userId, "cmd2")] } : { "buttons": [button(0, "上一页", `/查看图鉴 ${page - 1}`, session.userId, "cmd1"), button(0, "下一页", `/查看图鉴 ${page + 1}`, session.userId, "cmd2")] }
                         ]
@@ -134,9 +161,9 @@ export async function apply(ctx) {
         }
     })
 
-    ctx.command('宝可梦').subcommand('接收宝可梦 <Pid:number>','从图鉴中接收宝可梦，花费1200金币')
+    ctx.command('宝可梦').subcommand('接收宝可梦 <Pid>','从图鉴中接收宝可梦，花费1200金币')
         .alias('接收')
-        .action(async ({ session }, Pid: number) => {
+        .action(async ({ session }, Pid) => {
             const players: Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
             const { platform } = session
             let pokedex: Pokedex
@@ -154,7 +181,8 @@ export async function apply(ctx) {
             }
             pokedex = new Pokedex(player)
             if(!pokedex.check(Pid.toString())) return `你还没有捕捉到这个宝可梦`
-            const poke = `${Pid}.${Pid}`
+            let poke = `${Pid}.${Pid}`
+            Number(Pid)?poke = `${Pid}.${Pid}`:poke = `${expBase.exp.find((id)=>id.name===Pid).id}.${expBase.exp.find((id)=>id.name===Pid).id}`
             if (platform == 'qq' && config.QQ官方使用MD) {
                 try {
                     await session.bot.internal.sendMessage(session.channelId, {
@@ -305,4 +333,26 @@ ${(h('at', { id: (session.userId) }))}
 
         })
 
+
+        ctx.command('宝可梦').subcommand('图鉴检查','检查你的图鉴还缺少哪些宝可梦')
+        .action(async ({ session }) => {
+            const [player] = await ctx.database.get('pokebattle', { id: session.userId })
+            if (!player) {
+                await session.execute('签到')
+                return
+            }
+            const pokedex = new Pokedex(player)
+           const miss= pokedex.find(player.lap)
+           if (miss[0]==='') {
+                return `你当前图鉴已经收集完整`
+           }
+          const md =`查询中...
+${'```'}
+${miss[0]}
+${'```'}
+
+---
+你还有${miss[1]}只宝可梦没有收集`
+           await sendMarkdown(md, session)
+        })
 }
