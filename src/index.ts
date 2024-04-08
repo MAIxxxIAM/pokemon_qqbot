@@ -221,7 +221,7 @@ export async function apply(ctx, conf: Config) {
   })
   ctx.cron('0 0 */2 * *', async () => {
     await ctx.database.set('pokemon.resourceLimit', { rank: { $gt: 0 } }, row => ({
-      rank:0,
+      rank: 0,
     }))
     const unplayer: Pokebattle[] = await ctx.database
       .select('pokebattle')
@@ -722,7 +722,25 @@ ${(h('at', { id: (session.userId) }))}
               await ctx.database.set('pokebattle', { id: session.userId }, {
                 captureTimes: { $subtract: [{ $: 'captureTimes' }, catchCose] }
               })
-              return `球丢歪啦！重新捕捉吧~\n精灵球 -1`
+              const kb = {
+                keyboard: {
+                  content: {
+                    "rows": [
+                      { "buttons": [button(2, "👐 继续放生", "/放生", session.userId, "6"), button(2, "📷 继续捕捉", "/捕捉宝可梦", session.userId, "2")] },
+                      { "buttons": [button(2, "💳 查看信息", "/查看信息", session.userId, "3"), button(2, "⚔️ 对战", "/对战", session.userId, "4")] },
+                    ]
+                  },
+                }
+              }
+              const md=`# 球丢歪啦！重新捕捉吧~
+
+---
+- 精灵球 -1`
+              try{
+                await sendMarkdown(md, session, kb)
+                return
+              }catch{return `球丢歪啦！重新捕捉吧~\n精灵球 -1`}
+              
           }
           if (banID.includes(poke) && !userArr[0].lapTwo) {
 
@@ -1583,16 +1601,17 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let battlelog = battle[0]
         let winner = battle[1]
         let loser = battle[2]
-        if(!user){
+        if (!user) {
           await ctx.database.set('pokemon.resourceLimit', { id: winner }, row => ({
-          rankScore: $.add(row.rankScore, 2),
-        })
-        )
-        await ctx.database.set('pokemon.resourceLimit', { id: loser, rankScore: { $gt: 0 } }, row =>
-        ({
-          rankScore: $.sub(row.rankScore, 1),
-        })
-        )}
+            rankScore: $.add(row.rankScore, 2),
+          })
+          )
+          await ctx.database.set('pokemon.resourceLimit', { id: loser, rankScore: { $gt: 0 } }, row =>
+          ({
+            rankScore: $.sub(row.rankScore, 1),
+          })
+          )
+        }
         let loserArr = loser.substring(0, 5) == 'robot' ? [robot] : await ctx.database.get('pokebattle', { id: loser })
         let winnerArr = winner.substring(0, 5) == 'robot' ? [robot] : await ctx.database.get('pokebattle', { id: winner })
         let getgold = pokemonCal.mathRandomInt(1000, 1500) + (isVip(winnerArr[0]) ? 500 : 0)
@@ -1617,12 +1636,12 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
 
 ---
 获胜者:${(winName + (winnerArr[0].name || winnerArr[0].battlename).replace(/\*/g, '口'))}
-${winner == session.userId ? `金币+${getgold}  ${user?'指定对战无法获得积分':'对战积分+2'}
+${winner == session.userId ? `金币+${getgold}  ${user ? '指定对战无法获得积分' : '对战积分+2'}
 
 ---
-> ${loserlog} ${user?'':'对战积分-1'}` : `
+> ${loserlog} ${user ? '' : '对战积分-1'}` : `
 ---
-> ${loseName}<@${session.userId}>你输了已返还一半金币 ${user?'':'对战积分-1'}`}`
+> ${loseName}<@${session.userId}>你输了已返还一半金币 ${user ? '' : '对战积分-1'}`}`
           const kb = {
             keyboard: {
               content: {
