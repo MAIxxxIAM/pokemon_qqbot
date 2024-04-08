@@ -220,6 +220,9 @@ export async function apply(ctx, conf: Config) {
     }))
   })
   ctx.cron('0 0 */2 * *', async () => {
+    await ctx.database.set('pokemon.resourceLimit', { rank: { $gt: 0 } }, row => ({
+      rank:0,
+    }))
     const unplayer: Pokebattle[] = await ctx.database
       .select('pokebattle')
       .where(row => $.or(row.advanceChance, $.eq(row.lap, 3)))
@@ -1264,6 +1267,7 @@ ${(h('at', { id: (session.userId) }))}`
 ---
 
 - 对战积分：${playerLimit.rankScore}
+- 积分排名：${playerLimit.rank}
 - 金币获取剩余：${playerLimit.resource.goldLimit}
 - 宝可梦属性：${getType(userArr[0].monster_1).join(' ')}
 
@@ -1930,7 +1934,7 @@ ${bag.replace(/\n/g, '||')}`
         if (platform == 'qq' && config.QQ官方使用MD) {
           let MDreply: string = ''
           shop.forEach(item => {
-            MDreply += `[${item.name}]\t(mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买 ${item.name}`)}&reply=false&enter=true) 价格：${Math.floor(item.price * vipReward)}\r`
+            MDreply += `[${item.name}]\t(mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买 ${item.name} `)}&reply=false&enter=false) 价格：${Math.floor(item.price * vipReward)}\r`
           })
           try {
             await session.bot.internal.sendMessage(session.channelId, {
