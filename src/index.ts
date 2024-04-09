@@ -1267,7 +1267,7 @@ ${(h('at', { id: (session.userId) }))}`
 ---
 
 - 对战积分：${playerLimit.rankScore}
-- 积分排名：${playerLimit.rank}
+- 积分排名：${userArr[0].lap>2?`已进入了三周目，不计入排名`:playerLimit.rank?playerLimit.rank:`未进入前十`}
 - 金币获取剩余：${playerLimit.resource.goldLimit}
 - 宝可梦属性：${getType(userArr[0].monster_1).join(' ')}
 
