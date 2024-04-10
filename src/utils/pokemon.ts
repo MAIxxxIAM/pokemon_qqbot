@@ -132,8 +132,8 @@ const pokemonCal = {
   pokemonskill(a: number) {
 
     if (Math.random() >= 0.1 * Math.floor(a / 10)) {
-      return Math.floor(Math.random() * Math.floor(skillMachine.skill.length/2)+1)
-    } else return Math.floor(Math.random() * (Math.ceil(skillMachine.skill.length/2 )+ 1)) + Math.floor(skillMachine.skill.length/2)
+      return Math.floor(Math.random() * 100+1)
+    } else return Math.floor(Math.random() * (111)) + 100
   },
 
   skillbag(a: string[]) {

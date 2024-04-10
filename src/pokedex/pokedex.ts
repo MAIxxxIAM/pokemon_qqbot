@@ -182,7 +182,7 @@ export async function apply(ctx) {
             pokedex = new Pokedex(player)
             if(!pokedex.check(Pid.toString())) return `你还没有捕捉到这个宝可梦`
             let poke = `${Pid}.${Pid}`
-            Number(Pid)?poke = `${Pid}.${Pid}`:poke = `${expBase.exp.find((id)=>id.name===Pid).id}.${expBase.exp.find((id)=>id.name===Pid).id}`
+            Number(Pid)?poke = `${Number(Pid)}.${Number(Pid)}`:poke = `${Number(expBase.exp.find((id)=>id.name===Pid).id)}.${Number(expBase.exp.find((id)=>id.name===Pid).id)}`
             if (platform == 'qq' && config.QQ官方使用MD) {
                 try {
                     await session.bot.internal.sendMessage(session.channelId, {
