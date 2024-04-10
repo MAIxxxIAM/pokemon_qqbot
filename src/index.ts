@@ -1854,10 +1854,10 @@ ${bag.replace(/\n/g, '||')}`
         } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
       if (userArr[0].trainerNum < 1) return `${h('at', { id: (session.userId) })}你的盲盒不足，无法开启`
-      if (userArr[0].trainer.length > 111) return `你已经获得了全部训练师`
-      let getTrainer = String(pokemonCal.mathRandomInt(0, 112))
+      if (userArr[0].trainer.length > 121) return `你已经获得了全部训练师`
+      let getTrainer = String(pokemonCal.mathRandomInt(0, 121))
       while (userArr[0].trainer.includes(getTrainer)) {
-        getTrainer = String(pokemonCal.mathRandomInt(0, 112))
+        getTrainer = String(pokemonCal.mathRandomInt(0, 121))
       }
       userArr[0].trainer.push(getTrainer)
       const trainerImg = h.image(pathToFileURL(resolve(__dirname, './assets/img/trainer', getTrainer + '.png')).href)
