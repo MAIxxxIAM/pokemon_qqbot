@@ -1902,7 +1902,7 @@ ${bag.replace(/\n/g, '||')}`
 恭喜你获得了训练师
 请输入新训练师的名字:________`)
       }
-      const trainerName = await censorText(ctx, await session.prompt(60000))
+      let trainerName = await session.prompt(60000)
       if (!trainerName) {
         let randomName = getRandomName(3)
         let numr = userArr[0].trainerName.push(randomName)
@@ -1914,6 +1914,7 @@ ${bag.replace(/\n/g, '||')}`
         return `你好像没有输入名字，训练师已经自动命名为【${randomName}】
 输入【更换训练师】可以更换你的训练师`
       }
+      trainerName=await censorText(ctx,trainerName)
       userArr[0].trainerName.push(trainerName)
       await ctx.database.set('pokebattle', { id: session.userId }, {
         trainerNum: { $subtract: [{ $: 'trainerNum' }, 1] },
@@ -2041,6 +2042,7 @@ tips:${tips}`
       if (userArr[0].changeName < 1) return `你的改名次数已经用完`
       let regex = /^[\u4e00-\u9fa5]{2,6}$/
       if (!regex.test(name)) {
+        let count=0
         do {
           await session.send(`请回复2-6位中文`)
           await session.bot.internal.sendMessage(session.channelId, {
@@ -2057,8 +2059,10 @@ tips:${tips}`
             timestamp: session.timestamp,
             msg_seq: Math.floor(Math.random() * 1000000),
           })
-          const entry = await censorText(ctx, await session.prompt(60000))
+          const entry =await session.prompt(60000)
           name = entry
+          count++
+          if (count > 3) {return `输入错误次数过多`}
         }
         while (!regex.test(name))
       }
@@ -2068,6 +2072,7 @@ tips:${tips}`
           return
         } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
+      name= await censorText(ctx, name)
       await ctx.database.set('pokebattle', { id: session.userId }, {
         name: name,
         changeName: { $subtract: [{ $: 'changeName' }, 1] }
@@ -2104,8 +2109,9 @@ tips:${tips}`
     } catch {
       await session.send(`请向机器人回复你想要的训练师名字`)
     }
-    const newName = await censorText(ctx, await session.prompt(60000))
-    userArr[0].trainerName[0] = newName
+    const newName = await session.prompt(60000)
+    if (!newName) return `你好像没有输入名字`
+    userArr[0].trainerName[0] =await censorText(ctx,newName)
     await ctx.database.set('pokebattle', { id: session.userId }, {
       trainerName: userArr[0].trainerName
     })
