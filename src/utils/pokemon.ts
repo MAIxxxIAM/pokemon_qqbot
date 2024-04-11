@@ -172,11 +172,13 @@ const pokemonCal = {
     skill.sort((a, b) => { return Number(b) - Number(a) })
     let skillInfo = []
     for(let j=0;j<skill.length;j++) {
-      if(j>10){break}
       skillInfo.push(`${skillMachine.skill[skill[j]].skill}:${skillMachine.skill[skill[j]].Dam} 类型:${skillMachine.skill[skill[j]].category===1?'物理':'特殊'} 属性:${skillMachine.skill[skill[j]].type}`)
     }
-    return `你的技能背包中，最高威力的10个技能是
+    return `你的技能背包符合条件的技能是：
+---
+${"```"}
 ${skillInfo.join('\n')}
+${"```"}
 `
   }
 }

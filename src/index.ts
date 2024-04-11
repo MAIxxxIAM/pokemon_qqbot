@@ -472,66 +472,28 @@ export async function apply(ctx, conf: Config) {
 
 ![img#512 #763](${await toUrl(ctx, session, src)})
 
----
-每人都有一次初始改名机会 [改名](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/改名`)}&reply=false&enter=true)
+[📃 问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可问答`)}&reply=false&enter=true) || [⚔️ 对战](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战`)}&reply=false&enter=true) || [📕 属性](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/属性`)}&reply=false&enter=true)
 
-${userArr[0].advanceChance ? `你当前可以进入三周目
+[🛒 商店](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买`)}&reply=false&enter=true) || [🔈 公告](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/notice`)}&reply=false&enter=true) || [🔖 帮助](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)
+
+[🏆 兑换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=fales) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
+
+
+[**➣ ⚔️和他对战** ](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战 ${session.userId} `)}&reply=false&enter=true)
+
+${userArr[0].changeName>0?`---
+你当前可以改名 [**➣ 改名**](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/改名`)}&reply=false&enter=true)`:``}
+
+${userArr[0].advanceChance ? `---
+你当前可以进入三周目
 
 [三周目](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/lapnext`)}&reply=false&enter=true)` : ' '}
-${chance ? `你当前可以领取三周目资格
+${chance ? `---
+你当前可以领取三周目资格
 
 [领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)` : ' '} 
 `
-            const b = getMarkdownParams(md)
-            await session.bot.internal.sendMessage(session.guildId, {
-              content: "111",
-              msg_type: 2,
-              markdown: {
-                custom_template_id: '102072441_1711377105',
-                params: b
-              },
-              keyboard: {
-                content: {
-                  "rows": [
-                    {
-                      "buttons": [
-                        button(2, "🖊签到", "/签到", session.userId, "1"),
-                        button(2, "💳查看", "/查看信息", session.userId, "2"),
-                        button(2, "🔖帮助", "/宝可梦", session.userId, "3"),
-                        button(2, "🔈公告", "/notice", session.userId, "ntc")
-                      ]
-                    },
-                    {
-                      "buttons": [
-                        button(2, "⚔️对战", "/对战", session.userId, "4"),
-                        button(2, "♂杂交", "/杂交宝可梦", session.userId, "5"),
-                        button(2, "👐放生", "/放生", session.userId, "6"),
-                        button(2, "💻接收", "/接收", session.userId, "p", false),
-                      ]
-                    },
-                    {
-                      "buttons": [
-                        button(2, "📷捕捉", "/捕捉宝可梦", session.userId, "7"),
-                        button(2, "📕属性", "/属性", session.userId, "8"),
-                        button(2, "🛒商店", "/购买", session.userId, "9"),
-                        button(2, "🏆兑换", "/使用", session.userId, "x", false),
-                      ]
-                    },
-                    {
-                      "buttons": [
-                        urlbutton(2, "反馈", "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=CEqeK9q1yilezUrsSX9L3kO0hK5Wpi_7&authKey=SBuSSQtld6nFctvq9d4Xm1lW%2B0C3QuFZ6FLhCJk8ELCbtOqiR4drHcrbfRLVmcvz&noverify=0&group_code=836655539", session.userId, "10"),
-                        urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),
-                        button(2, "📃问答", "/宝可问答", session.userId, "12"),
-                        button(2, "VIP", '/vip查询', session.userId, "VIP"),
-                      ]
-                    },
-                    config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
-                  ]
-                },
-              },
-              msg_id: session.messageId,
-              timestamp: session.timestamp,
-            })
+            sendMarkdown(md, session,normalKb(session,userArr))
           } catch (e) {
             return h.image(src)
           }
@@ -732,15 +694,15 @@ ${(h('at', { id: (session.userId) }))}
                   },
                 }
               }
-              const md=`# 球丢歪啦！重新捕捉吧~
+              const md = `# 球丢歪啦！重新捕捉吧~
 
 ---
 - 精灵球 -1`
-              try{
+              try {
                 await sendMarkdown(md, session, kb)
                 return
-              }catch{return `球丢歪啦！重新捕捉吧~\n精灵球 -1`}
-              
+              } catch { return `球丢歪啦！重新捕捉吧~\n精灵球 -1` }
+
           }
           if (banID.includes(poke) && !userArr[0].lapTwo) {
 
@@ -1281,11 +1243,18 @@ ${(h('at', { id: (session.userId) }))}`
           const chance = await getChance(userArr[0], ctx)
           const md = `# <@${userId}>的训练师卡片
 ![img#485 #703](${await toUrl(ctx, session, src)})
+[📃 问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可问答`)}&reply=false&enter=true) || [⚔️ 对战](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战`)}&reply=false&enter=true) || [📕 属性](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/属性`)}&reply=false&enter=true)
 
+[🛒 商店](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买`)}&reply=false&enter=true) || [🔈 公告](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/notice`)}&reply=false&enter=true) || [🔖 帮助](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)
+
+[🏆 兑换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=fales) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
+
+
+[**➣ ⚔️和他对战** ](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战 ${session.userId} `)}&reply=false&enter=true)
 ---
 
 - 对战积分：${playerLimit.rankScore}
-- 积分排名：${userArr[0].lap>2?`已进入了三周目，不计入排名`:playerLimit.rank?playerLimit.rank:`未进入前十`}
+- 积分排名：${userArr[0].lap > 2 ? `不计入排名` : playerLimit.rank ? playerLimit.rank : `未进入前十`}
 - 金币获取剩余：${playerLimit.resource.goldLimit}
 - 宝可梦属性：${getType(userArr[0].monster_1).join(' ')}
 
@@ -1792,8 +1761,55 @@ ${bag.replace(/\n/g, '||')}`
       const userArr = await ctx.database.get('pokebattle', { id: session.userId })
       try {
         if (!userArr[0].skillbag[2] && !skill) return `你的技能还太少，有什么先用着吧，或者输入你想查询的技能名字 例如：【查询技能 大爆炸】`
-        if (!skill) return (pokemonCal.skillinfo(userArr[0].skillbag, '', false))
-        if (pokemonCal.findskillId(skill) == 0) return pokemonCal.skillinfo(userArr[0].skillbag, skill, true)
+        let type=skill?pokemonCal.skillinfo(userArr[0].skillbag, skill, true):'请选择查询属性,或者查询具体技能'
+        if (pokemonCal.findskillId(skill) == 0) {
+          const kb = {
+            keyboard: {
+              content: {
+                "rows": [
+                  {
+                    "buttons": [
+                      button(2, "一般", "/查询技能 一般", session.userId, "1"),
+                      button(2, "格斗", "/查询技能 格斗", session.userId, "11"),
+                      button(2, "飞行", "/查询技能 飞行", session.userId, "111"),
+                      button(2, "毒", "/查询技能 毒", session.userId, "1111"),
+                      button(2, "地面", "/查询技能 地面", session.userId, "11111"),
+                    ]
+                  },
+                  {
+                    "buttons": [
+                      button(2, "岩石", "/查询技能 岩石", session.userId, "111111"),
+                      button(2, "虫", "/查询技能 虫", session.userId, "1111111"),
+                      button(2, "幽灵", "/查询技能 幽灵", session.userId, "11111111"),
+                      button(2, "钢", "/查询技能 钢", session.userId, "12"),
+                      button(2, "火", "/查询技能 火", session.userId, "121"),
+                      button(2, "水", "/查询技能 水", session.userId, "1211"),
+                    ]
+                  },
+                  {
+                    "buttons": [
+                      button(2, "草", "/查询技能 草", session.userId, "12111"),
+                      button(2, "电", "/查询技能 电", session.userId, "121111"),
+                      button(2, "超能力", "/查询技能 超能力", session.userId, "1211111"),
+                      button(2, "冰", "/查询技能 冰", session.userId, "1221"),
+                      button(2, "龙", "/查询技能 龙", session.userId, "12211"),
+                    ]
+                  },
+                  {
+                    "buttons": [
+
+                      button(2, "恶", "/查询技能 恶", session.userId, "122111"),
+                      button(2, "技能背包", "/技能背包", session.userId, "1221111"),
+                      button(2, "装备技能", "/装备技能 ", session.userId, "12211111",false),
+                    ]
+                  },
+                ]
+              },
+            },
+          }
+          await sendMarkdown(type, session,kb)
+          return
+        }
         return `${skill}的技能信息：\n威力：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].Dam}\n类型：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].category == 1 ? '物理' : "特殊"}\n属性：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].type}\n描述：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].descript}`
       } catch (e) {
         logger.info(e)
@@ -1914,7 +1930,7 @@ ${bag.replace(/\n/g, '||')}`
         return `你好像没有输入名字，训练师已经自动命名为【${randomName}】
 输入【更换训练师】可以更换你的训练师`
       }
-      trainerName=await censorText(ctx,trainerName)
+      trainerName = await censorText(ctx, trainerName)
       userArr[0].trainerName.push(trainerName)
       await ctx.database.set('pokebattle', { id: session.userId }, {
         trainerNum: { $subtract: [{ $: 'trainerNum' }, 1] },
@@ -2042,7 +2058,7 @@ tips:${tips}`
       if (userArr[0].changeName < 1) return `你的改名次数已经用完`
       let regex = /^[\u4e00-\u9fa5]{2,6}$/
       if (!regex.test(name)) {
-        let count=0
+        let count = 0
         do {
           await session.send(`请回复2-6位中文`)
           await session.bot.internal.sendMessage(session.channelId, {
@@ -2059,10 +2075,10 @@ tips:${tips}`
             timestamp: session.timestamp,
             msg_seq: Math.floor(Math.random() * 1000000),
           })
-          const entry =await session.prompt(60000)
+          const entry = await session.prompt(60000)
           name = entry
           count++
-          if (count > 3) {return `输入错误次数过多`}
+          if (count > 3) { return `输入错误次数过多` }
         }
         while (!regex.test(name))
       }
@@ -2072,7 +2088,7 @@ tips:${tips}`
           return
         } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
-      name= await censorText(ctx, name)
+      name = await censorText(ctx, name)
       await ctx.database.set('pokebattle', { id: session.userId }, {
         name: name,
         changeName: { $subtract: [{ $: 'changeName' }, 1] }
@@ -2111,7 +2127,7 @@ tips:${tips}`
     }
     const newName = await session.prompt(60000)
     if (!newName) return `你好像没有输入名字`
-    userArr[0].trainerName[0] =await censorText(ctx,newName)
+    userArr[0].trainerName[0] = await censorText(ctx, newName)
     await ctx.database.set('pokebattle', { id: session.userId }, {
       trainerName: userArr[0].trainerName
     })

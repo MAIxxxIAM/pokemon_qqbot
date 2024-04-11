@@ -163,35 +163,23 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
             "buttons": [
               button(2, "🖊签到", "/签到", session.userId, "1"),
               button(2, "💳查看", "/查看信息", session.userId, "2"),
-              button(2, "🔖帮助", "/宝可梦", session.userId, "3"),
-              button(2, "🔈公告", "/notice", session.userId, "ntc"),
-            ]
-          },
-          {
-            "buttons": [
-              button(2, "⚔️对战", "/对战", session.userId, "4"),
-              button(2, "♂杂交", "/杂交宝可梦", session.userId, "5"),
-              button(2, "👐放生", "/放生", session.userId, "6"),
-              button(2, "💻接收", "/接收", session.userId, "p", false),
-            ]
-          },
-          {
-            "buttons": [
               button(2, "📷捕捉", "/捕捉宝可梦", session.userId, "7"),
-              button(2, "📕属性", "/属性", session.userId, "8"),
-              button(2, "🛒商店", "/购买", session.userId, "9"),
-              button(2, "🏆兑换", "/使用", session.userId, "x", false),
-            ]
-          },
-          {
-            "buttons": [
-              urlbutton(2, "反馈", "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=CEqeK9q1yilezUrsSX9L3kO0hK5Wpi_7&authKey=SBuSSQtld6nFctvq9d4Xm1lW%2B0C3QuFZ6FLhCJk8ELCbtOqiR4drHcrbfRLVmcvz&noverify=0&group_code=836655539", session.userId, "10"),
-              urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),
-              button(2, "📃问答", "/宝可问答", session.userId, "12"),
               button(2, "VIP", '/vip查询', session.userId, "VIP"),
             ]
           },
-          config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
+          {
+            "buttons": [
+              button(2, "💻接收", "/接收", session.userId, "p", false),
+              button(2, "🔍查询技能", "/查询技能", session.userId, "3"),
+              urlbutton(2, "反馈", "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=CEqeK9q1yilezUrsSX9L3kO0hK5Wpi_7&authKey=SBuSSQtld6nFctvq9d4Xm1lW%2B0C3QuFZ6FLhCJk8ELCbtOqiR4drHcrbfRLVmcvz&noverify=0&group_code=836655539", session.userId, "10"),
+            ]
+          },
+          {
+            "buttons": [
+              
+            ]
+          },
+          config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
         ]
       },
     },
