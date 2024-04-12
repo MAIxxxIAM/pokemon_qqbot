@@ -1505,11 +1505,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
           try {
             let randomID = await ctx.database
               .select('pokebattle')
-              .where(row => $.ne(row.id, userArr[0].id))
-              .where(row => $.lte(row.level, Number(userArr[0].level)))
-              .where(row => $.gte(row.level, Number(userArr[0].level) - 5))
-              .where(row => $.gt(row.battleTimes, 0))
-              .where(row => $.ne(row.monster_1, '0'))
+              .where(row =>$.and( $.ne(row.id, userArr[0].id),$.lte(row.level, Number(userArr[0].level)),$.gte(row.level, Number(userArr[0].level) - 5),$.gt(row.battleTimes, 0),$.ne(row.monster_1, '0')))
               .execute()
 
             if (randomID.length == 0) {
