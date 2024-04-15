@@ -5,7 +5,9 @@ import skillMachines from '../assets/json/skillMachine.json'
 import Base from '../assets/json/PokemonBase.json'
 import * as Type from '../assets/json/pokemonType.json'
 import * as bType from '../assets/json/battleType.json'
+import * as nature from '../assets/json/natures.json'
 import { Skills } from '../battle'
+import { Natures } from '../model'
 
 
 export const expToLv= exptolv
@@ -16,3 +18,4 @@ export const type = Type
 export const battleType = bType
 
 export const skills=new Skills(skillMachines.skill)
+export const natures = nature as Natures[]

@@ -3,6 +3,7 @@ import { Pokedex } from "../pokedex/pokedex"
 import { PokemonPower, Skill } from "../battle"
 import pokemonCal from "../utils/pokemon"
 import { config,Config  } from ".."
+import { natures } from "../utils/data"
 
 
 //智能体兼容
@@ -79,7 +80,7 @@ export class Remenber implements Messages {
 
 declare module 'koishi' {
     interface Tables {
-        'pokemon.battleSlot': BattleSlot
+        'pokemon.list': PokemonList
         'pokebattle': Pokebattle
         'pokemon.notice': PNotice
         'pokemon.resourceLimit': Resource
@@ -87,13 +88,14 @@ declare module 'koishi' {
         'intellegentBody': IntellegentBody
     }
 }
-
+//邀请表
 export interface AddGroup {
     id: string
     count: number
     addGroup: string[]
 }
 
+//个人金币上限
 export class PrivateResource {
     goldLimit: number
     constructor(gold: number) {
@@ -127,6 +129,7 @@ export class PrivateResource {
     }
 }
 
+//积分表
 export interface Resource {
     id: string
     rankScore: number
@@ -134,43 +137,44 @@ export interface Resource {
     resource: PrivateResource
 }
 
-export class Pokemon {
-    id: number
-    monster_1: string
-    battlename: string
-    level: number
-    hitSpeed: number
-    power: PokemonPower
-    skill: [Skill?, Skill?, Skill?, Skill?]
-    constructor(mId: string) {
-        this.monster_1 = mId
-        this.id = Number(mId.split('.')[0])
-        this.battlename = pokemonCal.pokemonlist(mId)
-        this.level = 5
-        const allBase = pokemonCal.pokeBase(mId)
-        this.hitSpeed = Number(allBase[5])
-        const allPower = pokemonCal.power(allBase, this.level)
-        this.power = {
-            hp: Number(allPower[0]),
-            attack: Number(allPower[1]),
-            defense: Number(allPower[2]),
-            specialAttack: Number(allPower[3]),
-            specialDefense: Number(allPower[4]),
-            speed: Number(allPower[5])
-        }
-        this.skill = [new Skill(0)]
-    }
+//宝可梦（待定
+// export class Pokemon {
+//     id: number
+//     monster_1: string
+//     battlename: string
+//     level: number
+//     hitSpeed: number
+//     power: PokemonPower
+//     skill: [Skill?, Skill?, Skill?, Skill?]
+//     constructor(mId: string) {
+//         this.monster_1 = mId
+//         this.id = Number(mId.split('.')[0])
+//         this.battlename = pokemonCal.pokemonlist(mId)
+//         this.level = 5
+//         const allBase = pokemonCal.pokeBase(mId)
+//         this.hitSpeed = Number(allBase[5])
+//         const allPower = pokemonCal.power(allBase, this.level)
+//         this.power = {
+//             hp: Number(allPower[0]),
+//             attack: Number(allPower[1]),
+//             defense: Number(allPower[2]),
+//             specialAttack: Number(allPower[3]),
+//             specialDefense: Number(allPower[4]),
+//             speed: Number(allPower[5])
+//         }
+//         this.skill = [new Skill(0)]
+//     }
 
-}
+// }
 
-interface PokeBag {
-    pokemon: [Pokemon?, Pokemon?, Pokemon?, Pokemon?, Pokemon?, Pokemon?]
-}
+// interface PokeBag {
+//     pokemon: [Pokemon?, Pokemon?, Pokemon?, Pokemon?, Pokemon?, Pokemon?]
+// }
 
-export interface BattleSlot {
-    id: string
-    pokemonBag: PokeBag
-}
+// export interface BattleSlot {
+//     id: string
+//     pokemonBag: PokeBag
+// }
 
 export interface PNotice {
     id: number
@@ -178,6 +182,7 @@ export interface PNotice {
     notice: string
 }
 
+//宝可梦主表
 export interface Pokebattle {
     id: string
     name: string
@@ -207,6 +212,52 @@ export interface Pokebattle {
     advanceChance?: boolean
     lap?: number
     ultra?: object
+}
+
+//宝可梦养成表
+export interface PokemonList{
+    id: string
+    tokens?:number
+    pokemon:FusionPokemon[]
+}
+
+//性格
+export class Natures{
+    effect?: string
+    up?: number
+    down?: number
+    constructor(){
+        const random = Math.random()>0.6?Math.floor(Math.random()*5):Math.floor(Math.random()*20+5)
+        this.effect = natures[random].effect
+        this.up = natures[random].up
+        this.down = natures[random].down
+    }
+}
+
+//融合宝可梦养成
+export class FusionPokemon{
+    id: string
+    name: string
+    natures: Natures
+    natureLevel: number
+    power:number[]
+    constructor(id: string,player?:PokemonList,flush=false){
+        const nature=new Natures()
+        const isId =player?.pokemon.find((pokeId)=>pokeId.id===id)
+        if(!isId) {
+        this.id = id
+        this.name = pokemonCal.pokemonlist(id)
+        this.natures =flush? nature:{}
+        this.natureLevel = 1
+        this.power = [0,0,0,0,0,0]
+    }else{
+            this.id= isId.id
+            this.name = isId.name
+            this.natures =flush?nature:isId.natures
+            this.natureLevel = isId.natureLevel
+            this.power = isId.power
+        }
+    }
 }
 
 export async function model(ctx: Context) {
@@ -289,6 +340,13 @@ export async function model(ctx: Context) {
             nullable: false,
         },
         addGroup: 'list'
+    }, {
+        primary: "id"
+    })
+    ctx.model.extend('pokemon.list', {
+        id: 'string',
+        tokens:'unsigned',
+        pokemon:'json'
     }, {
         primary: "id"
     })

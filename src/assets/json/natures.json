@@ -1,0 +1,127 @@
+﻿[
+    {
+        "effect": "勤奋",
+        "up": 0,
+        "down": 0
+    },
+    {
+        "effect": "坦率",
+        "up": 0,
+        "down": 0
+    },
+    {
+        "effect": "害羞",
+        "up": 0,
+        "down": 0
+    },
+    {
+        "effect": "浮躁",
+        "up": 0,
+        "down": 0
+    },
+    {
+        "effect": "认真",
+        "up": 0,
+        "down": 0
+    },
+    {
+        "effect": "怕寂寞",
+        "up": 1,
+        "down": 2
+    },
+    {
+        "effect": "固执",
+        "up": 1,
+        "down": 3
+    },
+    {
+        "effect": "顽皮",
+        "up": 1,
+        "down": 4
+    },
+    {
+        "effect": "勇敢",
+        "up": 1,
+        "down": 5
+    },
+    {
+        "effect": "大胆",
+        "up": 2,
+        "down": 1
+    },
+    {
+        "effect": "淘气",
+        "up": 2,
+        "down": 3
+    },
+    {
+        "effect": "乐天",
+        "up": 2,
+        "down": 4
+    },
+    {
+        "effect": "悠闲",
+        "up": 2,
+        "down": 5
+    },
+    {
+        "effect": "内敛",
+        "up": 3,
+        "down": 1
+    },
+    {
+        "effect": "慢吞吞",
+        "up": 3,
+        "down": 2
+    },
+    {
+        "effect": "马虎",
+        "up": 3,
+        "down": 4
+    },
+    {
+        "effect": "冷静",
+        "up": 3,
+        "down": 5
+    },
+    {
+        "effect": "温和",
+        "up": 4,
+        "down": 1
+    },
+    {
+        "effect": "温顺",
+        "up": 4,
+        "down": 2
+    },
+    {
+        "effect": "慎重",
+        "up": 4,
+        "down": 3
+    },
+    {
+        "effect": "自大",
+        "up": 4,
+        "down": 5
+    },
+    {
+        "effect": "胆小",
+        "up": 5,
+        "down": 1
+    },
+    {
+        "effect": "急躁",
+        "up": 5,
+        "down": 2
+    },
+    {
+        "effect": "爽朗",
+        "up": 5,
+        "down": 3
+    },
+    {
+        "effect": "天真",
+        "up": 5,
+        "down": 4
+    }
+]

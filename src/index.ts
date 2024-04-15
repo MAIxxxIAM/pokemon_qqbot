@@ -2,7 +2,7 @@ import { Schema, h, $, Context, is, Session } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
-import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText } from './utils/mothed'
+import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion } from './utils/mothed'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import * as fs from 'fs'
@@ -18,7 +18,7 @@ import { Robot } from './utils/robot'
 import { expToLv, expBase, skillMachine } from './utils/data'
 import { Pokedex } from './pokedex/pokedex'
 import { pokebattle } from './battle/pvp'
-import { AddGroup, Pokebattle, PrivateResource, Resource, model } from './model'
+import { AddGroup, FusionPokemon, Pokebattle, PokemonList, PrivateResource, Resource, model,IntellegentBody } from './model'
 import { catchPokemon } from './battle/pve'
 
 
@@ -211,6 +211,9 @@ export async function apply(ctx, conf: Config) {
     await ctx.database.set('pokemon.resourceLimit', {}, row => ({
       resource: new PrivateResource(config.金币获取上限)
     }))
+    await ctx.database.set("intellegentBody",{group_open_id:{$ne:''}},row=>({
+      token:7000
+    }))
   })
 
 
@@ -219,6 +222,15 @@ export async function apply(ctx, conf: Config) {
       battleTimes: $.add(row.battleTimes, 3),
     }))
   })
+  
+  ctx.cron('0 7 * * 1', async () => {
+    const randomPlayer: Pokebattle[] = await ctx.database.get('pokebattle', { lap:{$eq:3} })
+    const id = randomPlayer.map((item) => item.id)
+    await ctx.database.set('pokemon.resourceLimit', {id:{$in:id}}, row => ({
+      rankScore: 0
+    }))
+  })
+
   ctx.cron('0 0 */2 * *', async () => {
     await ctx.database.set('pokemon.resourceLimit', { rank: { $gt: 0 } }, row => ({
       rank: 0,
@@ -356,6 +368,7 @@ export async function apply(ctx, conf: Config) {
       const vipName = vip ? "[💎VIP]" : ''
       let dateToday = Math.round(Number(new Date()) / 1000)
       if (userArr.length != 0) {
+        const playerList:PokemonList=await getList(session.userId,ctx,userArr[0].monster_1)
         let dateNow = Math.floor((userArr[0].date + 28800) / 86400)
         if (dateNow == Math.floor((dateToday + 28800) / 86400)) {
           await session.send('今天你已经签到过了哟~快去捕捉属于你的宝可梦吧')
@@ -403,7 +416,7 @@ export async function apply(ctx, conf: Config) {
               exp: expNew,
               battlename: pokemonCal.pokemonlist(userArr[0].monster_1),
               base: pokemonCal.pokeBase(userArr[0].monster_1),
-              power: pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew),
+              power: pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew,playerList,userArr[0].monster_1),
               coin: { $add: [{ $: 'coin' }, config.签到获得个数 + vipCoin] },
               gold: { $add: [{ $: 'gold' }, 3000 + vipRGold] },
               trainer: userArr[0].trainer[0] ? userArr[0].trainer : ['0'],
@@ -447,8 +460,9 @@ export async function apply(ctx, conf: Config) {
             ctx.fillStyle = 'red';
             ctx.fillText(`输入【/宝可梦】查看详细指令`, 135, 350)
             ctx.fillStyle = 'black';
-            ctx.fillText(`hp:${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew)[0]} att:${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew)[1]} def:${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew)[2]}`, 30, 715)
-            ctx.fillText(`spa:${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew)[3]} spa:${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew)[4]} spe:${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew)[5]}`, 30, 740)
+            const playerPower=pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew,playerList,userArr[0].monster_1)
+            ctx.fillText(`hp:${playerPower[0]} att:${playerPower[1]} def:${playerPower[2]}`, 30, 715)
+            ctx.fillText(`spa:${playerPower[3]} spa:${playerPower[4]} spe:${playerPower[5]}`, 30, 740)
             ctx.fillText(date, 308, 173)
             ctx.fillText('Lv.' + lvNew.toString(), 328, 198)
             ctx.drawImage(overlay, 318, 203, 160 * expNew / expToLv.exp_lv[lvNew].exp, 8)
@@ -476,7 +490,7 @@ export async function apply(ctx, conf: Config) {
 
 [🛒 商店](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买`)}&reply=false&enter=true) || [🔈 公告](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/notice`)}&reply=false&enter=true) || [🔖 帮助](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)
 
-[🏆 兑换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=fales) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
+[🏆 兑换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=false) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
 
 
 [**➣ ⚔️和他对战** ](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战 ${session.userId} `)}&reply=false&enter=true)
@@ -928,6 +942,7 @@ ${(h('at', { id: (session.userId) }))}
       const vip = isVip(userArr[0])
       let dan: number | any[]
       if (userArr.length != 0) {
+        const playerList:PokemonList=await getList(session.userId,ctx,userArr[0].monster_1)
         //图片服务
         let pokemonimg1: string[] = []
         const bgImg = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', 'bag.png')}`)
@@ -1020,6 +1035,7 @@ ${(h('at', { id: (session.userId) }))}
             { return '输入错误' }
           } else {
             if (userArr[0].monster_1 != '0') {
+              const playerPower=pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level,playerList,userArr[0].monster_1)
               //图片服务
               let img_fuse = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components/fuse.png')}`)
               let img_F = await ctx.canvas.loadImage(`${config.图片源}/fusion/${pokeM.split('.')[0]}/${pokeM.split('.')[0]}.png`)
@@ -1051,12 +1067,12 @@ ${(h('at', { id: (session.userId) }))}
 
 ---
 ${point}
-生命：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0])}
-攻击：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1])}
-防御：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2])}
-特攻：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3])}
-特防：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4])}
-速度：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5])}
+生命：${Math.sign(Number(playerPower[0]) - userArr[0].power[0]) >= 0 ? '+' + (Number(playerPower[0]) - userArr[0].power[0]) : '' + (Number(playerPower[0]) - userArr[0].power[0])}
+攻击：${Math.sign(Number(playerPower[1]) - userArr[0].power[1]) >= 0 ? '+' + (Number(playerPower[1]) - userArr[0].power[1]) : '' + (Number(playerPower[1]) - userArr[0].power[1])}
+防御：${Math.sign(Number(playerPower[2]) - userArr[0].power[2]) >= 0 ? '+' + (Number(playerPower[2]) - userArr[0].power[2]) : '' + (Number(playerPower[2]) - userArr[0].power[2])}
+特攻：${Math.sign(Number(playerPower[3]) - userArr[0].power[3]) >= 0 ? '+' + (Number(playerPower[3]) - userArr[0].power[3]) : '' + (Number(playerPower[3]) - userArr[0].power[3])}
+特防：${Math.sign(Number(playerPower[4]) - userArr[0].power[4]) >= 0 ? '+' + (Number(playerPower[4]) - userArr[0].power[4]) : '' + (Number(playerPower[4]) - userArr[0].power[4])}
+速度：${Math.sign(Number(playerPower[5]) - userArr[0].power[5]) >= 0 ? '+' + (Number(playerPower[5]) - userArr[0].power[5]) : '' + (Number(playerPower[5]) - userArr[0].power[5])}
 ${point}
 
 ---
@@ -1068,12 +1084,12 @@ ${point}
 ${img_zj}
 能力变化：
 属性：${getType(dan[1]).join(' ')}
-生命：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0])}
-攻击：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1])}
-防御：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2])}
-特攻：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3])}
-特防：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4])}
-速度：${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5])}
+生命：${Math.sign(Number(playerPower[0]) - userArr[0].power[0]) >= 0 ? '+' + (Number(playerPower[0]) - userArr[0].power[0]) : '' + (Number(playerPower[0]) - userArr[0].power[0])}
+攻击：${Math.sign(Number(playerPower[1]) - userArr[0].power[1]) >= 0 ? '+' + (Number(playerPower[1]) - userArr[0].power[1]) : '' + (Number(playerPower[1]) - userArr[0].power[1])}
+防御：${Math.sign(Number(playerPower[2]) - userArr[0].power[2]) >= 0 ? '+' + (Number(playerPower[2]) - userArr[0].power[2]) : '' + (Number(playerPower[2]) - userArr[0].power[2])}
+特攻：${Math.sign(Number(playerPower[3]) - userArr[0].power[3]) >= 0 ? '+' + (Number(playerPower[3]) - userArr[0].power[3]) : '' + (Number(playerPower[3]) - userArr[0].power[3])}
+特防：${Math.sign(Number(playerPower[4]) - userArr[0].power[4]) >= 0 ? '+' + (Number(playerPower[4]) - userArr[0].power[4]) : '' + (Number(playerPower[4]) - userArr[0].power[4])}
+速度：${Math.sign(Number(playerPower[5]) - userArr[0].power[5]) >= 0 ? '+' + (Number(playerPower[5]) - userArr[0].power[5]) : '' + (Number(playerPower[5]) - userArr[0].power[5])}
 是否放入战斗栏（Y/N）
 ${(h('at', { id: (session.userId) }))}
 `)
@@ -1086,7 +1102,7 @@ ${(h('at', { id: (session.userId) }))}
                     monster_1: dan[1],
                     battlename: dan[0],
                     base: pokemonCal.pokeBase(dan[1]),
-                    power: pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)
+                    power: playerPower
                   })
                   const point = '```'
                   const md = '# ✨' + dan[0] + '✨' + `
@@ -1094,12 +1110,12 @@ ${(h('at', { id: (session.userId) }))}
 
 ---
 ${point}
-生命：${pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]}  ${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[0]) - userArr[0].power[0])}
-攻击：${pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]}  ${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[1]) - userArr[0].power[1])}
-防御：${pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]}  ${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[2]) - userArr[0].power[2])}
-特攻：${pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]}  ${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[3]) - userArr[0].power[3])}
-特防：${pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]}  ${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[4]) - userArr[0].power[4])}
-速度：${pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]}  ${Math.sign(Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5]) >= 0 ? '+' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5]) : '' + (Number(pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)[5]) - userArr[0].power[5])}
+生命：${playerPower[0]}  ${Math.sign(Number(playerPower[0]) - userArr[0].power[0]) >= 0 ? '+' + (Number(playerPower[0]) - userArr[0].power[0]) : '' + (Number(playerPower[0]) - userArr[0].power[0])}
+攻击：${playerPower[1]}  ${Math.sign(Number(playerPower[1]) - userArr[0].power[1]) >= 0 ? '+' + (Number(playerPower[1]) - userArr[0].power[1]) : '' + (Number(playerPower[1]) - userArr[0].power[1])}
+防御：${playerPower[2]}  ${Math.sign(Number(playerPower[2]) - userArr[0].power[2]) >= 0 ? '+' + (Number(playerPower[2]) - userArr[0].power[2]) : '' + (Number(playerPower[2]) - userArr[0].power[2])}
+特攻：${playerPower[3]}  ${Math.sign(Number(playerPower[3]) - userArr[0].power[3]) >= 0 ? '+' + (Number(playerPower[3]) - userArr[0].power[3]) : '' + (Number(playerPower[3]) - userArr[0].power[3])}
+特防：${playerPower[4]}  ${Math.sign(Number(playerPower[4]) - userArr[0].power[4]) >= 0 ? '+' + (Number(playerPower[4]) - userArr[0].power[4]) : '' + (Number(playerPower[4]) - userArr[0].power[4])}
+速度：${playerPower[5]}  ${Math.sign(Number(playerPower[5]) - userArr[0].power[5]) >= 0 ? '+' + (Number(playerPower[5]) - userArr[0].power[5]) : '' + (Number(playerPower[5]) - userArr[0].power[5])}
 ${point}
 `
                   await sendMarkdown(md, session)
@@ -1116,7 +1132,7 @@ ${point}
                 monster_1: dan[1],
                 base: pokemonCal.pokeBase(dan[1]),
                 battlename: dan[0],
-                power: pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level)
+                power: pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level,playerList,userArr[0].monster_1)
               })
 
               return `恭喜你
@@ -1247,7 +1263,7 @@ ${(h('at', { id: (session.userId) }))}`
 
 [🛒 商店](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买`)}&reply=false&enter=true) || [🔈 公告](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/notice`)}&reply=false&enter=true) || [🔖 帮助](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)
 
-[🏆 兑换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=fales) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
+[🏆 兑换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=false) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
 
 
 [**➣ ⚔️和他对战** ](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战 ${session.userId} `)}&reply=false&enter=true)
@@ -1297,6 +1313,7 @@ ${(h('at', { id: (session.userId) }))}`
         } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
       //图片服务
+      const playerList:PokemonList=await getList(session.userId,ctx,userArr[0].monster_1)
       if (pokemon) {
         if (Number(pokemon) > userArr[0].AllMonster.length) return `输入错误`
         choose = pokemon
@@ -1367,7 +1384,7 @@ ${(h('at', { id: (session.userId) }))}`
           AllMonster: userArr[0].AllMonster,
           level: lvNew,
           exp: expNew,
-          power: pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew),
+          power: pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew,playerList,userArr[0].monster_1),
         })
         try {
           const src = pokemonCal.pokemomPic(discarded[0], false).toString().match(/src="([^"]*)"/)[1]
@@ -1424,14 +1441,17 @@ ${(h('at', { id: (session.userId) }))}
       const fath = userArr[0].monster_1.split('.')[0] + '.' + userArr[0].monster_1.split('.')[0]
       const math = userArr[0].monster_1.split('.')[1] + '.' + userArr[0].monster_1.split('.')[1]
       let toDo = ''
+      const playerList:PokemonList=await getList(session.userId,ctx,userArr[0].monster_1)
+      const playerPower = pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level,playerList,userArr[0].monster_1)
+      const index=playerList.pokemon.findIndex((pokeId)=>pokeId.id===userArr[0].monster_1)
       if (userArr[0]?.base[0]) {
         toDo = `能力值：
-生命：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[0]}
-攻击：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[1]}
-防御：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[2]}
-特攻：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[3]}
-特防：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[4]}
-速度：${pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level)[5]}`
+生命：${playerPower[0]}
+攻击：${playerPower[1]}
+防御：${playerPower[2]}
+特攻：${playerPower[3]}
+特防：${playerPower[4]}
+速度：${playerPower[5]}`
       }
       try {
         const point = '```'
@@ -1446,9 +1466,11 @@ ${(h('at', { id: (session.userId) }))}
 ---
 ${point}
 ${(toDo)}
+性格：${playerList.pokemon[index]?.natures?playerList.pokemon[index].natures.effect:'未加载'}
 ${point}`
         await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(0, "♂ 杂交宝可梦", "/杂交宝可梦", session.userId, "1"), button(0, "📷 捕捉宝可梦", "/捕捉宝可梦", session.userId, "2")] }, { "buttons": [button(0, "💳 查看信息", "/查看信息", session.userId, "3"), button(0, "⚔️ 对战", "/对战", session.userId, "4")] },] }, }, })
       } catch (e) {
+        console.log(e)
         return `\u200b
 ============
 ${userArr[0].battlename}
@@ -1478,6 +1500,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
             return
           } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
         }
+        const playerList:PokemonList=await getList(session.userId,ctx,userArr[0].monster_1)
         let spendGold = userVip ? 249 : 500
         spendGold = (userLimit.resource.goldLimit == 0 && userArr[0].level == 100) ? 0 : spendGold
         if (userArr[0].gold < spendGold) {
@@ -1545,17 +1568,19 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
           return `对方的宝可梦还在恢复，无法对战`
         }
         tarArr[0].battleTimes = battleTimes
-
+        const tarList:PokemonList=await getList(userId,ctx,tarArr[0].monster_1)
         tarArr[0].base = pokemonCal.pokeBase(tarArr[0].monster_1)
-        tarArr[0].power = pokemonCal.power(pokemonCal.pokeBase(tarArr[0].monster_1), tarArr[0].level)
+        tarArr[0].power = pokemonCal.power(pokemonCal.pokeBase(tarArr[0].monster_1), tarArr[0].level,tarList,tarArr[0].monster_1)
 
         await ctx.database.set('pokebattle', { id: userId }, {
           battleTimes: battleTimes,
           base: tarArr[0].base,
           power: tarArr[0].power
         })
+        userArr[0].power=pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level,playerList,userArr[0].monster_1)
         await ctx.database.set('pokebattle', { id: session.userId }, {
           gold: { $subtract: [{ $: 'gold' }, spendGold] },
+          power: userArr[0].power
         })
         await session.send(`${userVip ? `你支付了会员价${spendGold}` : `你支付了${spendGold}`}金币，请稍等，正在发动了宝可梦对战`)
         if (tarArr[0].battleTimes == 0) {
@@ -1998,6 +2023,7 @@ ${bag.replace(/\n/g, '||')}`
                 content: {
                   "rows": [
                     { "buttons": [button(2, '购买', "/购买", session.userId, "1", false)] },
+                    { "buttons": [button(2, '积分兑换', "/积分兑换", session.userId, "2")] },
                   ]
                 },
               },
@@ -2092,6 +2118,136 @@ tips:${tips}`
       return `你的名字已经改为【${name}】`
     })
 
+  
+  ctx.command('宝可梦').subcommand('积分兑换 <items> [number:number]', '通过对战积分兑换').action(async ({ session },items,number:number) => {
+    number=Math.floor(Number(number))
+    if(number<0) return `怎么还有来骗积分的！！！`
+    const [player]:Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
+    const item=["金币上限","性格模组","荣誉勋章",'麦麦对话券']
+    if (!player) {
+      try {
+        await session.execute(`签到`)
+        return
+      } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
+    }
+    const [limit]:Resource[]=await ctx.database.get('pokemon.resourceLimit', { id: session.userId })
+    if(player.lap<3) return `你的请先积极对战或者收集宝可梦进入3周目`
+    const market=`# 积分商城
+
+---
+- [金币上限](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/积分兑换 金币上限 `)}&reply=false&enter=false)
+
+> 比例 1积分：30金币上限，**当日使用**
+
+- [性格模组](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/积分兑换 性格模组 `)}&reply=false&enter=true) 
+
+> 300积分 为当前宝可梦添加性格或刷新性格
+
+- [荣誉勋章](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/积分兑换 荣誉勋章 `)}&reply=false&enter=true) 
+
+> 200积分 提升 **1-5点** 当前宝可梦的随机一个属性努力值
+
+- [麦麦对话券](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/积分兑换 麦麦对话券 `)}&reply=false&enter=false) 
+
+> 比例 1积分：10token，当麦麦对话 **每日token** 不足时才会消耗
+
+**提升效果仅对相同杂交宝可梦有效**
+
+---
+
+> 积分每周一早7点重置
+`
+
+    if(!items) {
+      await sendMarkdown(market, session)
+      return
+    }
+    if(!item.includes(items)) return `没有这个道具`
+    switch(items){
+      case "金币上限":
+        if(!number) return `请输入需要兑换的积分数量`
+        number=Math.floor(number)
+        if(limit.rankScore<number) return `你的积分不足`
+        limit.resource.goldLimit+=number*30
+        await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
+          rankScore: $.sub(row.rankScore, number),
+          resource: limit.resource,
+        }))
+        return `成功兑换${number*30}金币上限`
+      case "性格模组":{
+        if(limit.rankScore<300) return `你的积分不足`
+        await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row=>({
+          rankScore: $.sub(row.rankScore, 300),
+        }))
+        const playerList:PokemonList=await getList(session.userId,ctx,player.monster_1)
+        const newNature=new FusionPokemon(player.monster_1,playerList,true)
+        await findFusion(newNature,playerList)
+        await ctx.database.set('pokemon.list', { id: session.userId }, {
+          pokemon:playerList.pokemon
+        }
+        )
+        return `成功给${ newNature.name}加载了性格模块，性格为 ${newNature.natures.effect}`}
+      case "荣誉勋章":
+        const powerDesc=["生命","攻击","防御","特攻","特防","速度"]
+        {if(limit.rankScore<200) return `你的积分不足`
+        await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row=>({
+          rankScore: $.sub(row.rankScore, 200),
+        }))
+        const playerList:PokemonList=await getList(session.userId,ctx,player.monster_1)
+        const newNature=new FusionPokemon(player.monster_1,playerList)
+        const index=await findFusion(newNature,playerList)
+        let random=0
+        let value=0
+        let up=0
+        do {
+        random = Math.floor(Math.random() * 6);
+        value=Math.floor(Math.random()*5+1)
+        up = playerList.pokemon[index].power[random] <= 255-value ?  value:255-value> 0?255-value:0;
+        } while (up === 0)
+        playerList.pokemon[index].power[random]+=up
+        await ctx.database.set('pokemon.list', { id: session.userId }, {
+          pokemon:playerList.pokemon
+        }
+        )
+        return `成功给${ newNature.name}添加了荣誉勋章，提升了${up}点${powerDesc[random]}努力值`}
+      case "麦麦对话券":
+        if(!number)(
+          number=0
+        )
+        if(limit.rankScore<number) return `你的积分不足`
+        const [aiPlayer] =await ctx.database.get('intellegentBody', { group_open_id:session.userId})
+        if(!aiPlayer){
+          const md=`# 添加机器少女麦麦，开始你们的对话
+
+---
+相信你已经迫不及待的要开始和麦麦聊天了！o(*////▽////*)q
+快点点击下面的按钮，召唤麦麦吧！`
+          const kb={
+            keyboard: {
+              content: {
+                "rows": [
+                  { "buttons": [urlbutton(2, "开始和麦麦聊天",'https://qun.qq.com/qunpro/robot/qunshare?robot_uin=3889017499&robot_appid=102098973&biz_type=1', session.userId, "11")] },
+                ]
+              },
+            },
+          }
+          await sendMarkdown(md, session, kb)
+        }
+        await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row=>({
+          rankScore: $.sub(row.rankScore, number),
+        }))
+        await ctx.database.set('pokemon.list', { id: session.userId }, row=>({
+          tokens: $.add(row.tokens,number*10),
+        }))
+        return `成功兑换了${number?number*10:0} token`
+    }
+  })
+  
+  
+  
+  
+  
+  
   ctx.command('宝可梦').subcommand('训练师改名', '改动训练师名字').action(async ({ session }) => {
     const userArr = await ctx.database.get('pokebattle', { id: session.userId })
     if (userArr.length == 0) {

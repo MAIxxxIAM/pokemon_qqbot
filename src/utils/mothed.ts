@@ -4,6 +4,7 @@ import { type, battleType } from './data'
 import { Context, Session ,Element} from 'koishi'
 import { WildPokemon } from '../battle'
 import { } from 'koishi-plugin-cron'
+import { FusionPokemon, Natures, PokemonList } from '../model'
 
 
 export async function isResourceLimit(userId: string, ctx: Context) {
@@ -13,6 +14,25 @@ export async function isResourceLimit(userId: string, ctx: Context) {
   } else {
     return resources[0]
   }
+}
+export async function getList(userId: string, ctx: Context,first?:string) {
+  const resources = await ctx.database.get('pokemon.list', { id: userId })
+  if (resources.length == 0) {
+    return await ctx.database.create('pokemon.list', { id: userId, pokemon: [new FusionPokemon(first)] })
+  } else {
+    return resources[0]
+  }
+}
+
+export async function findFusion(nature:FusionPokemon,playerList:PokemonList){
+  let index=playerList.pokemon.findIndex(a=>a.id==nature.id)
+  if(index==-1){
+    playerList.pokemon.push(nature)
+    index=playerList.pokemon.length-1
+  }else{
+    playerList.pokemon[index]=nature
+  }
+  return index
 }
 
 export async function getPic(ctx, log, user, tar) {
@@ -176,7 +196,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
           },
           {
             "buttons": [
-              
+              button(2, "❤ 领取麦麦", "/领取麦麦 ", session.userId, "l", false),
             ]
           },
           config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },

@@ -1,6 +1,6 @@
 import { Context } from "koishi";
 import { config,Config  } from "..";
-import { button, urlbutton } from "../utils/mothed"
+import { button, sendMarkdown, urlbutton } from "../utils/mothed"
 
 
 export async function apply(ctx: Context) {
@@ -88,11 +88,32 @@ ${notice}`
     })
 
     ctx.command('领取麦麦 <text>').action(async ({ session },text) => {
-        if (!text) return '请输入绑定账户的access_token'
+        const [pokeplayer]=await ctx.database.get('pokebattle', { id: session.userId })
+        if(!pokeplayer){
+            await session.execute('宝可梦签到')
+        }
+        if (!text) {
+                const md=`# 领养机器少女麦麦
+      
+---
+相信你已经迫不及待的要开始和麦麦聊天了！o(*////▽////*)q
+快点点击下面的按钮，召唤麦麦吧！`
+                const kb={
+                  keyboard: {
+                    content: {
+                      "rows": [
+                        { "buttons": [urlbutton(2, "🗨 开始和麦麦聊天",'https://qun.qq.com/qunpro/robot/qunshare?robot_uin=3889017499&robot_appid=102098973&biz_type=1', session.userId, "11")] },
+                      ]
+                    },
+                  },
+                }
+                await sendMarkdown(md, session, kb)
+                return
+        }
         const [player]= await ctx.database.get('intellegentBody' as any, { open_token: text,id:{$ne:session.userId} })
         if(player){
-          await ctx.database.set('intellegentBody' as any, { open_token: text }, { group_open_id:session.userId,open_token: null,token:3000 })
-          return '绑定成功'
+          await ctx.database.set('intellegentBody' as any, { open_token: text }, { group_open_id:session.userId,open_token: null,token:7000 })
+          return '绑定成功,初次绑定，赠送7000token，每日获得7000token。后续可用对战积分换取'
         }
         return '绑定失败。未找到对应账户'
       })

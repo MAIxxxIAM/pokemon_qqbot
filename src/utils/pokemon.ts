@@ -4,32 +4,44 @@ import {config,Config} from '../index';
 
 import { h } from "koishi"
 import { baseFusion } from './mothed';
+import { PokemonList } from '../model';
 
 const exptolv = expToLv
 const Base = pokemonBase
 
 const pokemonCal = {
-  power(a: string[], b: number) {
+  power(a: string[], b: number,c1:PokemonList,id:string) {
+    const index = c1.pokemon.findIndex((pokeId)=>pokeId.id===id)
+    const nature=index==-1?{effect:'无',up:0,down:0}:c1.pokemon[index].natures
+    const powerNatrue=index==-1?{
+      id:'临时',
+      name: '临时',
+      natures: {
+          effect: '无',
+          up: 0,
+          down: 0
+      },
+      natureLevel: 0,
+      power: [0, 0, 0, 0, 0, 0]
+  }:c1.pokemon[index]
+    const powerUp= powerNatrue.power
     try {
-      let c = ['0', '0', '0', '0', '0']
+      let c = ['0', '0', '0', '0', '0', '0']
       for (let i = 0; i < a.length; i++) {
-        if (i == 0) { c[i] = String(Math.floor((Number(a[i]) + 30 + 1.25) * b / 50 + 10 + b)) }
-        c[i] = String(Math.floor((Number(a[i]) + 30 + 1.25) * b / 50 + 5))
+        c[i] = String(Math.round((Number(a[i]) + 30 + Math.round(powerUp[i] / 8)) * b / 50 + 5))
       }
+      c[nature.up] = String(Math.ceil(Number(c[nature.up]) * (1+powerNatrue.natureLevel * 0.01)))
+      c[nature.down] = String(Math.floor(Number(c[nature.down]) * (1-powerNatrue.natureLevel * 0.01)))
       return c
-    } catch {
-      return ['0', '0', '0', '0', '0']
+    } catch(e) {
+      return ['0', '0', '0', '0', '0', '0']
     }
   },
 
   exp_bar(a: number, b: number) {
-    let exp_bar = ['=', '=', '=', '=', '=', '=', '=', '=', '=', '=']
     let nowExp = b / exptolv.exp_lv[a].exp * 100
-    exp_bar[Math.floor(nowExp / 10) - 1] = `✧${(nowExp.toFixed(1))}%✧`
     const expBar='🟩'.repeat(Math.floor(nowExp/10))+'🟨'.repeat(nowExp%10>4?1:0)+ '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜'.substring(Math.round(nowExp/10))
-
     return expBar
-
   },
 
   pokeBase(a) {

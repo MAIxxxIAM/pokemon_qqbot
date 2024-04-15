@@ -1,4 +1,5 @@
 import { Pokebattle } from ".."
+import { PokemonList } from "../model"
 import pokemonCal from "./pokemon"
 
 export class Robot implements Pokebattle {
@@ -26,7 +27,23 @@ export class Robot implements Pokebattle {
         this.monster_1= p1+'.'+p2
         this.battlename= pokemonCal.pokemonlist(this.monster_1)
         this.base=pokemonCal.pokeBase(this.monster_1)
-        this.power=pokemonCal.power(this.base, this.level)
+        const botpoke: PokemonList = {
+            id: this.id,
+            pokemon: [
+                {
+                    id: this.id,
+                    name: this.name,
+                    natures: {
+                        effect: '无',
+                        up: 0,
+                        down: 0
+                    },
+                    natureLevel: 0,
+                    power: [0, 0, 0, 0, 0, 0]
+                }
+            ]
+        }
+        this.power=pokemonCal.power(this.base, this.level, botpoke, this.monster_1)
         this.skill= Math.floor(Math.random()* 150)+1
         this.trainer=['robot']
         this.battleTimes=30

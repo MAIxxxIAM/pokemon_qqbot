@@ -1,9 +1,9 @@
 import { Context, Schema,$ } from 'koishi'
 
 import { Pokebattle, config, Config } from '../index';
-import { button, getChance, getMarkdownParams, sendMarkdown, toUrl } from '../utils/mothed';
+import { button, getChance, getList, getMarkdownParams, sendMarkdown, toUrl } from '../utils/mothed';
 import pokemonCal from '../utils/pokemon';
-import { Resource } from '../model';
+import { PokemonList, Resource } from '../model';
 
 export const name = 'lapTwo'
 
@@ -55,9 +55,9 @@ export function apply(ctx: Context) {
   })
 
   ctx.command('宝可梦').subcommand('刷新字段',{authority: 4}).action(async () => {
-    await ctx.database.set('pokebattle', {lapTwo:true},{
-      lap:2
-    })
+    await ctx.database.set('pokemon.resourceLimit', {}, row => ({
+      rankScore: 0
+    }))
     return '刷新成功'
   })
   ctx.command('宝可梦').subcommand('lapnext', '进入下一周目')
@@ -68,6 +68,7 @@ export function apply(ctx: Context) {
         await session.execute('签到')
         return
       }
+      const playerList:PokemonList=await getList(session.userId,ctx,user.monster_1)
       const advanceChance = user.advanceChance
       if (!user.lapTwo) {
         await session.execute('lapTwo')
@@ -114,7 +115,7 @@ export function apply(ctx: Context) {
             exp: 0,
             gold: user.gold >= 3000000 ? 3000000 : user.gold,
             base: pokemonCal.pokeBase(user.monster_1),
-            power: pokemonCal.power(user.base, 5),
+            power: pokemonCal.power(user.base, 5,playerList, user.monster_1),
             advanceChance: false,
           })
           return `你成功进入了三周目`
@@ -133,6 +134,7 @@ export function apply(ctx: Context) {
       const user: Pokebattle = userArr[0]
       if (user?.lapTwo) return `你已经进入了二周目`
       if (user.level < 80 || user.ultramonster.length < 5) return `条件不满足，请升级至80级，并且拥有5只传说中的宝可梦`
+      const playerList:PokemonList=await getList(session.userId,ctx,user.monster_1)
       if (platform == 'qq' && config.QQ官方使用MD) {
         try {
           await session.bot.internal.sendMessage(session.channelId, {
@@ -186,13 +188,14 @@ export function apply(ctx: Context) {
       const inTwo = await session.prompt(config.捕捉等待时间)
       switch (inTwo?.toLowerCase()) {
         case 'y':
+          
           await ctx.database.set('pokebattle', userId, {
             lapTwo: true,
             lap: 2,
             level: 5,
             exp: 0,
             base: pokemonCal.pokeBase(user.monster_1),
-            power: pokemonCal.power(user.base, 5),
+            power: pokemonCal.power(user.base, 5,playerList, user.monster_1),
           })
           return `你成功进入了二周目`
         case 'n':
