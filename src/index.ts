@@ -1571,7 +1571,24 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
           return `对方的宝可梦还在恢复，无法对战`
         }
         tarArr[0].battleTimes = battleTimes
-        const tarList:PokemonList=await getList(userId,ctx,tarArr[0].monster_1)
+        const robotlist: PokemonList={
+          id: 'robot',
+          win_count: 0,
+          pokemon: [
+              {
+                  id:  'robot',
+                  name: this.name,
+                  natures: {
+                      effect: '无',
+                      up: 0,
+                      down: 0
+                  },
+                  natureLevel: 0,
+                  power: [0, 0, 0, 0, 0, 0]
+              }
+          ]
+      }
+        const tarList:PokemonList=userId?.substring(0, 5) == 'robot' ?robotlist:await getList(userId,ctx,tarArr[0].monster_1)
         tarArr[0].base = pokemonCal.pokeBase(tarArr[0].monster_1)
         tarArr[0].power = pokemonCal.power(pokemonCal.pokeBase(tarArr[0].monster_1), tarArr[0].level,tarList,tarArr[0].monster_1)
 
@@ -1594,9 +1611,12 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let battlelog = battle[0]
         let winner = battle[1]
         let loser = battle[2]
+        let win_count=0
         if (!user) {
+          const index=playerList.pokemon.findIndex((pokeId)=>pokeId.id===userArr[0].monster_1)
+          win_count=(winner==session.userId)?(playerList.win_count<6? playerList.win_count + 1:playerList.win_count):0
           await ctx.database.set('pokemon.resourceLimit', { id: winner }, row => ({
-            rankScore: $.add(row.rankScore, 2),
+            rankScore: $.add(row.rankScore, 1+win_count),
           })
           )
           await ctx.database.set('pokemon.resourceLimit', { id: loser, rankScore: { $gt: 0 } }, row =>
@@ -1604,10 +1624,8 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
             rankScore: $.sub(row.rankScore, 1),
           })
           )
-
-          const index=playerList.pokemon.findIndex((pokeId)=>pokeId.id===userArr[0].monster_1)
-          const win_count=winner==session.userId?(playerList.win_count<5? playerList.win_count + 1:playerList.win_count):0
-          if(index!==-1){playerList.pokemon[index].natureLevel=2*win_count
+          if(index!==-1){
+            playerList.pokemon[index].natureLevel=2*(win_count-1)
           await ctx.database.set('pokemon.list', { id: session.userId },row=> ({
             win_count:win_count,
             pokemon:playerList.pokemon
@@ -1637,7 +1655,9 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
 
 ---
 获胜者:${(winName + (winnerArr[0].name || winnerArr[0].battlename).replace(/\*/g, '口'))}
-${winner == session.userId ? `金币+${getgold}  ${user ? '指定对战无法获得积分' : '对战积分+2'}
+${winner == session.userId ? `金币+${getgold}  ${user ? '指定对战无法获得积分' : `对战积分+${1+win_count}
+
+当前连胜：${win_count-1}`}
 
 ---
 > ${loserlog} ${user ? '' : '对战积分-1'}` : `

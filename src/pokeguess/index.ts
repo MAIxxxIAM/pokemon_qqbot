@@ -76,7 +76,6 @@ ${h('image', { url:qImage})}
 回复机器人输入答案序号或者答案文字`)
         }
         const answer = await session.prompt(60000)
-        console.log(answer)
         if (!answer) {
             try {
                 await session.send(`时间到，答题结束`)

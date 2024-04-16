@@ -17,9 +17,16 @@ export async function isResourceLimit(userId: string, ctx: Context) {
 }
 export async function getList(userId: string, ctx: Context,first?:string) {
   const resources = await ctx.database.get('pokemon.list', { id: userId })
+  const index=resources[0].pokemon.findIndex((pokeId)=>pokeId.id===first)
   if (resources.length == 0) {
     return await ctx.database.create('pokemon.list', { id: userId, pokemon: [new FusionPokemon(first)] })
   } else {
+    if(index==-1){
+      resources[0].pokemon.push(new FusionPokemon(first))
+      await ctx.database.set('pokemon.list', { id: userId }, row=>({
+        pokemon: resources[0].pokemon
+      }))
+    }
     return resources[0]
   }
 }
