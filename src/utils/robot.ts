@@ -29,6 +29,7 @@ export class Robot implements Pokebattle {
         this.base=pokemonCal.pokeBase(this.monster_1)
         const botpoke: PokemonList = {
             id: this.id,
+            win_count: 0,
             pokemon: [
                 {
                     id: this.id,

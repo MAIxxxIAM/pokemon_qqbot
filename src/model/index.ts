@@ -217,6 +217,7 @@ export interface Pokebattle {
 //宝可梦养成表
 export interface PokemonList{
     id: string
+    win_count:number
     tokens?:number
     pokemon:FusionPokemon[]
 }
@@ -345,6 +346,7 @@ export async function model(ctx: Context) {
     })
     ctx.model.extend('pokemon.list', {
         id: 'string',
+        win_count:'unsigned',
         tokens:'unsigned',
         pokemon:'json'
     }, {

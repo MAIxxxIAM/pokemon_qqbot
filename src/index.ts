@@ -1035,7 +1035,7 @@ ${(h('at', { id: (session.userId) }))}
             { return '输入错误' }
           } else {
             if (userArr[0].monster_1 != '0') {
-              const playerPower=pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level,playerList,userArr[0].monster_1)
+              const playerPower=pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level,playerList,dan[1])
               //图片服务
               let img_fuse = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components/fuse.png')}`)
               let img_F = await ctx.canvas.loadImage(`${config.图片源}/fusion/${pokeM.split('.')[0]}/${pokeM.split('.')[0]}.png`)
@@ -1132,7 +1132,7 @@ ${point}
                 monster_1: dan[1],
                 base: pokemonCal.pokeBase(dan[1]),
                 battlename: dan[0],
-                power: pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level,playerList,userArr[0].monster_1)
+                power: pokemonCal.power(pokemonCal.pokeBase(dan[1]), userArr[0].level,playerList,dan[1])
               })
 
               return `恭喜你
@@ -1444,6 +1444,9 @@ ${(h('at', { id: (session.userId) }))}
       const playerList:PokemonList=await getList(session.userId,ctx,userArr[0].monster_1)
       const playerPower = pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level,playerList,userArr[0].monster_1)
       const index=playerList.pokemon.findIndex((pokeId)=>pokeId.id===userArr[0].monster_1)
+      await ctx.database.set('pokebattle', { id: session.userId }, row=>({
+        power: playerPower
+      }))
       if (userArr[0]?.base[0]) {
         toDo = `能力值：
 生命：${playerPower[0]}
@@ -1466,7 +1469,7 @@ ${(h('at', { id: (session.userId) }))}
 ---
 ${point}
 ${(toDo)}
-性格：${playerList.pokemon[index]?.natures?playerList.pokemon[index].natures.effect:'未加载'}
+性格：${playerList.pokemon[index]?.natures?.effect?playerList.pokemon[index].natures.effect:'未加载'}
 ${point}`
         await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(0, "♂ 杂交宝可梦", "/杂交宝可梦", session.userId, "1"), button(0, "📷 捕捉宝可梦", "/捕捉宝可梦", session.userId, "2")] }, { "buttons": [button(0, "💳 查看信息", "/查看信息", session.userId, "3"), button(0, "⚔️ 对战", "/对战", session.userId, "4")] },] }, }, })
       } catch (e) {
@@ -1601,6 +1604,14 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
             rankScore: $.sub(row.rankScore, 1),
           })
           )
+
+          const index=playerList.pokemon.findIndex((pokeId)=>pokeId.id===userArr[0].monster_1)
+          const win_count=winner==session.userId?(playerList.win_count<5? playerList.win_count + 1:playerList.win_count):0
+          if(index!==-1){playerList.pokemon[index].natureLevel=2*win_count
+          await ctx.database.set('pokemon.list', { id: session.userId },row=> ({
+            win_count:win_count,
+            pokemon:playerList.pokemon
+          }))}
         }
         let loserArr = loser.substring(0, 5) == 'robot' ? [robot] : await ctx.database.get('pokebattle', { id: loser })
         let winnerArr = winner.substring(0, 5) == 'robot' ? [robot] : await ctx.database.get('pokebattle', { id: winner })
@@ -2207,8 +2218,11 @@ tips:${tips}`
         playerList.pokemon[index].power[random]+=up
         await ctx.database.set('pokemon.list', { id: session.userId }, {
           pokemon:playerList.pokemon
-        }
-        )
+        })
+        const playerPower = pokemonCal.power(pokemonCal.pokeBase(player.monster_1), player.level,playerList,player.monster_1)
+        await ctx.database.set('pokebattle', { id: session.userId }, row=>({
+          power:playerPower
+        }))
         return `成功给${ newNature.name}添加了荣誉勋章，提升了${up}点${powerDesc[random]}努力值`}
       case "麦麦对话券":
         if(!number)(

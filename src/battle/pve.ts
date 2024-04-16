@@ -24,6 +24,7 @@ export class PVE implements WildPokemon {
         this.hitSpeed = Number(PokeBase[5])
         const wildpoke: PokemonList = {
             id: id,
+            win_count: 0,
             pokemon: [
                 {
                     id: id,
