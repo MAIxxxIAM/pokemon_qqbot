@@ -208,9 +208,11 @@ export interface Pokebattle {
     trainer: string[]
     trainerNum?: number
     trainerName?: string[]
+    isfish?: boolean
     lapTwo?: boolean
     advanceChance?: boolean
     lap?: number
+    area?:number
     ultra?: object
 }
 
@@ -300,8 +302,18 @@ export async function model(ctx: Context) {
         skill: 'integer',
         coin: 'unsigned',
         gold: 'unsigned',
+        isfish: {
+            type: 'boolean',
+            initial: false,
+            nullable: false,
+        },
         changeName: {
             type: 'integer',
+            initial: 1,
+            nullable: false,
+        },
+        area:{
+            type: 'unsigned',
             initial: 1,
             nullable: false,
         },

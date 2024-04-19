@@ -41,11 +41,11 @@ export class PVE implements WildPokemon {
         }
         const power = pokemonCal.power(PokeBase, level, wildpoke, id)
         this.power = {
-            hp: Number(power[0]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * Math.ceil(player.level / 10) / 8,
-            attack: Number(power[1]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * Math.ceil(player.level / 10) / 8,
-            defense: Number(power[2]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * Math.ceil(player.level / 10) / 8,
-            specialAttack: Number(power[3]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * Math.ceil(player.level / 10) / 8,
-            specialDefense: Number(power[4]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * Math.ceil(player.level / 10) / 8,
+            hp: Number(power[0]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * 0.8,
+            attack: Number(power[1]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * 0.8,
+            defense: Number(power[2]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * 0.8,
+            specialAttack: Number(power[3]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * 0.8,
+            specialDefense: Number(power[4]) * (config.野生宝可梦难度系数 + 0.1 * player.lap) * 0.8,
             speed: Number(power[5])
         }
         const skill = skills.skills.filter(skill => skill.type === this.type[0])

@@ -64,6 +64,7 @@ export function apply(ctx: Context) {
     .alias('下周目').action(async ({ session }) => {
       const { userId } = session
       const [user] = await ctx.database.get('pokebattle', userId)
+      const [player] :Resource[]= await ctx.database.get('pokemon.resourceLimit', userId)
       if (!user) {
         await session.execute('签到')
         return
@@ -104,6 +105,7 @@ export function apply(ctx: Context) {
 但是你的宝可梦将会保留
 将会开启420只除神兽外的宝可梦捕捉
 如果你的金币大于300万，将会只保留300万金币
+如果积分大于2000，将会保留2000积分
 请输入Y/N`)
       }
       const inThree = await session.prompt(config.捕捉等待时间)
@@ -117,6 +119,9 @@ export function apply(ctx: Context) {
             base: pokemonCal.pokeBase(user.monster_1),
             power: pokemonCal.power(user.base, 5,playerList, user.monster_1),
             advanceChance: false,
+          })
+          await ctx.database.set('pokemon.resourceLimit', userId, {
+            rankScore: player.rankScore >= 2000 ? 2000 : player.rankScore
           })
           return `你成功进入了三周目`
         case 'n':
@@ -219,7 +224,7 @@ export function apply(ctx: Context) {
         const img = await toUrl(ctx, session, `${config.图片源}/sr/${poke.split('.')[0]}.png`)
         str.push(`\u200b
 ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(ultra[poke] / 2)) + '🟨'.repeat(ultra[poke] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(ultra[poke] / 2))}`)
-        mdStr.push(`![${pokemonCal.pokemonlist(poke)}#40 #40](${img}) : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(ultra[poke] / 2)) + '🟨'.repeat(ultra[poke] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(ultra[poke] / 2))}`)
+        mdStr.push(`![${pokemonCal.pokemonlist(poke)}#40px #40px](${img}) : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(ultra[poke] / 2)) + '🟨'.repeat(ultra[poke] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(ultra[poke] / 2))}`)
       }
       const md = mdStr.join('\n')
       const b = getMarkdownParams(md)

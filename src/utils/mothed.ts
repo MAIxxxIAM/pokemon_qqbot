@@ -17,7 +17,7 @@ export async function isResourceLimit(userId: string, ctx: Context) {
 }
 export async function getList(userId: string, ctx: Context,first?:string) {
   const resources = await ctx.database.get('pokemon.list', { id: userId })
-  const index=resources[0].pokemon.findIndex((pokeId)=>pokeId.id===first)
+  const index=resources[0]?.pokemon.findIndex((pokeId)=>pokeId.id===first)
   if (resources.length == 0) {
     return await ctx.database.create('pokemon.list', { id: userId, pokemon: [new FusionPokemon(first)] })
   } else {
@@ -32,7 +32,7 @@ export async function getList(userId: string, ctx: Context,first?:string) {
 }
 
 export async function findFusion(nature:FusionPokemon,playerList:PokemonList){
-  let index=playerList.pokemon.findIndex(a=>a.id==nature.id)
+  let index=playerList?.pokemon.findIndex(a=>a.id==nature.id)
   if(index==-1){
     playerList.pokemon.push(nature)
     index=playerList.pokemon.length-1
@@ -204,6 +204,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
           {
             "buttons": [
               button(2, "❤ 领取麦麦", "/领取麦麦 ", session.userId, "l", false),
+              button(2, "🎣 钓鱼", "/钓鱼", session.userId, "d"),
             ]
           },
           config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
@@ -216,7 +217,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
 
 export async function sendMarkdown(a: string, session: Session, button = null) {
   const b = getMarkdownParams(a)
-  await session.bot.internal.sendMessage(session.guildId, Object.assign({
+ return await session.bot.internal.sendMessage(session.guildId, Object.assign({
     content: "111",
     msg_type: 2,
     markdown: {
@@ -288,7 +289,7 @@ function arraysEqual(a: any[], b: any[]): boolean {
 
 export async function getChance(player:Pokebattle,ctx:Context){
   const banID = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245']
-  const keys=Object.keys(player.ultra)
+  const keys=Object.keys(player?.ultra)
   const [battle]= await ctx.database.get('pokemon.resourceLimit', { id: player.id })
   if(player.lap!==3&&!player.advanceChance&&player.level>99&&arraysEqual(banID, keys)&&battle?.rank>0&&battle?.rank<=10) return true
   if(player.lap==3||player.advanceChance||!player?.pokedex?.dex) return false
@@ -450,22 +451,21 @@ export function urlbutton(pt: number, a: string, b: string, d: string, c: string
     },
   }
 }
-export function actionbutton(a: string, b: string, d: string, c: string, t: string, id: string) {
+export function actionbutton(a: string, 数据: string, 权限: string,消息Id: string, 时间戳: number) {
   return {
-    "id": c,
+    "id":消息Id,
     "render_data": {
       "label": a,
-      "visited_label": `${a}-已选`
+      "visited_label": a
     },
     "action": {
       "type": 1,
       "permission": {
         "type": 0,
-        "specify_user_ids": [d]
+        "specify_user_ids": [权限]
       },
-      "click_limit": 10,
       "unsupport_tips": "请输入@Bot",
-      "data": t + "=" + b + "=" + id,
+      "data":`${时间戳}=${数据}`,
     },
   }
 }
