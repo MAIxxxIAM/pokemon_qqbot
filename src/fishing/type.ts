@@ -26,12 +26,14 @@ export class FishingGame {
         this.items = items
     }
 
-    fish(lucky:Lucky): FishItem{
-        const roll = Math.random() * (100-lucky)+lucky
-        let cumulativeProbability = 0
+    fish(lucky:Lucky,Merits:number): FishItem{
+        const roll = Math.random() * 100
+        let cumulativeProbability = - (Merits*0.04+lucky)
 
         for (const item of this.items) {
-            cumulativeProbability += item.rarity
+            let add=item.rarity==60?item.rarity-2*(Merits * 0.04 + lucky):item.rarity+0.5*(Merits * 0.04 + lucky)
+            add=item.rarity==0.99?add+0.5*(Merits * 0.04 + lucky):add
+            cumulativeProbability +=add
             if (roll < cumulativeProbability) {
                 const reelInTime = Math.floor(Math.random() * 5000)+5000
                 item.reelInTime = reelInTime

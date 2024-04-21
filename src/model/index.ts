@@ -213,7 +213,9 @@ export interface Pokebattle {
     advanceChance?: boolean
     lap?: number
     area?:number
+    cyberMerit?:number
     ultra?: object
+    fly_count?:number
 }
 
 //宝可梦养成表
@@ -314,13 +316,23 @@ export async function model(ctx: Context) {
         },
         area:{
             type: 'unsigned',
-            initial: 1,
+            initial: 0,
+            nullable: false,
+        },
+        cyberMerit:{
+            type: 'unsigned',
+            initial: 0,
             nullable: false,
         },
         skillbag: 'list',
         trainer: 'list',
         trainerNum: 'unsigned',
         trainerName: 'list',
+        fly_count: {
+            type: 'unsigned',
+            initial: 20,
+            nullable: false,
+        },
     }, {
         primary: "id"
     })

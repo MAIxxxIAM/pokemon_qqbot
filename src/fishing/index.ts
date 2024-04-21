@@ -12,29 +12,42 @@ export async function apply(ctx: Context) {
 
     ctx.on('interaction/button', async (session,) => {
         const fishGame= new FishingGame(fishing)
-        const test = fishGame.fish(Lucky['普通鱼饵'])
         const { d } = session.event._data
         const [player] = await ctx.database.get('pokebattle', d.group_member_openid)
         if(!player) return
         if (!player.isfish) {
             return
         }
+        const addMerits = player.cyberMerit > 99 ? 0 : 1
         const pokeDex = new Pokedex(player)
         await ctx.database.set('pokebattle', { id: d.group_member_openid }, row => ({
-            isfish: false
+            isfish: false,
+            cyberMerit: $.add(row.cyberMerit, addMerits)
         }))
         let regex = /^[\u4e00-\u9fa5]{2,6}$/
+
+        const isEvent = player.lap < 3 &&  player.level < 90
         const noneMd = `${regex.test(player.name) ? player.name : `<@${session.userId}>`}的运气极佳，幸运女神都有点嫉妒
 
-> 但是你什么都没钓到`
+> 但是你什么都没钓到
+
+---
+${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
+
+当前赛博功德值:${player.cyberMerit+1}`
         const getMd = (item: FishItem) => `${regex.test(player.name) ? player.name : `<@${session.userId}>`}获得了${item.name[Math.floor(Math.random() * item.name.length)]}
         
-> 价值${item.points}积分`
+> 价值${item.points}积分
+
+---
+${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
+
+当前赛博功德值:${player.cyberMerit+addMerits}`
         session.messageId = d.data.resolved.button_id
         session.userId = d.group_member_openid
         session.channelId = d.group_openid
         const fished: '普通鱼饵' | '高级鱼饵' = d.data.resolved.button_data.split('=')[1]
-        let getFish = fishGame.fish(Lucky[fished])
+        let getFish = fishGame.fish(Lucky[fished],player.cyberMerit)
         // if(session.userId=='262D994B2D838AD0F1B65FC272BB85BA'){
         //     getFish={
         //         name:["340.340"],
@@ -75,6 +88,7 @@ export async function apply(ctx: Context) {
                 await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
                 await ctx.database.set('pokebattle', { id: session.userId }, {
                     ultra: player.ultra,
+                    cyberMerit:0
                 })
                 return
             }
@@ -92,7 +106,8 @@ export async function apply(ctx: Context) {
                 pokeDex.pull(getFish.name[0], player)
                 await ctx.database.set('pokebattle', { id: session.userId }, {
                     ultra: player.ultra,
-                    pokedex: player.pokedex
+                    pokedex: player.pokedex,
+                    cyberMerit:0
                 }
                 )
             }
