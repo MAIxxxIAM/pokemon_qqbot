@@ -1417,8 +1417,8 @@ ${(h('at', { id: (session.userId) }))}`
         const rLimit = new PrivateResource(resource.resource.goldLimit)
         getGold = await rLimit.getGold(ctx, getGold, session.userId)
         const legendaryPokemonRandom = Math.random() * 100
-        const events = legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : `将宝可梦放生后，身心受到了净化
-赛博功德+1`
+        const events = pokemon?`捕捉途中放生宝可梦，好像什么都无法发生`:(legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : `将宝可梦放生后，身心受到了净化
+赛博功德+1`)
         const addMerits = userArr[0].cyberMerit > 99 ? 0 : 1
         const isEvent = userArr[0].lap < 3 || userArr[0].level < 90
         await ctx.database.set('pokebattle', { id: session.userId }, row=>({
