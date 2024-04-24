@@ -5,7 +5,27 @@ import { Context, Session ,Element} from 'koishi'
 import { WildPokemon } from '../battle'
 import { } from 'koishi-plugin-cron'
 import { FusionPokemon, Natures, PokemonList } from '../model'
+import { StoneType } from '../digGame/type'
 
+
+export function mudPath(a:string){
+  return `${testcanvas}${resolve(__dirname, `../assets/img/digGame/${StoneType[a]}.png`)}`
+
+}
+
+export function getMinePosition(a:string){
+  const [letters]=a.match(/[a-zA-Z]/g)
+  let position=[0,0]
+  const [numbers]=a.match(/\d+/g)
+  position[1]=Number(numbers)-1
+  let ascii = letters.charCodeAt(0);
+  if (ascii >= 97) {
+    position[0]= ascii - 97
+  } else {
+    position[0]= ascii - 65
+  }
+  return position
+}
 
 export async function isResourceLimit(userId: string, ctx: Context) {
   const resources = await ctx.database.get('pokemon.resourceLimit', { id: userId })

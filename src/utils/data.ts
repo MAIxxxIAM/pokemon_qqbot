@@ -10,6 +10,8 @@ import { Skills } from '../battle'
 import { Natures } from '../model'
 import Fishing from '../assets/json/fishing.json'
 import { FishItem} from '../fishing/type'
+import DigItems from '../assets/json/digItem.json'
+import { DigItem } from '../digGame/type'
 
 
 export const expToLv= exptolv
@@ -22,3 +24,4 @@ export const battleType = bType
 export const skills=new Skills(skillMachines.skill)
 export const natures:Natures[] = nature
 export const fishing:FishItem[] =Fishing
+export const digItems:DigItem[] = DigItems

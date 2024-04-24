@@ -14,6 +14,7 @@ import * as pokedex from './pokedex/pokedex'
 import * as notice from './notice/index'
 import * as fishing from './fishing/index'
 import crypto from 'crypto'
+import * as digGame from './digGame/index'
 
 
 import { Robot } from './utils/robot'
@@ -221,8 +222,8 @@ export async function apply(ctx, conf: Config) {
     // await ctx.database.set("intellegentBody",{group_open_id:''},row=>({
     //   token:1500
     // }))
-    await ctx.database.set('pokebattle', { vip: { $gt: 0 } }, row => ({
-      vip: $.sub(row.vip, 1),
+    await ctx.database.set('pokebattle', {}, row => ({
+      vip: $.if($.gt(row.vip,0), $.sub(row.vip, 1), 0),
       fly_count: 20
     }))
   })
@@ -295,6 +296,7 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(pokeGuess)
   ctx.plugin(notice)
   ctx.plugin(fishing)
+  ctx.plugin(digGame)
 
   if (config.指令使用日志) {
     ctx.on('command/before-execute', ({ session, command }) => {
@@ -431,7 +433,7 @@ export async function apply(ctx, conf: Config) {
               base: pokemonCal.pokeBase(userArr[0].monster_1),
               power: pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew, playerList, userArr[0].monster_1),
               coin: { $add: [{ $: 'coin' }, config.签到获得个数 + vipCoin] },
-              gold: { $add: [{ $: 'gold' }, (userArr[0].lap>2?10000:3000) + vipRGold] },
+              gold: { $add: [{ $: 'gold' }, (userArr[0].lap > 2 ? 10000 : 3000) + vipRGold] },
               trainer: userArr[0].trainer[0] ? userArr[0].trainer : ['0'],
               trainerName: userArr[0].trainerName[0] ? userArr[0].trainerName : ['默认训练师']
             })
@@ -464,12 +466,12 @@ export async function apply(ctx, conf: Config) {
             ctx.drawImage(pokemonimg, 21, 500, 160, 160)
             ctx.drawImage(trainerimg, 21, 56, 160, 160)
             ctx.font = 'normal 30px zpix'
-            ctx.fillText(userArr[0].gold + (userArr[0].lap>2?10000:3000) + vipRGold, 290, 100)
+            ctx.fillText(userArr[0].gold + (userArr[0].lap > 2 ? 10000 : 3000) + vipRGold, 290, 100)
             ctx.fillText(vipName + playerName + `签到成功`, 49, 270)
             ctx.font = 'normal 20px zpix'
             ctx.fillText(`零花钱：`, 254, 65)
             ctx.font = 'normal 20px zpix'
-            ctx.fillText(`获得金币+` + ((userArr[0].lap>2?10000:3000) + vipRGold), 49, 300)
+            ctx.fillText(`获得金币+` + ((userArr[0].lap > 2 ? 10000 : 3000) + vipRGold), 49, 300)
             ctx.fillText(`当前可用精灵球:${userArr[0].captureTimes + config.签到获得个数 + vipRBoll}`, 256, 300)
             ctx.fillText(`获得精灵球+${config.签到获得个数 + vipRBoll}`, 49, 325)
             ctx.fillText(`获得经验+${expGet}`, 256, 325)
@@ -839,6 +841,9 @@ ${(h('at', { id: (session.userId) }))}
             expGet = userArr[0].level > 99 ? 0 : Math.floor(userArr[0].level * baseexp / 7 * vipReward)
             expNew = pokemonCal.expCal(userArr[0].level, userArr[0].exp + expGet)[1]
             getGold = userArr[0].level > 99 ? Math.floor(pokemonCal.mathRandomInt(200, 400) * vipReward) : 0
+            const resource = await isResourceLimit(session.userId, ctx)
+            const rLimit = new PrivateResource(resource.resource.goldLimit)
+            getGold=await rLimit.getGold(ctx, getGold, session.userId)
             lvNew = pokemonCal.expCal(userArr[0].level, userArr[0].exp + expGet)[0]
           }
           result = userArr[0].monster_1 == '0' ? true : result
@@ -1417,11 +1422,11 @@ ${(h('at', { id: (session.userId) }))}`
         const rLimit = new PrivateResource(resource.resource.goldLimit)
         getGold = await rLimit.getGold(ctx, getGold, session.userId)
         const legendaryPokemonRandom = Math.random() * 100
-        const events = pokemon?`捕捉途中放生宝可梦，好像什么都无法发生`:(legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : `将宝可梦放生后，身心受到了净化
+        const events = pokemon ? `捕捉途中放生宝可梦，好像什么都无法发生` : (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : `将宝可梦放生后，身心受到了净化
 赛博功德+1`)
         const addMerits = userArr[0].cyberMerit > 99 ? 0 : 1
         const isEvent = userArr[0].lap < 3 || userArr[0].level < 90
-        await ctx.database.set('pokebattle', { id: session.userId }, row=>({
+        await ctx.database.set('pokebattle', { id: session.userId }, row => ({
           AllMonster: userArr[0].AllMonster,
           level: lvNew,
           exp: expNew,
@@ -1440,7 +1445,7 @@ ${(h('at', { id: (session.userId) }))}`
 > ${userArr[0].level > 99 ? `金币+${getGold}` : `经验+${expGet}`}
 ${!isEvent ? events : ''}
 
-当前赛博功德值:${userArr[0].cyberMerit+addMerits}`
+当前赛博功德值:${userArr[0].cyberMerit + addMerits}`
           const kb = {
             keyboard: {
               content: {
@@ -1454,7 +1459,7 @@ ${!isEvent ? events : ''}
           await sendMarkdown(md, session, kb)
           if (userArr[0].lap < 3 || userArr[0].level < 90) return
           if (!pokemon) {
-            if (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ) {
+            if (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04)) {
               const key = crypto.createHash('md5').update(session.userId + new Date().getTime()).digest('hex').toUpperCase()
               legendaryPokemonId[key] = '342.342'
               await session.execute(`捕捉宝可梦 ${key}`)
@@ -1683,7 +1688,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
           })
           )
           if (index !== -1) {
-            playerList.pokemon[index].natureLevel = 2 * (win_count - 1) > 11 ? 11 : 2 * (win_count - 1)
+            playerList.pokemon[index].natureLevel =(winner == session.userId)?( 2 * (win_count - 1) > 11 ? 11 : 2 * (win_count - 1)):0
             await ctx.database.set('pokemon.list', { id: session.userId }, row => ({
               win_count: win_count,
               pokemon: playerList.pokemon
@@ -2160,11 +2165,11 @@ ${matchedItem[0].name}+${num}
 tips:${tips}`
         }
       } else {
-        const place=['初级区域', '中级区域', '高级区域']
+        const place = ['初级区域', '中级区域', '高级区域']
         const legendaryPokemonRandom = Math.random() * 100
         const addMerits = userArr[0].cyberMerit > 99 ? 0 : 1
         const addFlyCount = userArr[0].fly_count > 0 ? 1 : 0
-        const isEvent = userArr[0].lap < 3|| userArr[0].level < 90
+        const isEvent = userArr[0].lap < 3 || userArr[0].level < 90
         const areaId = area.indexOf(item)
         const events = (legendaryPokemonRandom > (99 - userArr[0].cyberMerit * 0.04) && userArr[0].fly_count > 0) ? `飞机航行中似乎出现了意外，请注意` : `飞机安全抵达目的地：${place[areaId]} 赛博功德+1`
         if (userArr[0].lap <= areaId) return `你还没有获得更强的认证，无法购买`
@@ -2183,9 +2188,9 @@ tips:${tips}`
 ---
 ${!isEvent ? events : ''}
 
-当前飞机航行事件 ${userArr[0].fly_count-addFlyCount} / 20
+当前飞机航行事件 ${userArr[0].fly_count - addFlyCount} / 20
 
-当前赛博功德值:${userArr[0].cyberMerit+addMerits}`
+当前赛博功德值:${userArr[0].cyberMerit + addMerits}`
         await sendMarkdown(md, session)
         if (userArr[0].fly_count < 1) return
         if (isEvent) return
@@ -2324,19 +2329,28 @@ ${!isEvent ? events : ''}
         const powerDesc = ["生命", "攻击", "防御", "特攻", "特防", "速度"]
         {
           if (limit.rankScore < 200) return `你的积分不足`
-          await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
-            rankScore: $.sub(row.rankScore, 200),
-          }))
           const playerList: PokemonList = await getList(session.userId, ctx, player.monster_1)
           const newNature = new FusionPokemon(player.monster_1, playerList)
           const index = await findFusion(newNature, playerList)
+          let sum = playerList.pokemon[index].power.reduce((a, b) => a + b, 0);
+          if (sum > 255 * 6) {
+            playerList.pokemon[index].power = playerList.pokemon[index].power.map((a) => a>255?255:a)
+            await ctx.database.set('pokemon.list', { id: session.userId }, {
+              pokemon: playerList.pokemon
+            })
+            const playerPower = pokemonCal.power(pokemonCal.pokeBase(player.monster_1), player.level, playerList, player.monster_1)
+            await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+              power: playerPower
+            }))
+            return `你的宝可梦已经非常强大了`
+          }
           let random = 0
           let value = 0
           let up = 0
           do {
             random = Math.floor(Math.random() * 6);
             value = Math.floor(Math.random() * 5 + 1)
-            up = playerList.pokemon[index].power[random] <= 255 - value ? value : 255 - value > 0 ? 255 - value : 0;
+            up = (playerList.pokemon[index].power[random] <= (255 - value)) ? value : 255-(playerList.pokemon[index].power[random])
           } while (up === 0)
           playerList.pokemon[index].power[random] += up
           await ctx.database.set('pokemon.list', { id: session.userId }, {
@@ -2345,6 +2359,9 @@ ${!isEvent ? events : ''}
           const playerPower = pokemonCal.power(pokemonCal.pokeBase(player.monster_1), player.level, playerList, player.monster_1)
           await ctx.database.set('pokebattle', { id: session.userId }, row => ({
             power: playerPower
+          }))
+          await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
+            rankScore: $.sub(row.rankScore, 200),
           }))
           return `成功给${newNature.name}添加了荣誉勋章，提升了${up}点${powerDesc[random]}努力值`
         }

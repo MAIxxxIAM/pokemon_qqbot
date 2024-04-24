@@ -4,6 +4,7 @@ import { PokemonPower, Skill } from "../battle"
 import pokemonCal from "../utils/pokemon"
 import { config,Config  } from ".."
 import { natures } from "../utils/data"
+import { DigMine } from "../digGame/type"
 
 
 //智能体兼容
@@ -86,6 +87,7 @@ declare module 'koishi' {
         'pokemon.resourceLimit': Resource
         'pokemon.addGroup': AddGroup
         'intellegentBody': IntellegentBody
+        'pokemon.digChannel': DigChannel
     }
 }
 //邀请表
@@ -175,6 +177,11 @@ export interface Resource {
 //     id: string
 //     pokemonBag: PokeBag
 // }
+export interface DigChannel {
+    id: string
+    digGames: DigMine
+    channelCD: Date
+}
 
 export interface PNotice {
     id: number
@@ -373,6 +380,17 @@ export async function model(ctx: Context) {
         win_count:'unsigned',
         tokens:'unsigned',
         pokemon:'json'
+    }, {
+        primary: "id"
+    })
+    ctx.model.extend('pokemon.digChannel', {
+        id: 'string',
+        digGames: 'json',
+        channelCD:{
+            type: 'timestamp',
+            initial: new Date(0),
+            nullable: false,
+        },
     }, {
         primary: "id"
     })
