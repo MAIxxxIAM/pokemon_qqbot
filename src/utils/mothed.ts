@@ -5,12 +5,51 @@ import { Context, Session ,Element} from 'koishi'
 import { WildPokemon } from '../battle'
 import { } from 'koishi-plugin-cron'
 import { FusionPokemon, Natures, PokemonList } from '../model'
-import { StoneType } from '../digGame/type'
+import { DigMine, StoneType } from '../digGame/type'
 
 
 export function mudPath(a:string){
   return `${testcanvas}${resolve(__dirname, `../assets/img/digGame/${StoneType[a]}.png`)}`
 
+}
+
+export function calculateDistance(x1, y1, x2, y2) {
+  let dx = x2 - x1
+  let dy = y2 - y1
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+export async function minePic(ctx,digGame:DigMine,sign?:{x:number,y:number,color:string}){
+  const digGamePositionX=digGame.item.x
+  const digGamePositionY=digGame.item.y
+  const mineBack=await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/digGame/miningbg.png`)}`)
+  const fissureMud=await ctx.canvas.loadImage(mudPath('fissureMud'))
+  const mud=await ctx.canvas.loadImage(mudPath('mud'))
+  const fissureStone=await ctx.canvas.loadImage(mudPath('fissureStone'))
+  const stone=await ctx.canvas.loadImage(mudPath('stone'))
+  const hardStone=await ctx.canvas.loadImage(mudPath('hardStone'))
+  const largeStone=await ctx.canvas.loadImage(mudPath('largeStone'))
+  const empty=await ctx.canvas.loadImage(mudPath('empty'))
+  const hs=await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/digGame/${digGame.item.id}.png`)}`)
+  const stoneList={fissureMud,mud,fissureStone,stone,hardStone,largeStone,empty}
+  const dataUrl=ctx.canvas.render(550,384,async (ctx)=>{
+    ctx.drawImage(mineBack,0,0,550,384)
+    for (let i = 0; i < 13; i++) {
+        for (let j = 0; j < 10; j++) {
+            ctx.drawImage(stoneList[StoneType[digGame.grid[i][j]]],i*32+39,j*32+64,32,32)
+            if(digGamePositionX==i&&digGamePositionY==j&&digGame.grid[i][j]==0){
+               ctx.drawImage(hs,i*32+39,j*32+64,32,32)
+             }
+              if(!sign) continue 
+              if(sign.x==i&&sign.y==j){
+                ctx.strokeStyle=sign.color
+                ctx.lineWidth = 2
+                ctx.strokeRect(i*32+40,j*32+65,30,30)
+              }
+        }
+    }
+})
+return dataUrl
 }
 
 export function getMinePosition(a:string){
@@ -225,6 +264,11 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
             "buttons": [
               button(2, "❤ 领取麦麦", "/领取麦麦 ", session.userId, "l", false),
               button(2, "🎣 钓鱼", "/钓鱼", session.userId, "d"),
+            ]
+          },
+          {
+            "buttons": [
+              button(2, "化石挖掘", "/挖掘 ", session.userId, "w"),
             ]
           },
           config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },

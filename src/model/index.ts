@@ -4,7 +4,7 @@ import { PokemonPower, Skill } from "../battle"
 import pokemonCal from "../utils/pokemon"
 import { config,Config  } from ".."
 import { natures } from "../utils/data"
-import { DigMine } from "../digGame/type"
+import { DigItem, DigMine } from "../digGame/type"
 
 
 //智能体兼容
@@ -194,12 +194,14 @@ export interface Pokebattle {
     id: string
     name: string
     date?: number
+    fossil_bag?: DigItem[]
     captureTimes?: number
     battleTimes: number
     battleToTrainer: number
     pokedex?: Pokedex
     level: number
     exp: number
+    isPut?: boolean
     vip?: number
     monster_1: string
     battlename?: string
@@ -220,6 +222,7 @@ export interface Pokebattle {
     advanceChance?: boolean
     lap?: number
     area?:number
+    tool?:number
     cyberMerit?:number
     ultra?: object
     fly_count?:number
@@ -291,12 +294,22 @@ export async function model(ctx: Context) {
         id: 'string',
         name: 'string',
         date: 'integer',
+        fossil_bag: {
+            type: 'json',
+            initial: [],
+            nullable: false,
+        },
         captureTimes: 'unsigned',
         battleTimes: 'unsigned',
         battleToTrainer: 'unsigned',
         pokedex: 'json',
         level: 'unsigned',
         exp: 'unsigned',
+        isPut: {
+            type: 'boolean',
+            initial: false,
+            nullable: false,
+        },
         vip: {
             type: 'unsigned',
             initial: 0,
@@ -338,6 +351,11 @@ export async function model(ctx: Context) {
         fly_count: {
             type: 'unsigned',
             initial: 20,
+            nullable: false,
+        },
+        tool:{
+            type: 'unsigned',
+            initial: 1,
             nullable: false,
         },
     }, {

@@ -1,62 +1,77 @@
 [
     {
+        "id":"hs1",
         "name":"化石·一",
         "score":200
     },
     {
+        "id":"hs2",
         "name":"化石·二",
         "score":200
     },
     {
+        "id":"hs3",
         "name":"化石·三",
         "score":200
     },
     {
+        "id":"hs4",
         "name":"化石·四",
-        "score":300
+        "score":225
     },
     {
+        "id":"hs5",
         "name":"化石·五",
-        "score":300
+        "score":225
     },
     {
+        "id":"hs6",
         "name":"化石·六",
-        "score":300
+        "score":225
     },
     {
+        "id":"hs7",
         "name":"化石·七",
-        "score":350
+        "score":250
     },
     {
+        "id":"hs8",
         "name":"化石·八",
-        "score":350
+        "score":250
     },
     {
+        "id":"hs9",
         "name":"化石·九",
-        "score":350
+        "score":250
     },
     {
+        "id":"hs10",
         "name":"化石·十",
-        "score":375
+        "score":275
     },
     {
+        "id":"hs11",
         "name":"化石·十一",
-        "score":375
+        "score":275
     },
     {
+        "id":"hs12",
         "name":"化石·十二",
-        "score":375
+        "score":275
     },
     {
+        "id":"hs13",
         "name":"化石·十三",
-        "score":400
+        "score":325
     },
     {
+        "id":"hs14",
         "name":"化石·十四",
-        "score":400
+        "score":325
     },
     {
+        "id":"hs15",
         "name":"化石·十五",
-        "score":400
+        "score":350
     }
 ]

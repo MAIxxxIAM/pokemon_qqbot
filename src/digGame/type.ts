@@ -16,11 +16,15 @@ export enum DigTool {
 }
 
 export interface DigItem {
+    id:string,
     name: string,
     score: number
+    x?: number,
+    y?: number
+    number?: number
 }
 
-interface Stats {
+export interface MStats {
     isCanDig: boolean,
     isFindItem: boolean,
 }
@@ -28,6 +32,7 @@ interface Stats {
 export class DigMine {
     grid: StoneType[][]
     item: {
+        id:string,
         name: string,
         score: number,
         x: number,
@@ -41,36 +46,33 @@ export class DigMine {
             const itemX = Math.floor(Math.random() * 5)
             const itemY = Math.floor(Math.random() * 5)
             const item = digItems[Math.floor(Math.random() * digItems.length)]
-            this.item = { name: item.name, score: item.score, x: itemX, y: itemY }
+            this.item = { id:item.id,name: item.name, score: item.score, x: itemX, y: itemY }
         } else {
             this.grid = digData.grid
             this.item = digData.item
         }
     }
     dig(x: number, y: number, tool: DigTool) {
+        let stats:MStats= { isCanDig: true, isFindItem: false }
         if (tool === DigTool.shovel && this.grid[x][y] > 3) {
-            return { isCanDig: false, isFindItem: false }
+           return  { isCanDig: false, isFindItem: false }
         }
         if (x < 0 || x >= 13 || y < 0 || y >= 10) {
             return { isCanDig: false, isFindItem: false }
         }
-        const spot = this.grid[x][y]
-        if (spot === 0) {
+        if (this.grid[x][y] === 0) {
             return { isCanDig: false, isFindItem: false }
         }
-        if (x === this.item.x && y === this.item.y && spot == 1) {
-            return { isCanDig: true, isFindItem: true }
-        }
         this.grid[x][y] -= tool
-        console.log(this.grid[x][y])
         this.grid[x][y]=this.grid[x][y]<0?0:this.grid[x][y]
+        const spot = this.grid[x][y]
+        if (x === this.item.x && y === this.item.y && spot == 0) {
+            stats= { isCanDig: true, isFindItem: true }
+        }
         if (tool === DigTool.pickaxe) {
             for (let dx = -1; dx <= 1; dx++) {
-                if (dx === 0) {
-                    continue
-                }
                 for (let dy = -1; dy <= 1; dy++) {
-                    if (dy === 0) {
+                    if (dy === 0&&dx === 0) {
                         continue
                     }
                     let nx = x + dx
@@ -78,16 +80,19 @@ export class DigMine {
                     if (nx < 0 || nx >= 13 || ny < 0 || ny >= 10) {
                         continue
                     }
-                    if (this.grid[nx][ny] <= 0 || this.grid[nx][ny] >= StoneType.fissureStone) {
+                    if (this.grid[nx][ny] <= 0) {
                         continue
                     }
                     this.grid[nx][ny] -= 1
+                    if(this.grid[nx][ny] > StoneType.mud){
+                    this.grid[nx][ny] -= 1
+                    }
                     if (nx === this.item.x && ny === this.item.y && this.grid[nx][ny] === 0) {
-                        return { isCanDig: true, isFindItem: true }
+                        stats= { isCanDig: true, isFindItem: true }
                     }
                 }
             }
         }
-        return { isCanDig: true, isFindItem: false }
+        return stats
     }
 }

@@ -608,6 +608,9 @@ ${chance ? `---
         } catch (e) { return `请先输入签到指令领取属于你的宝可梦和精灵球` }
 
       } else {
+        if(userArr[0].isPut){
+          return `请先完成放生后再进行捕捉`
+        }
         let pokeM = []
         let grassMonster = []
         let black = ['', '', '']
@@ -1354,6 +1357,9 @@ ${(h('at', { id: (session.userId) }))}`
         } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
       //图片服务
+      await ctx.database.set('pokebattle', { id: session.userId },row=>({
+        isPut:true
+      }))
       const playerList: PokemonList = await getList(session.userId, ctx, userArr[0].monster_1)
       if (pokemon) {
         if (Number(pokemon) > userArr[0].AllMonster.length) return `输入错误`
@@ -1407,9 +1413,17 @@ ${(h('at', { id: (session.userId) }))}`
         }
         choose = await session.prompt(20000)
       }
-      if (!choose) return `${(h('at', { id: (session.userId) }))}你好像还在犹豫，有点舍不得他们`
+      if (!choose){
+        await ctx.database.set('pokebattle', { id: session.userId },row=>({
+          isPut:false
+        }))
+         return `${(h('at', { id: (session.userId) }))}你好像还在犹豫，有点舍不得他们`}
       if (userArr[0].AllMonster[Number(choose) - 1]) {
-        if (userArr[0].AllMonster.length === 1) return `${(h('at', { id: (session.userId) }))}你只剩一只宝可梦了，无法放生`
+        if (userArr[0].AllMonster.length === 1) {
+          await ctx.database.set('pokebattle', { id: session.userId },row=>({
+            isPut:false
+          }))
+          return `${(h('at', { id: (session.userId) }))}你只剩一只宝可梦了，无法放生`}
         // let discarded=userArr[0].AllMonster[Number(choose)-1]
         let chsNum = Number(choose) - 1
         let baseexp = Number(expBase.exp[Number(String(userArr[0].AllMonster[chsNum]).split('.')[0]) - 1].expbase)
@@ -1457,6 +1471,9 @@ ${!isEvent ? events : ''}
             },
           }
           await sendMarkdown(md, session, kb)
+          await ctx.database.set('pokebattle', { id: session.userId },row=>({
+            isPut:false
+          }))
           if (userArr[0].lap < 3 || userArr[0].level < 90) return
           if (!pokemon) {
             if (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04)) {
@@ -1469,6 +1486,9 @@ ${!isEvent ? events : ''}
             }
           }
         } catch (e) {
+          await ctx.database.set('pokebattle', { id: session.userId },row=>({
+            isPut:false
+          }))
           return `
 你将【${(pokemonCal.pokemonlist(discarded[0]))}】放生了
 ${pokemonCal.pokemomPic(discarded[0], false)}
@@ -1480,6 +1500,9 @@ ${(pokemonCal.exp_bar(lvNew, expNew))}
 ${(h('at', { id: (session.userId) }))}
         `}
       } else {
+        await ctx.database.set('pokebattle', { id: session.userId },row=>({
+          isPut:false
+        }))
         return `你好像想放生一些了不得的东西`
       }
 
@@ -1688,7 +1711,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
           })
           )
           if (index !== -1) {
-            playerList.pokemon[index].natureLevel =(winner == session.userId)?( 2 * (win_count - 1) > 11 ? 11 : 2 * (win_count - 1)):0
+            playerList.pokemon[index].natureLevel =(winner == session.userId)?( 2 * (win_count - 1) > 11 ? 11 : 2 * (win_count - 1)):1
             await ctx.database.set('pokemon.list', { id: session.userId }, row => ({
               win_count: win_count,
               pokemon: playerList.pokemon
@@ -2315,6 +2338,20 @@ ${!isEvent ? events : ''}
         const playerList: PokemonList = await getList(session.userId, ctx, player.monster_1)
         const newNature = new FusionPokemon(player.monster_1, playerList, true)
         await findFusion(newNature, playerList)
+        const isInstall =`是否将${pokemonCal.pokemonlist(player.monster_1)}的性格更改为${newNature.natures.effect}`
+        const kb = {
+          keyboard: {
+            content: {
+              "rows": [
+                { "buttons": [button(2, 'Y', "Y", session.userId, "1"),button(2, 'N', "N", session.userId, "2")] },
+              ]
+            },
+          },
+        }
+        await sendMarkdown(isInstall, session, kb)
+        const choose = await session.prompt(20000)
+        const isChoose = choose == 'Y' ? true : false
+        if (!isChoose) return `你并不想将${pokemonCal.pokemonlist(player.monster_1)}的性格更改为${newNature.natures.effect}`
         await ctx.database.set('pokemon.list', { id: session.userId }, {
           pokemon: playerList.pokemon
         }
@@ -2333,7 +2370,7 @@ ${!isEvent ? events : ''}
           const newNature = new FusionPokemon(player.monster_1, playerList)
           const index = await findFusion(newNature, playerList)
           let sum = playerList.pokemon[index].power.reduce((a, b) => a + b, 0);
-          if (sum > 255 * 6) {
+          if (sum >= 255 * 6) {
             playerList.pokemon[index].power = playerList.pokemon[index].power.map((a) => a>255?255:a)
             await ctx.database.set('pokemon.list', { id: session.userId }, {
               pokemon: playerList.pokemon
