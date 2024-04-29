@@ -152,6 +152,7 @@ export let config: Config
 
 
 export async function apply(ctx, conf: Config) {
+
   let legendaryPokemonId = {}
   config = conf
   if (config.是否开启文本审核) {
@@ -205,8 +206,9 @@ export async function apply(ctx, conf: Config) {
   })
 
   model(ctx)
-  await ctx.database.set('pokebattle', { isFish: true }, row => ({
-    isfish: false
+  await ctx.database.set('pokebattle', {}, row => ({
+    isfish: false,
+    isPut: false
   }))
 
   ctx.cron('0 0 * * *', async () => {
