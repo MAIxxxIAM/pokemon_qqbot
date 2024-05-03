@@ -43,8 +43,8 @@ export class DigMine {
         const randomType = allType.filter(k => StoneType[k as keyof typeof StoneType] >= StoneType.mud && StoneType[k as keyof typeof StoneType] <= StoneType.largeStone)
         if (!digData) {
             this.grid = Array(13).fill(0).map(() => Array(10).fill(0).map(() => StoneType[randomType[Math.floor(Math.random() * randomType.length)]]))
-            const itemX = Math.floor(Math.random() * 5)
-            const itemY = Math.floor(Math.random() * 5)
+            const itemX = Math.floor(Math.random() * 13)
+            const itemY = Math.floor(Math.random() * 10)
             const item = digItems[Math.floor(Math.random() * digItems.length)]
             this.item = { id:item.id,name: item.name, score: item.score, x: itemX, y: itemY }
         } else {

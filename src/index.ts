@@ -1,4 +1,4 @@
-import { Schema, h, $, Context, is, Session } from 'koishi'
+import { Schema, h, $,is, Context, Session } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
@@ -15,6 +15,7 @@ import * as notice from './notice/index'
 import * as fishing from './fishing/index'
 import crypto from 'crypto'
 import * as digGame from './digGame/index'
+import * as handleAndCiying from './pokedle/src'
 
 
 import { Robot } from './utils/robot'
@@ -39,6 +40,20 @@ export const inject = {
 export const usage = ``
 
 export interface Config {
+  isDarkThemeEnabled: boolean
+  isHighContrastThemeEnabled: boolean
+  maxSimultaneousGuesses: number
+  compositeImagePageWidth: number
+  compositeImagePageHeight: number
+  enableWordGuessTimeLimit: boolean
+  wordGuessTimeLimitInSeconds: number
+  retractDelay: number
+  imageType: "png" | "jpeg" | "webp"
+  isTextToImageConversionEnabled: boolean
+  isEnableQQOfficialRobotMarkdownTemplate: boolean
+  customTemplateId: string
+  key: string
+  numberOfMessageButtonsPerRow: number
   指令使用日志: boolean
   QQ官方使用MD: boolean
   签到获得个数: number
@@ -140,7 +155,45 @@ export const Config = Schema.intersect([
     }),
     Schema.object({}),
   ]),
+  Schema.object({
+    isDarkThemeEnabled: Schema.boolean().default(false).description(`是否开启黑暗主题。`),
+    isHighContrastThemeEnabled: Schema.boolean().default(false).description(`是否开启高对比度（色盲）主题。`),
+    // shouldAddBorderInHandleMode: Schema.boolean().default(true).description(`是否为块添加边框，仅在汉兜模式下生效。`),
+  }).description('主题设置'),
 
+  Schema.object({
+    maxSimultaneousGuesses: Schema.number().min(1).default(4).description(`最多同时猜测单词的数量。`),
+    compositeImagePageWidth: Schema.number().min(1).default(800).description(`合成图片页面宽度。`),
+    compositeImagePageHeight: Schema.number().min(1).default(100).description(`合成图片页面高度。`),
+  }).description('游戏设置'),
+
+  Schema.intersect([
+    Schema.object({
+      enableWordGuessTimeLimit: Schema.boolean().default(false).description(`是否开启猜单词游戏作答时间限制功能。`),
+    }),
+    Schema.union([
+      Schema.object({
+        enableWordGuessTimeLimit: Schema.const(true).required(),
+        wordGuessTimeLimitInSeconds: Schema.number().min(0).default(120).description(`猜单词游戏作答时间，单位是秒。`),
+      }),
+      Schema.object({}),
+    ]),
+    Schema.object({
+      retractDelay: Schema.number().min(0).default(0).description(`自动撤回等待的时间，单位是秒。值为 0 时不启用自动撤回功能。`),
+      imageType: Schema.union(['png', 'jpeg', 'webp']).default('png').description(`发送的图片类型。`),
+      isTextToImageConversionEnabled: Schema.boolean().default(false).description(`是否开启将文本转为图片的功能（可选），如需启用，需要启用 \`markdownToImage\` 服务。`),
+      isEnableQQOfficialRobotMarkdownTemplate: Schema.boolean().default(false).description(`是否启用 QQ 官方机器人的 Markdown 模板，带消息按钮。`),
+    }),
+    Schema.union([
+      Schema.object({
+        isEnableQQOfficialRobotMarkdownTemplate: Schema.const(true).required(),
+        customTemplateId: Schema.string().default('111').description(`自定义模板 ID。`),
+        key: Schema.string().default('').description(`文本内容中特定插值的 key，用于存放文本。如果你的插值为 {{.info}}，那么请在这里填 info。`),
+        numberOfMessageButtonsPerRow: Schema.number().min(4).max(5).default(4).description(`每行消息按钮的数量。`),
+      }),
+      Schema.object({}),
+    ]),
+  ])
 ])
 
 
@@ -149,11 +202,9 @@ export let testcanvas: string
 export let logger: any
 export let shop: any[]
 export let config: Config
-
+export let legendaryPokemonId = {}
 
 export async function apply(ctx, conf: Config) {
-
-  let legendaryPokemonId = {}
   config = conf
   if (config.是否开启文本审核) {
     ctx.on('before-send', async (session: Session) => {
@@ -299,6 +350,7 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(notice)
   ctx.plugin(fishing)
   ctx.plugin(digGame)
+  ctx.plugin(handleAndCiying)
 
   if (config.指令使用日志) {
     ctx.on('command/before-execute', ({ session, command }) => {

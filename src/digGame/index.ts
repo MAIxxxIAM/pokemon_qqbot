@@ -81,8 +81,12 @@ export async function apply(ctx: any) {
 ![img#550px #384px](${await toUrl(ctx, session, src)})
 
 > 蓝色为当前挖掘位置
-镐子可以探测化石位置，绿色为4格内，黄色为5-7格，红色为8格以上
-锤子可以砸到周围8格
+
+> 镐子可以探测化石位置，绿色为4格内，黄色为5-7格，红色为8格以上
+
+> 镐子只能在土块（黄色）区域探测，石块上无法探测，将出现白色框
+
+> 锤子可以砸到周围8格
 
 ---
 > 当前工具:${player.tool === 1 ? '镐子' : '锤子'}
@@ -90,8 +94,7 @@ export async function apply(ctx: any) {
 
 ${MdString}
 
-> 注：化石当前可售出为积分，集齐15种化石后，可以融合为传说中的宝可梦——固拉多
-下周将推出玩家间互换化石的功能`
+> 注：化石当前可售出为积分，集齐15种化石后，可以融合为传说中的宝可梦——固拉多`
             const kb = {
                 keyboard: {
                     content: {
@@ -198,19 +201,20 @@ ${MdString}
             }
             player.ultra['341.341'] = 10
             await ctx.database.set('pokebattle', { id: session.userId }, {
+                fossil_bag: player.fossil_bag,
                 ultra: player.ultra,
                 pokedex: player.pokedex,
                 cyberMerit:0
             })
             const getMd=`<@${session.userId}>成功获得
-            ![img#512px #512px](${await toUrl(ctx, session, `${(pokemonCal.pokemomPic('341.341', false)).toString().match(/src="([^"]*)"/)[1]}`)})
-            ---
-            ![img#20px #20px](${await toUrl(ctx, session, `${config.图片源}/sr/341.png`)}) : ${player.ultra['341.341'] * 10}% ${'🟩'.repeat(Math.floor(player.ultra['341.341'] / 2)) + '🟨'.repeat(player.ultra['341.341'] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(player.ultra['341.341'] / 2))}
+![img#512px #512px](${await toUrl(ctx, session, `${(pokemonCal.pokemomPic('341.341', false)).toString().match(/src="([^"]*)"/)[1]}`)})
+---
+![img#20px #20px](${await toUrl(ctx, session, `${config.图片源}/sr/341.png`)}) : ${player.ultra['341.341'] * 10}% ${'🟩'.repeat(Math.floor(player.ultra['341.341'] / 2)) + '🟨'.repeat(player.ultra['341.341'] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(player.ultra['341.341'] / 2))}
                   
-            ---
-            **传说宝可梦——${pokemonCal.pokemonlist('341.341')}**
+---
+**传说宝可梦——${pokemonCal.pokemonlist('341.341')}**
             
-            已经放入图鉴`
+已经放入图鉴`
 
             await sendMarkdown(getMd, session)
         })

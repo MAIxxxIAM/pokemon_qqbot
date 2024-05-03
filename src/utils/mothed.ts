@@ -269,6 +269,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
           {
             "buttons": [
               button(2, "化石挖掘", "/挖掘 ", session.userId, "w"),
+              button(2, "宝可猜名", "/wordlegame.开始 ", session.userId, "q"),
             ]
           },
           config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },

@@ -5,6 +5,7 @@ import pokemonCal from "../utils/pokemon"
 import { config,Config  } from ".."
 import { natures } from "../utils/data"
 import { DigItem, DigMine } from "../digGame/type"
+import { unknowns } from "../pokedle/src/type/type"
 
 
 //智能体兼容
@@ -195,6 +196,7 @@ export interface Pokebattle {
     name: string
     date?: number
     fossil_bag?: DigItem[]
+    unknowns_bag?: unknowns[]
     captureTimes?: number
     battleTimes: number
     battleToTrainer: number
@@ -295,6 +297,11 @@ export async function model(ctx: Context) {
         name: 'string',
         date: 'integer',
         fossil_bag: {
+            type: 'json',
+            initial: [],
+            nullable: false,
+        },
+        unknowns_bag: {
             type: 'json',
             initial: [],
             nullable: false,

@@ -1,0 +1,5127 @@
+[
+    {
+        "idiom": "妙蛙种子",
+        "pinyin": "miào wā zhǒng zi",
+        "explanation": "全国编号-1"
+    },
+    {
+        "idiom": "妙蛙草",
+        "pinyin": "miào wā cǎo",
+        "explanation": "全国编号-2"
+    },
+    {
+        "idiom": "妙蛙花",
+        "pinyin": "miào wā huā",
+        "explanation": "全国编号-3"
+    },
+    {
+        "idiom": "小火龙",
+        "pinyin": "xiǎo huǒ lóng",
+        "explanation": "全国编号-4"
+    },
+    {
+        "idiom": "火恐龙",
+        "pinyin": "huǒ kǒng lóng",
+        "explanation": "全国编号-5"
+    },
+    {
+        "idiom": "喷火龙",
+        "pinyin": "pēn huǒ lóng",
+        "explanation": "全国编号-6"
+    },
+    {
+        "idiom": "杰尼龟",
+        "pinyin": "jié ní guī",
+        "explanation": "全国编号-7"
+    },
+    {
+        "idiom": "卡咪龟",
+        "pinyin": "kǎ mī guī",
+        "explanation": "全国编号-8"
+    },
+    {
+        "idiom": "水箭龟",
+        "pinyin": "shuǐ jiàn guī",
+        "explanation": "全国编号-9"
+    },
+    {
+        "idiom": "绿毛虫",
+        "pinyin": "lǜ máo chóng",
+        "explanation": "全国编号-10"
+    },
+    {
+        "idiom": "铁甲蛹",
+        "pinyin": "tiě jiǎ yǒng",
+        "explanation": "全国编号-11"
+    },
+    {
+        "idiom": "巴大蝶",
+        "pinyin": "bā dà dié",
+        "explanation": "全国编号-12"
+    },
+    {
+        "idiom": "独角虫",
+        "pinyin": "dú jiǎo chóng",
+        "explanation": "全国编号-13"
+    },
+    {
+        "idiom": "铁壳蛹",
+        "pinyin": "tiě ké yǒng",
+        "explanation": "全国编号-14"
+    },
+    {
+        "idiom": "大针蜂",
+        "pinyin": "dà zhēn fēng",
+        "explanation": "全国编号-15"
+    },
+    {
+        "idiom": "波波",
+        "pinyin": "bō bō",
+        "explanation": "全国编号-16"
+    },
+    {
+        "idiom": "比比鸟",
+        "pinyin": "bǐ bǐ niǎo",
+        "explanation": "全国编号-17"
+    },
+    {
+        "idiom": "大比鸟",
+        "pinyin": "dà bǐ niǎo",
+        "explanation": "全国编号-18"
+    },
+    {
+        "idiom": "小拉达",
+        "pinyin": "xiǎo lā dá",
+        "explanation": "全国编号-19"
+    },
+    {
+        "idiom": "拉达",
+        "pinyin": "lā dá",
+        "explanation": "全国编号-20"
+    },
+    {
+        "idiom": "烈雀",
+        "pinyin": "liè què",
+        "explanation": "全国编号-21"
+    },
+    {
+        "idiom": "大嘴雀",
+        "pinyin": "dà zuǐ què",
+        "explanation": "全国编号-22"
+    },
+    {
+        "idiom": "阿柏蛇",
+        "pinyin": "ā bǎi shé",
+        "explanation": "全国编号-23"
+    },
+    {
+        "idiom": "阿柏怪",
+        "pinyin": "ā bǎi guài",
+        "explanation": "全国编号-24"
+    },
+    {
+        "idiom": "皮卡丘",
+        "pinyin": "pí kǎ qiū",
+        "explanation": "全国编号-25"
+    },
+    {
+        "idiom": "雷丘",
+        "pinyin": "léi qiū",
+        "explanation": "全国编号-26"
+    },
+    {
+        "idiom": "穿山鼠",
+        "pinyin": "chuān shān shǔ",
+        "explanation": "全国编号-27"
+    },
+    {
+        "idiom": "穿山王",
+        "pinyin": "chuān shān wáng",
+        "explanation": "全国编号-28"
+    },
+    {
+        "idiom": "尼多兰",
+        "pinyin": "ní duō lán",
+        "explanation": "全国编号-29"
+    },
+    {
+        "idiom": "尼多娜",
+        "pinyin": "ní duō nà",
+        "explanation": "全国编号-30"
+    },
+    {
+        "idiom": "尼多后",
+        "pinyin": "ní duō hòu",
+        "explanation": "全国编号-31"
+    },
+    {
+        "idiom": "尼多朗",
+        "pinyin": "ní duō lǎng",
+        "explanation": "全国编号-32"
+    },
+    {
+        "idiom": "尼多力诺",
+        "pinyin": "ní duō lì nuò",
+        "explanation": "全国编号-33"
+    },
+    {
+        "idiom": "尼多王",
+        "pinyin": "ní duō wáng",
+        "explanation": "全国编号-34"
+    },
+    {
+        "idiom": "皮皮",
+        "pinyin": "pí pí",
+        "explanation": "全国编号-35"
+    },
+    {
+        "idiom": "皮可西",
+        "pinyin": "pí kě xī",
+        "explanation": "全国编号-36"
+    },
+    {
+        "idiom": "六尾",
+        "pinyin": "liù wěi",
+        "explanation": "全国编号-37"
+    },
+    {
+        "idiom": "九尾",
+        "pinyin": "jiǔ wěi",
+        "explanation": "全国编号-38"
+    },
+    {
+        "idiom": "胖丁",
+        "pinyin": "pàng dīng",
+        "explanation": "全国编号-39"
+    },
+    {
+        "idiom": "胖可丁",
+        "pinyin": "pàng kě dīng",
+        "explanation": "全国编号-40"
+    },
+    {
+        "idiom": "超音蝠",
+        "pinyin": "chāo yīn fú",
+        "explanation": "全国编号-41"
+    },
+    {
+        "idiom": "大嘴蝠",
+        "pinyin": "dà zuǐ fú",
+        "explanation": "全国编号-42"
+    },
+    {
+        "idiom": "走路草",
+        "pinyin": "zǒu lù cǎo",
+        "explanation": "全国编号-43"
+    },
+    {
+        "idiom": "臭臭花",
+        "pinyin": "chòu chòu huā",
+        "explanation": "全国编号-44"
+    },
+    {
+        "idiom": "霸王花",
+        "pinyin": "bà wáng huā",
+        "explanation": "全国编号-45"
+    },
+    {
+        "idiom": "派拉斯",
+        "pinyin": "pài lā sī",
+        "explanation": "全国编号-46"
+    },
+    {
+        "idiom": "派拉斯特",
+        "pinyin": "pài lā sī tè",
+        "explanation": "全国编号-47"
+    },
+    {
+        "idiom": "毛球",
+        "pinyin": "máo qiú",
+        "explanation": "全国编号-48"
+    },
+    {
+        "idiom": "摩鲁蛾",
+        "pinyin": "mó lǔ é",
+        "explanation": "全国编号-49"
+    },
+    {
+        "idiom": "地鼠",
+        "pinyin": "dì shǔ",
+        "explanation": "全国编号-50"
+    },
+    {
+        "idiom": "三地鼠",
+        "pinyin": "sān dì shǔ",
+        "explanation": "全国编号-51"
+    },
+    {
+        "idiom": "喵喵",
+        "pinyin": "miāo miāo",
+        "explanation": "全国编号-52"
+    },
+    {
+        "idiom": "猫老大",
+        "pinyin": "māo lǎo dà",
+        "explanation": "全国编号-53"
+    },
+    {
+        "idiom": "可达鸭",
+        "pinyin": "kě dá yā",
+        "explanation": "全国编号-54"
+    },
+    {
+        "idiom": "哥达鸭",
+        "pinyin": "gē dá yā",
+        "explanation": "全国编号-55"
+    },
+    {
+        "idiom": "猴怪",
+        "pinyin": "hóu guài",
+        "explanation": "全国编号-56"
+    },
+    {
+        "idiom": "火暴猴",
+        "pinyin": "huǒ bào hóu",
+        "explanation": "全国编号-57"
+    },
+    {
+        "idiom": "卡蒂狗",
+        "pinyin": "kǎ dì gǒu",
+        "explanation": "全国编号-58"
+    },
+    {
+        "idiom": "风速狗",
+        "pinyin": "fēng sù gǒu",
+        "explanation": "全国编号-59"
+    },
+    {
+        "idiom": "蚊香蝌蚪",
+        "pinyin": "wén xiāng kē dǒu",
+        "explanation": "全国编号-60"
+    },
+    {
+        "idiom": "蚊香君",
+        "pinyin": "wén xiāng jūn",
+        "explanation": "全国编号-61"
+    },
+    {
+        "idiom": "蚊香泳士",
+        "pinyin": "wén xiāng yǒng shì",
+        "explanation": "全国编号-62"
+    },
+    {
+        "idiom": "凯西",
+        "pinyin": "kǎi xī",
+        "explanation": "全国编号-63"
+    },
+    {
+        "idiom": "勇基拉",
+        "pinyin": "yǒng jī lā",
+        "explanation": "全国编号-64"
+    },
+    {
+        "idiom": "胡地",
+        "pinyin": "hú dì",
+        "explanation": "全国编号-65"
+    },
+    {
+        "idiom": "腕力",
+        "pinyin": "wàn lì",
+        "explanation": "全国编号-66"
+    },
+    {
+        "idiom": "豪力",
+        "pinyin": "háo lì",
+        "explanation": "全国编号-67"
+    },
+    {
+        "idiom": "怪力",
+        "pinyin": "guài lì",
+        "explanation": "全国编号-68"
+    },
+    {
+        "idiom": "喇叭芽",
+        "pinyin": "lǎ ba yá",
+        "explanation": "全国编号-69"
+    },
+    {
+        "idiom": "口呆花",
+        "pinyin": "kǒu dāi huā",
+        "explanation": "全国编号-70"
+    },
+    {
+        "idiom": "大食花",
+        "pinyin": "dà shí huā",
+        "explanation": "全国编号-71"
+    },
+    {
+        "idiom": "玛瑙水母",
+        "pinyin": "mǎ nǎo shuǐ mǔ",
+        "explanation": "全国编号-72"
+    },
+    {
+        "idiom": "毒刺水母",
+        "pinyin": "dú cì shuǐ mǔ",
+        "explanation": "全国编号-73"
+    },
+    {
+        "idiom": "小拳石",
+        "pinyin": "xiǎo quán shí",
+        "explanation": "全国编号-74"
+    },
+    {
+        "idiom": "隆隆石",
+        "pinyin": "lóng lóng shí",
+        "explanation": "全国编号-75"
+    },
+    {
+        "idiom": "隆隆岩",
+        "pinyin": "lóng lóng yán",
+        "explanation": "全国编号-76"
+    },
+    {
+        "idiom": "小火马",
+        "pinyin": "xiǎo huǒ mǎ",
+        "explanation": "全国编号-77"
+    },
+    {
+        "idiom": "烈焰马",
+        "pinyin": "liè yàn mǎ",
+        "explanation": "全国编号-78"
+    },
+    {
+        "idiom": "呆呆兽",
+        "pinyin": "dāi dāi shòu",
+        "explanation": "全国编号-79"
+    },
+    {
+        "idiom": "呆壳兽",
+        "pinyin": "dāi ké shòu",
+        "explanation": "全国编号-80"
+    },
+    {
+        "idiom": "小磁怪",
+        "pinyin": "xiǎo cí guài",
+        "explanation": "全国编号-81"
+    },
+    {
+        "idiom": "三合一磁怪",
+        "pinyin": "sān hé yī cí guài",
+        "explanation": "全国编号-82"
+    },
+    {
+        "idiom": "大葱鸭",
+        "pinyin": "dà cōng yā",
+        "explanation": "全国编号-83"
+    },
+    {
+        "idiom": "嘟嘟",
+        "pinyin": "dū dū",
+        "explanation": "全国编号-84"
+    },
+    {
+        "idiom": "嘟嘟利",
+        "pinyin": "dū dū lì",
+        "explanation": "全国编号-85"
+    },
+    {
+        "idiom": "小海狮",
+        "pinyin": "xiǎo hǎi shī",
+        "explanation": "全国编号-86"
+    },
+    {
+        "idiom": "白海狮",
+        "pinyin": "bái hǎi shī",
+        "explanation": "全国编号-87"
+    },
+    {
+        "idiom": "臭泥",
+        "pinyin": "chòu ní",
+        "explanation": "全国编号-88"
+    },
+    {
+        "idiom": "臭臭泥",
+        "pinyin": "chòu chòu ní",
+        "explanation": "全国编号-89"
+    },
+    {
+        "idiom": "大舌贝",
+        "pinyin": "dà shé bèi",
+        "explanation": "全国编号-90"
+    },
+    {
+        "idiom": "刺甲贝",
+        "pinyin": "cì jiǎ bèi",
+        "explanation": "全国编号-91"
+    },
+    {
+        "idiom": "鬼斯",
+        "pinyin": "guǐ sī",
+        "explanation": "全国编号-92"
+    },
+    {
+        "idiom": "鬼斯通",
+        "pinyin": "guǐ sī tōng",
+        "explanation": "全国编号-93"
+    },
+    {
+        "idiom": "耿鬼",
+        "pinyin": "gěng guǐ",
+        "explanation": "全国编号-94"
+    },
+    {
+        "idiom": "大岩蛇",
+        "pinyin": "dà yán shé",
+        "explanation": "全国编号-95"
+    },
+    {
+        "idiom": "催眠貘",
+        "pinyin": "cuī mián mò",
+        "explanation": "全国编号-96"
+    },
+    {
+        "idiom": "引梦貘人",
+        "pinyin": "yǐn mèng mò rén",
+        "explanation": "全国编号-97"
+    },
+    {
+        "idiom": "大钳蟹",
+        "pinyin": "dà qián xiè",
+        "explanation": "全国编号-98"
+    },
+    {
+        "idiom": "巨钳蟹",
+        "pinyin": "jù qián xiè",
+        "explanation": "全国编号-99"
+    },
+    {
+        "idiom": "霹雳电球",
+        "pinyin": "pī lì diàn qiú",
+        "explanation": "全国编号-100"
+    },
+    {
+        "idiom": "顽皮雷弹",
+        "pinyin": "wán pí léi tán",
+        "explanation": "全国编号-101"
+    },
+    {
+        "idiom": "蛋蛋",
+        "pinyin": "dàn dàn",
+        "explanation": "全国编号-102"
+    },
+    {
+        "idiom": "椰蛋树",
+        "pinyin": "yē dàn shù",
+        "explanation": "全国编号-103"
+    },
+    {
+        "idiom": "卡拉卡拉",
+        "pinyin": "kǎ lā kǎ lā",
+        "explanation": "全国编号-104"
+    },
+    {
+        "idiom": "嘎啦嘎啦",
+        "pinyin": "gǎ lā gǎ lā",
+        "explanation": "全国编号-105"
+    },
+    {
+        "idiom": "飞腿郎",
+        "pinyin": "fēi tuǐ láng",
+        "explanation": "全国编号-106"
+    },
+    {
+        "idiom": "快拳郎",
+        "pinyin": "kuài quán láng",
+        "explanation": "全国编号-107"
+    },
+    {
+        "idiom": "大舌头",
+        "pinyin": "dà shé tou",
+        "explanation": "全国编号-108"
+    },
+    {
+        "idiom": "瓦斯弹",
+        "pinyin": "wǎ sī tán",
+        "explanation": "全国编号-109"
+    },
+    {
+        "idiom": "双弹瓦斯",
+        "pinyin": "shuāng tán wǎ sī",
+        "explanation": "全国编号-110"
+    },
+    {
+        "idiom": "独角犀牛",
+        "pinyin": "dú jiǎo xī niú",
+        "explanation": "全国编号-111"
+    },
+    {
+        "idiom": "钻角犀兽",
+        "pinyin": "zuàn jiǎo xī shòu",
+        "explanation": "全国编号-112"
+    },
+    {
+        "idiom": "吉利蛋",
+        "pinyin": "jí lì dàn",
+        "explanation": "全国编号-113"
+    },
+    {
+        "idiom": "蔓藤怪",
+        "pinyin": "màn téng guài",
+        "explanation": "全国编号-114"
+    },
+    {
+        "idiom": "袋兽",
+        "pinyin": "dài shòu",
+        "explanation": "全国编号-115"
+    },
+    {
+        "idiom": "墨海马",
+        "pinyin": "mò hǎi mǎ",
+        "explanation": "全国编号-116"
+    },
+    {
+        "idiom": "海刺龙",
+        "pinyin": "hǎi cì lóng",
+        "explanation": "全国编号-117"
+    },
+    {
+        "idiom": "角金鱼",
+        "pinyin": "jiǎo jīn yú",
+        "explanation": "全国编号-118"
+    },
+    {
+        "idiom": "金鱼王",
+        "pinyin": "jīn yú wáng",
+        "explanation": "全国编号-119"
+    },
+    {
+        "idiom": "海星星",
+        "pinyin": "hǎi xīng xīng",
+        "explanation": "全国编号-120"
+    },
+    {
+        "idiom": "宝石海星",
+        "pinyin": "bǎo shí hǎi xīng",
+        "explanation": "全国编号-121"
+    },
+    {
+        "idiom": "魔墙人偶",
+        "pinyin": "mó qiáng rén ǒu",
+        "explanation": "全国编号-122"
+    },
+    {
+        "idiom": "飞天螳螂",
+        "pinyin": "fēi tiān táng láng",
+        "explanation": "全国编号-123"
+    },
+    {
+        "idiom": "迷唇姐",
+        "pinyin": "mí chún jiě",
+        "explanation": "全国编号-124"
+    },
+    {
+        "idiom": "电击兽",
+        "pinyin": "diàn jī shòu",
+        "explanation": "全国编号-125"
+    },
+    {
+        "idiom": "鸭嘴火兽",
+        "pinyin": "yā zuǐ huǒ shòu",
+        "explanation": "全国编号-126"
+    },
+    {
+        "idiom": "凯罗斯",
+        "pinyin": "kǎi luó sī",
+        "explanation": "全国编号-127"
+    },
+    {
+        "idiom": "肯泰罗",
+        "pinyin": "kěn tài luó",
+        "explanation": "全国编号-128"
+    },
+    {
+        "idiom": "鲤鱼王",
+        "pinyin": "lǐ yú wáng",
+        "explanation": "全国编号-129"
+    },
+    {
+        "idiom": "暴鲤龙",
+        "pinyin": "bào lǐ lóng",
+        "explanation": "全国编号-130"
+    },
+    {
+        "idiom": "拉普拉斯",
+        "pinyin": "lā pǔ lā sī",
+        "explanation": "全国编号-131"
+    },
+    {
+        "idiom": "百变怪",
+        "pinyin": "bǎi biàn guài",
+        "explanation": "全国编号-132"
+    },
+    {
+        "idiom": "伊布",
+        "pinyin": "yī bù",
+        "explanation": "全国编号-133"
+    },
+    {
+        "idiom": "水伊布",
+        "pinyin": "shuǐ yī bù",
+        "explanation": "全国编号-134"
+    },
+    {
+        "idiom": "雷伊布",
+        "pinyin": "léi yī bù",
+        "explanation": "全国编号-135"
+    },
+    {
+        "idiom": "火伊布",
+        "pinyin": "huǒ yī bù",
+        "explanation": "全国编号-136"
+    },
+    {
+        "idiom": "多边兽",
+        "pinyin": "duō biān shòu",
+        "explanation": "全国编号-137"
+    },
+    {
+        "idiom": "菊石兽",
+        "pinyin": "jú shí shòu",
+        "explanation": "全国编号-138"
+    },
+    {
+        "idiom": "多刺菊石兽",
+        "pinyin": "duō cì jú shí shòu",
+        "explanation": "全国编号-139"
+    },
+    {
+        "idiom": "化石盔",
+        "pinyin": "huà shí kuī",
+        "explanation": "全国编号-140"
+    },
+    {
+        "idiom": "镰刀盔",
+        "pinyin": "lián dāo kuī",
+        "explanation": "全国编号-141"
+    },
+    {
+        "idiom": "化石翼龙",
+        "pinyin": "huà shí yì lóng",
+        "explanation": "全国编号-142"
+    },
+    {
+        "idiom": "卡比兽",
+        "pinyin": "kǎ bǐ shòu",
+        "explanation": "全国编号-143"
+    },
+    {
+        "idiom": "急冻鸟",
+        "pinyin": "jí dòng niǎo",
+        "explanation": "全国编号-144"
+    },
+    {
+        "idiom": "闪电鸟",
+        "pinyin": "shǎn diàn niǎo",
+        "explanation": "全国编号-145"
+    },
+    {
+        "idiom": "火焰鸟",
+        "pinyin": "huǒ yàn niǎo",
+        "explanation": "全国编号-146"
+    },
+    {
+        "idiom": "迷你龙",
+        "pinyin": "mí nǐ lóng",
+        "explanation": "全国编号-147"
+    },
+    {
+        "idiom": "哈克龙",
+        "pinyin": "hā kè lóng",
+        "explanation": "全国编号-148"
+    },
+    {
+        "idiom": "快龙",
+        "pinyin": "kuài lóng",
+        "explanation": "全国编号-149"
+    },
+    {
+        "idiom": "超梦",
+        "pinyin": "chāo mèng",
+        "explanation": "全国编号-150"
+    },
+    {
+        "idiom": "梦幻",
+        "pinyin": "mèng huàn",
+        "explanation": "全国编号-151"
+    },
+    {
+        "idiom": "菊草叶",
+        "pinyin": "jú cǎo yè",
+        "explanation": "全国编号-152"
+    },
+    {
+        "idiom": "月桂叶",
+        "pinyin": "yuè guì yè",
+        "explanation": "全国编号-153"
+    },
+    {
+        "idiom": "大竺葵",
+        "pinyin": "dà zhú kuí",
+        "explanation": "全国编号-154"
+    },
+    {
+        "idiom": "火球鼠",
+        "pinyin": "huǒ qiú shǔ",
+        "explanation": "全国编号-155"
+    },
+    {
+        "idiom": "火岩鼠",
+        "pinyin": "huǒ yán shǔ",
+        "explanation": "全国编号-156"
+    },
+    {
+        "idiom": "火暴兽",
+        "pinyin": "huǒ bào shòu",
+        "explanation": "全国编号-157"
+    },
+    {
+        "idiom": "小锯鳄",
+        "pinyin": "xiǎo jù è",
+        "explanation": "全国编号-158"
+    },
+    {
+        "idiom": "蓝鳄",
+        "pinyin": "lán è",
+        "explanation": "全国编号-159"
+    },
+    {
+        "idiom": "大力鳄",
+        "pinyin": "dà lì è",
+        "explanation": "全国编号-160"
+    },
+    {
+        "idiom": "尾立",
+        "pinyin": "wěi lì",
+        "explanation": "全国编号-161"
+    },
+    {
+        "idiom": "大尾立",
+        "pinyin": "dà wěi lì",
+        "explanation": "全国编号-162"
+    },
+    {
+        "idiom": "咕咕",
+        "pinyin": "gū gū",
+        "explanation": "全国编号-163"
+    },
+    {
+        "idiom": "猫头夜鹰",
+        "pinyin": "māo tóu yè yīng",
+        "explanation": "全国编号-164"
+    },
+    {
+        "idiom": "芭瓢虫",
+        "pinyin": "bā piáo chóng",
+        "explanation": "全国编号-165"
+    },
+    {
+        "idiom": "安瓢虫",
+        "pinyin": "ān piáo chóng",
+        "explanation": "全国编号-166"
+    },
+    {
+        "idiom": "圆丝蛛",
+        "pinyin": "yuán sī zhū",
+        "explanation": "全国编号-167"
+    },
+    {
+        "idiom": "阿利多斯",
+        "pinyin": "ā lì duō sī",
+        "explanation": "全国编号-168"
+    },
+    {
+        "idiom": "叉字蝠",
+        "pinyin": "chā zì fú",
+        "explanation": "全国编号-169"
+    },
+    {
+        "idiom": "灯笼鱼",
+        "pinyin": "dēng long yú",
+        "explanation": "全国编号-170"
+    },
+    {
+        "idiom": "电灯怪",
+        "pinyin": "diàn dēng guài",
+        "explanation": "全国编号-171"
+    },
+    {
+        "idiom": "皮丘",
+        "pinyin": "pí qiū",
+        "explanation": "全国编号-172"
+    },
+    {
+        "idiom": "皮宝宝",
+        "pinyin": "pí bǎo bao",
+        "explanation": "全国编号-173"
+    },
+    {
+        "idiom": "宝宝丁",
+        "pinyin": "bǎo bao dīng",
+        "explanation": "全国编号-174"
+    },
+    {
+        "idiom": "波克比",
+        "pinyin": "bō kè bǐ",
+        "explanation": "全国编号-175"
+    },
+    {
+        "idiom": "波克基古",
+        "pinyin": "bō kè jī gǔ",
+        "explanation": "全国编号-176"
+    },
+    {
+        "idiom": "天然雀",
+        "pinyin": "tiān rán què",
+        "explanation": "全国编号-177"
+    },
+    {
+        "idiom": "天然鸟",
+        "pinyin": "tiān rán niǎo",
+        "explanation": "全国编号-178"
+    },
+    {
+        "idiom": "咩利羊",
+        "pinyin": "miē lì yáng",
+        "explanation": "全国编号-179"
+    },
+    {
+        "idiom": "茸茸羊",
+        "pinyin": "róng róng yáng",
+        "explanation": "全国编号-180"
+    },
+    {
+        "idiom": "电龙",
+        "pinyin": "diàn lóng",
+        "explanation": "全国编号-181"
+    },
+    {
+        "idiom": "美丽花",
+        "pinyin": "měi lì huā",
+        "explanation": "全国编号-182"
+    },
+    {
+        "idiom": "玛力露",
+        "pinyin": "mǎ lì lù",
+        "explanation": "全国编号-183"
+    },
+    {
+        "idiom": "玛力露丽",
+        "pinyin": "mǎ lì lù lì",
+        "explanation": "全国编号-184"
+    },
+    {
+        "idiom": "树才怪",
+        "pinyin": "shù cái guài",
+        "explanation": "全国编号-185"
+    },
+    {
+        "idiom": "蚊香蛙皇",
+        "pinyin": "wén xiāng wā huáng",
+        "explanation": "全国编号-186"
+    },
+    {
+        "idiom": "毽子草",
+        "pinyin": "jiàn zǐ cǎo",
+        "explanation": "全国编号-187"
+    },
+    {
+        "idiom": "毽子花",
+        "pinyin": "jiàn zǐ huā",
+        "explanation": "全国编号-188"
+    },
+    {
+        "idiom": "毽子棉",
+        "pinyin": "jiàn zǐ mián",
+        "explanation": "全国编号-189"
+    },
+    {
+        "idiom": "长尾怪手",
+        "pinyin": "cháng wěi guài shǒu",
+        "explanation": "全国编号-190"
+    },
+    {
+        "idiom": "向日种子",
+        "pinyin": "xiàng rì zhǒng zi",
+        "explanation": "全国编号-191"
+    },
+    {
+        "idiom": "向日花怪",
+        "pinyin": "xiàng rì huā guài",
+        "explanation": "全国编号-192"
+    },
+    {
+        "idiom": "蜻蜻蜓",
+        "pinyin": "qīng qīng tíng",
+        "explanation": "全国编号-193"
+    },
+    {
+        "idiom": "乌波",
+        "pinyin": "wū bō",
+        "explanation": "全国编号-194"
+    },
+    {
+        "idiom": "沼王",
+        "pinyin": "zhǎo wáng",
+        "explanation": "全国编号-195"
+    },
+    {
+        "idiom": "太阳伊布",
+        "pinyin": "tài yáng yī bù",
+        "explanation": "全国编号-196"
+    },
+    {
+        "idiom": "月亮伊布",
+        "pinyin": "yuè liàng yī bù",
+        "explanation": "全国编号-197"
+    },
+    {
+        "idiom": "黑暗鸦",
+        "pinyin": "hēi àn yā",
+        "explanation": "全国编号-198"
+    },
+    {
+        "idiom": "呆呆王",
+        "pinyin": "dāi dāi wáng",
+        "explanation": "全国编号-199"
+    },
+    {
+        "idiom": "梦妖",
+        "pinyin": "mèng yāo",
+        "explanation": "全国编号-200"
+    },
+    {
+        "idiom": "未知图腾",
+        "pinyin": "wèi zhī tú téng",
+        "explanation": "全国编号-201"
+    },
+    {
+        "idiom": "果然翁",
+        "pinyin": "guǒ rán wēng",
+        "explanation": "全国编号-202"
+    },
+    {
+        "idiom": "麒麟奇",
+        "pinyin": "qí lín qí",
+        "explanation": "全国编号-203"
+    },
+    {
+        "idiom": "榛果球",
+        "pinyin": "zhēn guǒ qiú",
+        "explanation": "全国编号-204"
+    },
+    {
+        "idiom": "佛烈托斯",
+        "pinyin": "fó liè tuō sī",
+        "explanation": "全国编号-205"
+    },
+    {
+        "idiom": "土龙弟弟",
+        "pinyin": "tǔ lóng dì di",
+        "explanation": "全国编号-206"
+    },
+    {
+        "idiom": "天蝎",
+        "pinyin": "tiān xiē",
+        "explanation": "全国编号-207"
+    },
+    {
+        "idiom": "大钢蛇",
+        "pinyin": "dà gāng shé",
+        "explanation": "全国编号-208"
+    },
+    {
+        "idiom": "布鲁",
+        "pinyin": "bù lǔ",
+        "explanation": "全国编号-209"
+    },
+    {
+        "idiom": "布鲁皇",
+        "pinyin": "bù lǔ huáng",
+        "explanation": "全国编号-210"
+    },
+    {
+        "idiom": "千针鱼",
+        "pinyin": "qiān zhēn yú",
+        "explanation": "全国编号-211"
+    },
+    {
+        "idiom": "巨钳螳螂",
+        "pinyin": "jù qián táng láng",
+        "explanation": "全国编号-212"
+    },
+    {
+        "idiom": "壶壶",
+        "pinyin": "hú hú",
+        "explanation": "全国编号-213"
+    },
+    {
+        "idiom": "赫拉克罗斯",
+        "pinyin": "hè lā kè luó sī",
+        "explanation": "全国编号-214"
+    },
+    {
+        "idiom": "狃拉",
+        "pinyin": "niǔ lā",
+        "explanation": "全国编号-215"
+    },
+    {
+        "idiom": "熊宝宝",
+        "pinyin": "xióng bǎo bao",
+        "explanation": "全国编号-216"
+    },
+    {
+        "idiom": "圈圈熊",
+        "pinyin": "quān quān xióng",
+        "explanation": "全国编号-217"
+    },
+    {
+        "idiom": "熔岩虫",
+        "pinyin": "róng yán chóng",
+        "explanation": "全国编号-218"
+    },
+    {
+        "idiom": "熔岩蜗牛",
+        "pinyin": "róng yán wō niú",
+        "explanation": "全国编号-219"
+    },
+    {
+        "idiom": "小山猪",
+        "pinyin": "xiǎo shān zhū",
+        "explanation": "全国编号-220"
+    },
+    {
+        "idiom": "长毛猪",
+        "pinyin": "cháng máo zhū",
+        "explanation": "全国编号-221"
+    },
+    {
+        "idiom": "太阳珊瑚",
+        "pinyin": "tài yáng shān hú",
+        "explanation": "全国编号-222"
+    },
+    {
+        "idiom": "铁炮鱼",
+        "pinyin": "tiě pào yú",
+        "explanation": "全国编号-223"
+    },
+    {
+        "idiom": "章鱼桶",
+        "pinyin": "zhāng yú tǒng",
+        "explanation": "全国编号-224"
+    },
+    {
+        "idiom": "信使鸟",
+        "pinyin": "xìn shǐ niǎo",
+        "explanation": "全国编号-225"
+    },
+    {
+        "idiom": "巨翅飞鱼",
+        "pinyin": "jù chì fēi yú",
+        "explanation": "全国编号-226"
+    },
+    {
+        "idiom": "盔甲鸟",
+        "pinyin": "kuī jiǎ niǎo",
+        "explanation": "全国编号-227"
+    },
+    {
+        "idiom": "戴鲁比",
+        "pinyin": "dài lǔ bǐ",
+        "explanation": "全国编号-228"
+    },
+    {
+        "idiom": "黑鲁加",
+        "pinyin": "hēi lǔ jiā",
+        "explanation": "全国编号-229"
+    },
+    {
+        "idiom": "刺龙王",
+        "pinyin": "cì lóng wáng",
+        "explanation": "全国编号-230"
+    },
+    {
+        "idiom": "小小象",
+        "pinyin": "xiǎo xiǎo xiàng",
+        "explanation": "全国编号-231"
+    },
+    {
+        "idiom": "顿甲",
+        "pinyin": "dùn jiǎ",
+        "explanation": "全国编号-232"
+    },
+    {
+        "idiom": "多边兽2型",
+        "pinyin": "duō biān shòu 2 xíng",
+        "explanation": "全国编号-233"
+    },
+    {
+        "idiom": "惊角鹿",
+        "pinyin": "jīng jiǎo lù",
+        "explanation": "全国编号-234"
+    },
+    {
+        "idiom": "图图犬",
+        "pinyin": "tú tú quǎn",
+        "explanation": "全国编号-235"
+    },
+    {
+        "idiom": "无畏小子",
+        "pinyin": "wú wèi xiǎo zi",
+        "explanation": "全国编号-236"
+    },
+    {
+        "idiom": "战舞郎",
+        "pinyin": "zhàn wǔ láng",
+        "explanation": "全国编号-237"
+    },
+    {
+        "idiom": "迷唇娃",
+        "pinyin": "mí chún wá",
+        "explanation": "全国编号-238"
+    },
+    {
+        "idiom": "电击怪",
+        "pinyin": "diàn jī guài",
+        "explanation": "全国编号-239"
+    },
+    {
+        "idiom": "鸭嘴宝宝",
+        "pinyin": "yā zuǐ bǎo bao",
+        "explanation": "全国编号-240"
+    },
+    {
+        "idiom": "大奶罐",
+        "pinyin": "dà nǎi guàn",
+        "explanation": "全国编号-241"
+    },
+    {
+        "idiom": "幸福蛋",
+        "pinyin": "xìng fú dàn",
+        "explanation": "全国编号-242"
+    },
+    {
+        "idiom": "雷公",
+        "pinyin": "léi gōng",
+        "explanation": "全国编号-243"
+    },
+    {
+        "idiom": "炎帝",
+        "pinyin": "yán dì",
+        "explanation": "全国编号-244"
+    },
+    {
+        "idiom": "水君",
+        "pinyin": "shuǐ jūn",
+        "explanation": "全国编号-245"
+    },
+    {
+        "idiom": "幼基拉斯",
+        "pinyin": "yòu jī lā sī",
+        "explanation": "全国编号-246"
+    },
+    {
+        "idiom": "沙基拉斯",
+        "pinyin": "shā jī lā sī",
+        "explanation": "全国编号-247"
+    },
+    {
+        "idiom": "班基拉斯",
+        "pinyin": "bān jī lā sī",
+        "explanation": "全国编号-248"
+    },
+    {
+        "idiom": "洛奇亚",
+        "pinyin": "luò qí yà",
+        "explanation": "全国编号-249"
+    },
+    {
+        "idiom": "凤王",
+        "pinyin": "fèng wáng",
+        "explanation": "全国编号-250"
+    },
+    {
+        "idiom": "时拉比",
+        "pinyin": "shí lā bǐ",
+        "explanation": "全国编号-251"
+    },
+    {
+        "idiom": "木守宫",
+        "pinyin": "mù shǒu gōng",
+        "explanation": "全国编号-252"
+    },
+    {
+        "idiom": "森林蜥蜴",
+        "pinyin": "sēn lín xī yì",
+        "explanation": "全国编号-253"
+    },
+    {
+        "idiom": "蜥蜴王",
+        "pinyin": "xī yì wáng",
+        "explanation": "全国编号-254"
+    },
+    {
+        "idiom": "火稚鸡",
+        "pinyin": "huǒ zhì jī",
+        "explanation": "全国编号-255"
+    },
+    {
+        "idiom": "力壮鸡",
+        "pinyin": "lì zhuàng jī",
+        "explanation": "全国编号-256"
+    },
+    {
+        "idiom": "火焰鸡",
+        "pinyin": "huǒ yàn jī",
+        "explanation": "全国编号-257"
+    },
+    {
+        "idiom": "水跃鱼",
+        "pinyin": "shuǐ yuè yú",
+        "explanation": "全国编号-258"
+    },
+    {
+        "idiom": "沼跃鱼",
+        "pinyin": "zhǎo yuè yú",
+        "explanation": "全国编号-259"
+    },
+    {
+        "idiom": "巨沼怪",
+        "pinyin": "jù zhǎo guài",
+        "explanation": "全国编号-260"
+    },
+    {
+        "idiom": "土狼犬",
+        "pinyin": "tǔ láng quǎn",
+        "explanation": "全国编号-261"
+    },
+    {
+        "idiom": "大狼犬",
+        "pinyin": "dà láng quǎn",
+        "explanation": "全国编号-262"
+    },
+    {
+        "idiom": "蛇纹熊",
+        "pinyin": "shé wén xióng",
+        "explanation": "全国编号-263"
+    },
+    {
+        "idiom": "直冲熊",
+        "pinyin": "zhí chōng xióng",
+        "explanation": "全国编号-264"
+    },
+    {
+        "idiom": "刺尾虫",
+        "pinyin": "cì wěi chóng",
+        "explanation": "全国编号-265"
+    },
+    {
+        "idiom": "甲壳茧",
+        "pinyin": "jiǎ qiào jiǎn",
+        "explanation": "全国编号-266"
+    },
+    {
+        "idiom": "狩猎凤蝶",
+        "pinyin": "shòu liè fèng dié",
+        "explanation": "全国编号-267"
+    },
+    {
+        "idiom": "盾甲茧",
+        "pinyin": "dùn jiǎ jiǎn",
+        "explanation": "全国编号-268"
+    },
+    {
+        "idiom": "毒粉蛾",
+        "pinyin": "dú fěn é",
+        "explanation": "全国编号-269"
+    },
+    {
+        "idiom": "莲叶童子",
+        "pinyin": "lián yè tóng zǐ",
+        "explanation": "全国编号-270"
+    },
+    {
+        "idiom": "莲帽小童",
+        "pinyin": "lián mào xiǎo tóng",
+        "explanation": "全国编号-271"
+    },
+    {
+        "idiom": "乐天河童",
+        "pinyin": "lè tiān hé tóng",
+        "explanation": "全国编号-272"
+    },
+    {
+        "idiom": "橡实果",
+        "pinyin": "xiàng shí guǒ",
+        "explanation": "全国编号-273"
+    },
+    {
+        "idiom": "长鼻叶",
+        "pinyin": "cháng bí yè",
+        "explanation": "全国编号-274"
+    },
+    {
+        "idiom": "狡猾天狗",
+        "pinyin": "jiǎo huá tiān gǒu",
+        "explanation": "全国编号-275"
+    },
+    {
+        "idiom": "傲骨燕",
+        "pinyin": "ào gǔ yàn",
+        "explanation": "全国编号-276"
+    },
+    {
+        "idiom": "大王燕",
+        "pinyin": "dà wáng yàn",
+        "explanation": "全国编号-277"
+    },
+    {
+        "idiom": "长翅鸥",
+        "pinyin": "cháng chì ōu",
+        "explanation": "全国编号-278"
+    },
+    {
+        "idiom": "大嘴鸥",
+        "pinyin": "dà zuǐ ōu",
+        "explanation": "全国编号-279"
+    },
+    {
+        "idiom": "拉鲁拉丝",
+        "pinyin": "lā lǔ lā sī",
+        "explanation": "全国编号-280"
+    },
+    {
+        "idiom": "奇鲁莉安",
+        "pinyin": "qí lǔ lì ān",
+        "explanation": "全国编号-281"
+    },
+    {
+        "idiom": "沙奈朵",
+        "pinyin": "shā nài duǒ",
+        "explanation": "全国编号-282"
+    },
+    {
+        "idiom": "溜溜糖球",
+        "pinyin": "liū liū táng qiú",
+        "explanation": "全国编号-283"
+    },
+    {
+        "idiom": "雨翅蛾",
+        "pinyin": "yǔ chì é",
+        "explanation": "全国编号-284"
+    },
+    {
+        "idiom": "蘑蘑菇",
+        "pinyin": "mó mó gu",
+        "explanation": "全国编号-285"
+    },
+    {
+        "idiom": "斗笠菇",
+        "pinyin": "dòu lì gū",
+        "explanation": "全国编号-286"
+    },
+    {
+        "idiom": "懒人獭",
+        "pinyin": "lǎn rén tǎ",
+        "explanation": "全国编号-287"
+    },
+    {
+        "idiom": "过动猿",
+        "pinyin": "guò dòng yuán",
+        "explanation": "全国编号-288"
+    },
+    {
+        "idiom": "请假王",
+        "pinyin": "qǐng jià wáng",
+        "explanation": "全国编号-289"
+    },
+    {
+        "idiom": "土居忍士",
+        "pinyin": "tǔ jū rěn shì",
+        "explanation": "全国编号-290"
+    },
+    {
+        "idiom": "铁面忍者",
+        "pinyin": "tiě miàn rěn zhě",
+        "explanation": "全国编号-291"
+    },
+    {
+        "idiom": "脱壳忍者",
+        "pinyin": "tuō ké rěn zhě",
+        "explanation": "全国编号-292"
+    },
+    {
+        "idiom": "咕妞妞",
+        "pinyin": "gū niū niū",
+        "explanation": "全国编号-293"
+    },
+    {
+        "idiom": "吼爆弹",
+        "pinyin": "hǒu bào tán",
+        "explanation": "全国编号-294"
+    },
+    {
+        "idiom": "爆音怪",
+        "pinyin": "bào yīn guài",
+        "explanation": "全国编号-295"
+    },
+    {
+        "idiom": "幕下力士",
+        "pinyin": "mù xià lì shì",
+        "explanation": "全国编号-296"
+    },
+    {
+        "idiom": "铁掌力士",
+        "pinyin": "tiě zhǎng lì shì",
+        "explanation": "全国编号-297"
+    },
+    {
+        "idiom": "露力丽",
+        "pinyin": "lù lì lì",
+        "explanation": "全国编号-298"
+    },
+    {
+        "idiom": "朝北鼻",
+        "pinyin": "cháo běi bí",
+        "explanation": "全国编号-299"
+    },
+    {
+        "idiom": "向尾喵",
+        "pinyin": "xiàng wěi miāo",
+        "explanation": "全国编号-300"
+    },
+    {
+        "idiom": "优雅猫",
+        "pinyin": "yōu yǎ māo",
+        "explanation": "全国编号-301"
+    },
+    {
+        "idiom": "勾魂眼",
+        "pinyin": "gōu hún yǎn",
+        "explanation": "全国编号-302"
+    },
+    {
+        "idiom": "大嘴娃",
+        "pinyin": "dà zuǐ wá",
+        "explanation": "全国编号-303"
+    },
+    {
+        "idiom": "可可多拉",
+        "pinyin": "kě kě duō lā",
+        "explanation": "全国编号-304"
+    },
+    {
+        "idiom": "可多拉",
+        "pinyin": "kě duō lā",
+        "explanation": "全国编号-305"
+    },
+    {
+        "idiom": "波士可多拉",
+        "pinyin": "bō shì kě duō lā",
+        "explanation": "全国编号-306"
+    },
+    {
+        "idiom": "玛沙那",
+        "pinyin": "mǎ shā nà",
+        "explanation": "全国编号-307"
+    },
+    {
+        "idiom": "恰雷姆",
+        "pinyin": "qià léi mǔ",
+        "explanation": "全国编号-308"
+    },
+    {
+        "idiom": "落雷兽",
+        "pinyin": "luò léi shòu",
+        "explanation": "全国编号-309"
+    },
+    {
+        "idiom": "雷电兽",
+        "pinyin": "léi diàn shòu",
+        "explanation": "全国编号-310"
+    },
+    {
+        "idiom": "正电拍拍",
+        "pinyin": "zhèng diàn pāi pāi",
+        "explanation": "全国编号-311"
+    },
+    {
+        "idiom": "负电拍拍",
+        "pinyin": "fù diàn pāi pāi",
+        "explanation": "全国编号-312"
+    },
+    {
+        "idiom": "电萤虫",
+        "pinyin": "diàn yíng chóng",
+        "explanation": "全国编号-313"
+    },
+    {
+        "idiom": "甜甜萤",
+        "pinyin": "tián tián yíng",
+        "explanation": "全国编号-314"
+    },
+    {
+        "idiom": "毒蔷薇",
+        "pinyin": "dú qiáng wēi",
+        "explanation": "全国编号-315"
+    },
+    {
+        "idiom": "溶食兽",
+        "pinyin": "róng shí shòu",
+        "explanation": "全国编号-316"
+    },
+    {
+        "idiom": "吞食兽",
+        "pinyin": "tūn shí shòu",
+        "explanation": "全国编号-317"
+    },
+    {
+        "idiom": "利牙鱼",
+        "pinyin": "lì yá yú",
+        "explanation": "全国编号-318"
+    },
+    {
+        "idiom": "巨牙鲨",
+        "pinyin": "jù yá shā",
+        "explanation": "全国编号-319"
+    },
+    {
+        "idiom": "吼吼鲸",
+        "pinyin": "hǒu hǒu jīng",
+        "explanation": "全国编号-320"
+    },
+    {
+        "idiom": "吼鲸王",
+        "pinyin": "hǒu jīng wáng",
+        "explanation": "全国编号-321"
+    },
+    {
+        "idiom": "呆火驼",
+        "pinyin": "dāi huǒ tuó",
+        "explanation": "全国编号-322"
+    },
+    {
+        "idiom": "喷火驼",
+        "pinyin": "pēn huǒ tuó",
+        "explanation": "全国编号-323"
+    },
+    {
+        "idiom": "煤炭龟",
+        "pinyin": "méi tàn guī",
+        "explanation": "全国编号-324"
+    },
+    {
+        "idiom": "跳跳猪",
+        "pinyin": "tiào tiào zhū",
+        "explanation": "全国编号-325"
+    },
+    {
+        "idiom": "噗噗猪",
+        "pinyin": "pū pū zhū",
+        "explanation": "全国编号-326"
+    },
+    {
+        "idiom": "晃晃斑",
+        "pinyin": "huàng huàng bān",
+        "explanation": "全国编号-327"
+    },
+    {
+        "idiom": "大颚蚁",
+        "pinyin": "dà è yǐ",
+        "explanation": "全国编号-328"
+    },
+    {
+        "idiom": "超音波幼虫",
+        "pinyin": "chāo yīn bō yòu chóng",
+        "explanation": "全国编号-329"
+    },
+    {
+        "idiom": "沙漠蜻蜓",
+        "pinyin": "shā mò qīng tíng",
+        "explanation": "全国编号-330"
+    },
+    {
+        "idiom": "刺球仙人掌",
+        "pinyin": "cì qiú xiān rén zhǎng",
+        "explanation": "全国编号-331"
+    },
+    {
+        "idiom": "梦歌仙人掌",
+        "pinyin": "mèng gē xiān rén zhǎng",
+        "explanation": "全国编号-332"
+    },
+    {
+        "idiom": "青绵鸟",
+        "pinyin": "qīng mián niǎo",
+        "explanation": "全国编号-333"
+    },
+    {
+        "idiom": "七夕青鸟",
+        "pinyin": "qī xī qīng niǎo",
+        "explanation": "全国编号-334"
+    },
+    {
+        "idiom": "猫鼬斩",
+        "pinyin": "māo yòu zhǎn",
+        "explanation": "全国编号-335"
+    },
+    {
+        "idiom": "饭匙蛇",
+        "pinyin": "fàn chí shé",
+        "explanation": "全国编号-336"
+    },
+    {
+        "idiom": "月石",
+        "pinyin": "yuè shí",
+        "explanation": "全国编号-337"
+    },
+    {
+        "idiom": "太阳岩",
+        "pinyin": "tài yáng yán",
+        "explanation": "全国编号-338"
+    },
+    {
+        "idiom": "泥泥鳅",
+        "pinyin": "ní ní qiū",
+        "explanation": "全国编号-339"
+    },
+    {
+        "idiom": "鲶鱼王",
+        "pinyin": "nián yú wáng",
+        "explanation": "全国编号-340"
+    },
+    {
+        "idiom": "龙虾小兵",
+        "pinyin": "lóng xiā xiǎo bīng",
+        "explanation": "全国编号-341"
+    },
+    {
+        "idiom": "铁螯龙虾",
+        "pinyin": "tiě áo lóng xiā",
+        "explanation": "全国编号-342"
+    },
+    {
+        "idiom": "天秤偶",
+        "pinyin": "tiān chèng ǒu",
+        "explanation": "全国编号-343"
+    },
+    {
+        "idiom": "念力土偶",
+        "pinyin": "niàn lì tǔ ǒu",
+        "explanation": "全国编号-344"
+    },
+    {
+        "idiom": "触手百合",
+        "pinyin": "chù shǒu bǎi hé",
+        "explanation": "全国编号-345"
+    },
+    {
+        "idiom": "摇篮百合",
+        "pinyin": "yáo lán bǎi hé",
+        "explanation": "全国编号-346"
+    },
+    {
+        "idiom": "太古羽虫",
+        "pinyin": "tài gǔ yǔ chóng",
+        "explanation": "全国编号-347"
+    },
+    {
+        "idiom": "太古盔甲",
+        "pinyin": "tài gǔ kuī jiǎ",
+        "explanation": "全国编号-348"
+    },
+    {
+        "idiom": "丑丑鱼",
+        "pinyin": "chǒu chǒu yú",
+        "explanation": "全国编号-349"
+    },
+    {
+        "idiom": "美纳斯",
+        "pinyin": "měi nà sī",
+        "explanation": "全国编号-350"
+    },
+    {
+        "idiom": "飘浮泡泡",
+        "pinyin": "piāo fú pào pào",
+        "explanation": "全国编号-351"
+    },
+    {
+        "idiom": "变隐龙",
+        "pinyin": "biàn yǐn lóng",
+        "explanation": "全国编号-352"
+    },
+    {
+        "idiom": "怨影娃娃",
+        "pinyin": "yuàn yǐng wá wa",
+        "explanation": "全国编号-353"
+    },
+    {
+        "idiom": "诅咒娃娃",
+        "pinyin": "zǔ zhòu wá wa",
+        "explanation": "全国编号-354"
+    },
+    {
+        "idiom": "夜巡灵",
+        "pinyin": "yè xún líng",
+        "explanation": "全国编号-355"
+    },
+    {
+        "idiom": "彷徨夜灵",
+        "pinyin": "páng huáng yè líng",
+        "explanation": "全国编号-356"
+    },
+    {
+        "idiom": "热带龙",
+        "pinyin": "rè dài lóng",
+        "explanation": "全国编号-357"
+    },
+    {
+        "idiom": "风铃铃",
+        "pinyin": "fēng líng líng",
+        "explanation": "全国编号-358"
+    },
+    {
+        "idiom": "阿勃梭鲁",
+        "pinyin": "ā bó suō lǔ",
+        "explanation": "全国编号-359"
+    },
+    {
+        "idiom": "小果然",
+        "pinyin": "xiǎo guǒ rán",
+        "explanation": "全国编号-360"
+    },
+    {
+        "idiom": "雪童子",
+        "pinyin": "xuě tóng zǐ",
+        "explanation": "全国编号-361"
+    },
+    {
+        "idiom": "冰鬼护",
+        "pinyin": "bīng guǐ hù",
+        "explanation": "全国编号-362"
+    },
+    {
+        "idiom": "海豹球",
+        "pinyin": "hǎi bào qiú",
+        "explanation": "全国编号-363"
+    },
+    {
+        "idiom": "海魔狮",
+        "pinyin": "hǎi mó shī",
+        "explanation": "全国编号-364"
+    },
+    {
+        "idiom": "帝牙海狮",
+        "pinyin": "dì yá hǎi shī",
+        "explanation": "全国编号-365"
+    },
+    {
+        "idiom": "珍珠贝",
+        "pinyin": "zhēn zhū bèi",
+        "explanation": "全国编号-366"
+    },
+    {
+        "idiom": "猎斑鱼",
+        "pinyin": "liè bān yú",
+        "explanation": "全国编号-367"
+    },
+    {
+        "idiom": "樱花鱼",
+        "pinyin": "yīng huā yú",
+        "explanation": "全国编号-368"
+    },
+    {
+        "idiom": "古空棘鱼",
+        "pinyin": "gǔ kōng jí yú",
+        "explanation": "全国编号-369"
+    },
+    {
+        "idiom": "爱心鱼",
+        "pinyin": "ài xīn yú",
+        "explanation": "全国编号-370"
+    },
+    {
+        "idiom": "宝贝龙",
+        "pinyin": "bǎo bèi lóng",
+        "explanation": "全国编号-371"
+    },
+    {
+        "idiom": "甲壳龙",
+        "pinyin": "jiǎ qiào lóng",
+        "explanation": "全国编号-372"
+    },
+    {
+        "idiom": "暴飞龙",
+        "pinyin": "bào fēi lóng",
+        "explanation": "全国编号-373"
+    },
+    {
+        "idiom": "铁哑铃",
+        "pinyin": "tiě yǎ líng",
+        "explanation": "全国编号-374"
+    },
+    {
+        "idiom": "金属怪",
+        "pinyin": "jīn shǔ guài",
+        "explanation": "全国编号-375"
+    },
+    {
+        "idiom": "巨金怪",
+        "pinyin": "jù jīn guài",
+        "explanation": "全国编号-376"
+    },
+    {
+        "idiom": "雷吉洛克",
+        "pinyin": "léi jí luò kè",
+        "explanation": "全国编号-377"
+    },
+    {
+        "idiom": "雷吉艾斯",
+        "pinyin": "léi jí ài sī",
+        "explanation": "全国编号-378"
+    },
+    {
+        "idiom": "雷吉斯奇鲁",
+        "pinyin": "léi jí sī qí lǔ",
+        "explanation": "全国编号-379"
+    },
+    {
+        "idiom": "拉帝亚斯",
+        "pinyin": "lā dì yà sī",
+        "explanation": "全国编号-380"
+    },
+    {
+        "idiom": "拉帝欧斯",
+        "pinyin": "lā dì ōu sī",
+        "explanation": "全国编号-381"
+    },
+    {
+        "idiom": "盖欧卡",
+        "pinyin": "gài ōu kǎ",
+        "explanation": "全国编号-382"
+    },
+    {
+        "idiom": "固拉多",
+        "pinyin": "gù lā duō",
+        "explanation": "全国编号-383"
+    },
+    {
+        "idiom": "烈空坐",
+        "pinyin": "liè kōng zuò",
+        "explanation": "全国编号-384"
+    },
+    {
+        "idiom": "基拉祈",
+        "pinyin": "jī lā qí",
+        "explanation": "全国编号-385"
+    },
+    {
+        "idiom": "代欧奇希斯",
+        "pinyin": "dài ōu qí xī sī",
+        "explanation": "全国编号-386"
+    },
+    {
+        "idiom": "草苗龟",
+        "pinyin": "cǎo miáo guī",
+        "explanation": "全国编号-387"
+    },
+    {
+        "idiom": "树林龟",
+        "pinyin": "shù lín guī",
+        "explanation": "全国编号-388"
+    },
+    {
+        "idiom": "土台龟",
+        "pinyin": "tǔ tái guī",
+        "explanation": "全国编号-389"
+    },
+    {
+        "idiom": "小火焰猴",
+        "pinyin": "xiǎo huǒ yàn hóu",
+        "explanation": "全国编号-390"
+    },
+    {
+        "idiom": "猛火猴",
+        "pinyin": "měng huǒ hóu",
+        "explanation": "全国编号-391"
+    },
+    {
+        "idiom": "烈焰猴",
+        "pinyin": "liè yàn hóu",
+        "explanation": "全国编号-392"
+    },
+    {
+        "idiom": "波加曼",
+        "pinyin": "bō jiā màn",
+        "explanation": "全国编号-393"
+    },
+    {
+        "idiom": "波皇子",
+        "pinyin": "bō huáng zǐ",
+        "explanation": "全国编号-394"
+    },
+    {
+        "idiom": "帝王拿波",
+        "pinyin": "dì wáng ná bō",
+        "explanation": "全国编号-395"
+    },
+    {
+        "idiom": "姆克儿",
+        "pinyin": "mǔ kè ér",
+        "explanation": "全国编号-396"
+    },
+    {
+        "idiom": "姆克鸟",
+        "pinyin": "mǔ kè niǎo",
+        "explanation": "全国编号-397"
+    },
+    {
+        "idiom": "姆克鹰",
+        "pinyin": "mǔ kè yīng",
+        "explanation": "全国编号-398"
+    },
+    {
+        "idiom": "大牙狸",
+        "pinyin": "dà yá lí",
+        "explanation": "全国编号-399"
+    },
+    {
+        "idiom": "大尾狸",
+        "pinyin": "dà wěi lí",
+        "explanation": "全国编号-400"
+    },
+    {
+        "idiom": "圆法师",
+        "pinyin": "yuán fǎ shī",
+        "explanation": "全国编号-401"
+    },
+    {
+        "idiom": "音箱蟀",
+        "pinyin": "yīn xiāng shuài",
+        "explanation": "全国编号-402"
+    },
+    {
+        "idiom": "小猫怪",
+        "pinyin": "xiǎo māo guài",
+        "explanation": "全国编号-403"
+    },
+    {
+        "idiom": "勒克猫",
+        "pinyin": "lè kè māo",
+        "explanation": "全国编号-404"
+    },
+    {
+        "idiom": "伦琴猫",
+        "pinyin": "lún qín māo",
+        "explanation": "全国编号-405"
+    },
+    {
+        "idiom": "含羞苞",
+        "pinyin": "hán xiū bāo",
+        "explanation": "全国编号-406"
+    },
+    {
+        "idiom": "罗丝雷朵",
+        "pinyin": "luó sī léi duǒ",
+        "explanation": "全国编号-407"
+    },
+    {
+        "idiom": "头盖龙",
+        "pinyin": "tóu gài lóng",
+        "explanation": "全国编号-408"
+    },
+    {
+        "idiom": "战槌龙",
+        "pinyin": "zhàn chuí lóng",
+        "explanation": "全国编号-409"
+    },
+    {
+        "idiom": "盾甲龙",
+        "pinyin": "dùn jiǎ lóng",
+        "explanation": "全国编号-410"
+    },
+    {
+        "idiom": "护城龙",
+        "pinyin": "hù chéng lóng",
+        "explanation": "全国编号-411"
+    },
+    {
+        "idiom": "结草儿",
+        "pinyin": "jié cǎo ér",
+        "explanation": "全国编号-412"
+    },
+    {
+        "idiom": "结草贵妇",
+        "pinyin": "jié cǎo guì fù",
+        "explanation": "全国编号-413"
+    },
+    {
+        "idiom": "绅士蛾",
+        "pinyin": "shēn shì é",
+        "explanation": "全国编号-414"
+    },
+    {
+        "idiom": "三蜜蜂",
+        "pinyin": "sān mì fēng",
+        "explanation": "全国编号-415"
+    },
+    {
+        "idiom": "蜂女王",
+        "pinyin": "fēng nǚ wáng",
+        "explanation": "全国编号-416"
+    },
+    {
+        "idiom": "帕奇利兹",
+        "pinyin": "pà qí lì zī",
+        "explanation": "全国编号-417"
+    },
+    {
+        "idiom": "泳圈鼬",
+        "pinyin": "yǒng quān yòu",
+        "explanation": "全国编号-418"
+    },
+    {
+        "idiom": "浮潜鼬",
+        "pinyin": "fú qián yòu",
+        "explanation": "全国编号-419"
+    },
+    {
+        "idiom": "樱花宝",
+        "pinyin": "yīng huā bǎo",
+        "explanation": "全国编号-420"
+    },
+    {
+        "idiom": "樱花儿",
+        "pinyin": "yīng huā ér",
+        "explanation": "全国编号-421"
+    },
+    {
+        "idiom": "无壳海兔",
+        "pinyin": "wú ké hǎi tù",
+        "explanation": "全国编号-422"
+    },
+    {
+        "idiom": "海兔兽",
+        "pinyin": "hǎi tù shòu",
+        "explanation": "全国编号-423"
+    },
+    {
+        "idiom": "双尾怪手",
+        "pinyin": "shuāng wěi guài shǒu",
+        "explanation": "全国编号-424"
+    },
+    {
+        "idiom": "飘飘球",
+        "pinyin": "piāo piāo qiú",
+        "explanation": "全国编号-425"
+    },
+    {
+        "idiom": "随风球",
+        "pinyin": "suí fēng qiú",
+        "explanation": "全国编号-426"
+    },
+    {
+        "idiom": "卷卷耳",
+        "pinyin": "juàn juàn ěr",
+        "explanation": "全国编号-427"
+    },
+    {
+        "idiom": "长耳兔",
+        "pinyin": "cháng ěr tù",
+        "explanation": "全国编号-428"
+    },
+    {
+        "idiom": "梦妖魔",
+        "pinyin": "mèng yāo mó",
+        "explanation": "全国编号-429"
+    },
+    {
+        "idiom": "乌鸦头头",
+        "pinyin": "wū yā tóu tóu",
+        "explanation": "全国编号-430"
+    },
+    {
+        "idiom": "魅力喵",
+        "pinyin": "mèi lì miāo",
+        "explanation": "全国编号-431"
+    },
+    {
+        "idiom": "东施喵",
+        "pinyin": "dōng shī miāo",
+        "explanation": "全国编号-432"
+    },
+    {
+        "idiom": "铃铛响",
+        "pinyin": "líng dang xiǎng",
+        "explanation": "全国编号-433"
+    },
+    {
+        "idiom": "臭鼬噗",
+        "pinyin": "chòu yòu pū",
+        "explanation": "全国编号-434"
+    },
+    {
+        "idiom": "坦克臭鼬",
+        "pinyin": "tǎn kè chòu yòu",
+        "explanation": "全国编号-435"
+    },
+    {
+        "idiom": "铜镜怪",
+        "pinyin": "tóng jìng guài",
+        "explanation": "全国编号-436"
+    },
+    {
+        "idiom": "青铜钟",
+        "pinyin": "qīng tóng zhōng",
+        "explanation": "全国编号-437"
+    },
+    {
+        "idiom": "盆才怪",
+        "pinyin": "pén cái guài",
+        "explanation": "全国编号-438"
+    },
+    {
+        "idiom": "魔尼尼",
+        "pinyin": "mó ní ní",
+        "explanation": "全国编号-439"
+    },
+    {
+        "idiom": "小福蛋",
+        "pinyin": "xiǎo fú dàn",
+        "explanation": "全国编号-440"
+    },
+    {
+        "idiom": "聒噪鸟",
+        "pinyin": "guō zào niǎo",
+        "explanation": "全国编号-441"
+    },
+    {
+        "idiom": "花岩怪",
+        "pinyin": "huā yán guài",
+        "explanation": "全国编号-442"
+    },
+    {
+        "idiom": "圆陆鲨",
+        "pinyin": "yuán lù shā",
+        "explanation": "全国编号-443"
+    },
+    {
+        "idiom": "尖牙陆鲨",
+        "pinyin": "jiān yá lù shā",
+        "explanation": "全国编号-444"
+    },
+    {
+        "idiom": "烈咬陆鲨",
+        "pinyin": "liè yǎo lù shā",
+        "explanation": "全国编号-445"
+    },
+    {
+        "idiom": "小卡比兽",
+        "pinyin": "xiǎo kǎ bǐ shòu",
+        "explanation": "全国编号-446"
+    },
+    {
+        "idiom": "利欧路",
+        "pinyin": "lì ōu lù",
+        "explanation": "全国编号-447"
+    },
+    {
+        "idiom": "路卡利欧",
+        "pinyin": "lù kǎ lì ōu",
+        "explanation": "全国编号-448"
+    },
+    {
+        "idiom": "沙河马",
+        "pinyin": "shā hé mǎ",
+        "explanation": "全国编号-449"
+    },
+    {
+        "idiom": "河马兽",
+        "pinyin": "hé mǎ shòu",
+        "explanation": "全国编号-450"
+    },
+    {
+        "idiom": "钳尾蝎",
+        "pinyin": "qián wěi xiē",
+        "explanation": "全国编号-451"
+    },
+    {
+        "idiom": "龙王蝎",
+        "pinyin": "lóng wáng xiē",
+        "explanation": "全国编号-452"
+    },
+    {
+        "idiom": "不良蛙",
+        "pinyin": "bù liáng wā",
+        "explanation": "全国编号-453"
+    },
+    {
+        "idiom": "毒骷蛙",
+        "pinyin": "dú kū wā",
+        "explanation": "全国编号-454"
+    },
+    {
+        "idiom": "尖牙笼",
+        "pinyin": "jiān yá lóng",
+        "explanation": "全国编号-455"
+    },
+    {
+        "idiom": "荧光鱼",
+        "pinyin": "yíng guāng yú",
+        "explanation": "全国编号-456"
+    },
+    {
+        "idiom": "霓虹鱼",
+        "pinyin": "ní hóng yú",
+        "explanation": "全国编号-457"
+    },
+    {
+        "idiom": "小球飞鱼",
+        "pinyin": "xiǎo qiú fēi yú",
+        "explanation": "全国编号-458"
+    },
+    {
+        "idiom": "雪笠怪",
+        "pinyin": "xuě lì guài",
+        "explanation": "全国编号-459"
+    },
+    {
+        "idiom": "暴雪王",
+        "pinyin": "bào xuě wáng",
+        "explanation": "全国编号-460"
+    },
+    {
+        "idiom": "玛狃拉",
+        "pinyin": "mǎ niǔ lā",
+        "explanation": "全国编号-461"
+    },
+    {
+        "idiom": "自爆磁怪",
+        "pinyin": "zì bào cí guài",
+        "explanation": "全国编号-462"
+    },
+    {
+        "idiom": "大舌舔",
+        "pinyin": "dà shé tiǎn",
+        "explanation": "全国编号-463"
+    },
+    {
+        "idiom": "超甲狂犀",
+        "pinyin": "chāo jiǎ kuáng xī",
+        "explanation": "全国编号-464"
+    },
+    {
+        "idiom": "巨蔓藤",
+        "pinyin": "jù màn téng",
+        "explanation": "全国编号-465"
+    },
+    {
+        "idiom": "电击魔兽",
+        "pinyin": "diàn jī mó shòu",
+        "explanation": "全国编号-466"
+    },
+    {
+        "idiom": "鸭嘴炎兽",
+        "pinyin": "yā zuǐ yán shòu",
+        "explanation": "全国编号-467"
+    },
+    {
+        "idiom": "波克基斯",
+        "pinyin": "bō kè jī sī",
+        "explanation": "全国编号-468"
+    },
+    {
+        "idiom": "远古巨蜓",
+        "pinyin": "yuǎn gǔ jù tíng",
+        "explanation": "全国编号-469"
+    },
+    {
+        "idiom": "叶伊布",
+        "pinyin": "yè yī bù",
+        "explanation": "全国编号-470"
+    },
+    {
+        "idiom": "冰伊布",
+        "pinyin": "bīng yī bù",
+        "explanation": "全国编号-471"
+    },
+    {
+        "idiom": "天蝎王",
+        "pinyin": "tiān xiē wáng",
+        "explanation": "全国编号-472"
+    },
+    {
+        "idiom": "象牙猪",
+        "pinyin": "xiàng yá zhū",
+        "explanation": "全国编号-473"
+    },
+    {
+        "idiom": "多边兽乙型",
+        "pinyin": "duō biān shòu yǐ xíng",
+        "explanation": "全国编号-474"
+    },
+    {
+        "idiom": "艾路雷朵",
+        "pinyin": "ài lù léi duǒ",
+        "explanation": "全国编号-475"
+    },
+    {
+        "idiom": "大朝北鼻",
+        "pinyin": "dà cháo běi bí",
+        "explanation": "全国编号-476"
+    },
+    {
+        "idiom": "黑夜魔灵",
+        "pinyin": "hēi yè mó líng",
+        "explanation": "全国编号-477"
+    },
+    {
+        "idiom": "雪妖女",
+        "pinyin": "xuě yāo nǚ",
+        "explanation": "全国编号-478"
+    },
+    {
+        "idiom": "洛托姆",
+        "pinyin": "luò tuō mǔ",
+        "explanation": "全国编号-479"
+    },
+    {
+        "idiom": "由克希",
+        "pinyin": "yóu kè xī",
+        "explanation": "全国编号-480"
+    },
+    {
+        "idiom": "艾姆利多",
+        "pinyin": "ài mǔ lì duō",
+        "explanation": "全国编号-481"
+    },
+    {
+        "idiom": "亚克诺姆",
+        "pinyin": "yà kè nuò mǔ",
+        "explanation": "全国编号-482"
+    },
+    {
+        "idiom": "帝牙卢卡",
+        "pinyin": "dì yá lú kǎ",
+        "explanation": "全国编号-483"
+    },
+    {
+        "idiom": "帕路奇亚",
+        "pinyin": "pà lù qí yà",
+        "explanation": "全国编号-484"
+    },
+    {
+        "idiom": "席多蓝恩",
+        "pinyin": "xí duō lán ēn",
+        "explanation": "全国编号-485"
+    },
+    {
+        "idiom": "雷吉奇卡斯",
+        "pinyin": "léi jí qí kǎ sī",
+        "explanation": "全国编号-486"
+    },
+    {
+        "idiom": "骑拉帝纳",
+        "pinyin": "qí lā dì nà",
+        "explanation": "全国编号-487"
+    },
+    {
+        "idiom": "克雷色利亚",
+        "pinyin": "kè léi sè lì yà",
+        "explanation": "全国编号-488"
+    },
+    {
+        "idiom": "霏欧纳",
+        "pinyin": "fēi ōu nà",
+        "explanation": "全国编号-489"
+    },
+    {
+        "idiom": "玛纳霏",
+        "pinyin": "mǎ nà fēi",
+        "explanation": "全国编号-490"
+    },
+    {
+        "idiom": "达克莱伊",
+        "pinyin": "dá kè lái yī",
+        "explanation": "全国编号-491"
+    },
+    {
+        "idiom": "谢米",
+        "pinyin": "xiè mǐ",
+        "explanation": "全国编号-492"
+    },
+    {
+        "idiom": "阿尔宙斯",
+        "pinyin": "ā ěr zhòu sī",
+        "explanation": "全国编号-493"
+    },
+    {
+        "idiom": "比克提尼",
+        "pinyin": "bǐ kè tí ní",
+        "explanation": "全国编号-494"
+    },
+    {
+        "idiom": "藤藤蛇",
+        "pinyin": "téng téng shé",
+        "explanation": "全国编号-495"
+    },
+    {
+        "idiom": "青藤蛇",
+        "pinyin": "qīng téng shé",
+        "explanation": "全国编号-496"
+    },
+    {
+        "idiom": "君主蛇",
+        "pinyin": "jūn zhǔ shé",
+        "explanation": "全国编号-497"
+    },
+    {
+        "idiom": "暖暖猪",
+        "pinyin": "nuǎn nuǎn zhū",
+        "explanation": "全国编号-498"
+    },
+    {
+        "idiom": "炒炒猪",
+        "pinyin": "chǎo chǎo zhū",
+        "explanation": "全国编号-499"
+    },
+    {
+        "idiom": "炎武王",
+        "pinyin": "yán wǔ wáng",
+        "explanation": "全国编号-500"
+    },
+    {
+        "idiom": "水水獭",
+        "pinyin": "shuǐ shuǐ tǎ",
+        "explanation": "全国编号-501"
+    },
+    {
+        "idiom": "双刃丸",
+        "pinyin": "shuāng rèn wán",
+        "explanation": "全国编号-502"
+    },
+    {
+        "idiom": "大剑鬼",
+        "pinyin": "dà jiàn guǐ",
+        "explanation": "全国编号-503"
+    },
+    {
+        "idiom": "探探鼠",
+        "pinyin": "tàn tàn shǔ",
+        "explanation": "全国编号-504"
+    },
+    {
+        "idiom": "步哨鼠",
+        "pinyin": "bù shào shǔ",
+        "explanation": "全国编号-505"
+    },
+    {
+        "idiom": "小约克",
+        "pinyin": "xiǎo yuē kè",
+        "explanation": "全国编号-506"
+    },
+    {
+        "idiom": "哈约克",
+        "pinyin": "hā yuē kè",
+        "explanation": "全国编号-507"
+    },
+    {
+        "idiom": "长毛狗",
+        "pinyin": "cháng máo gǒu",
+        "explanation": "全国编号-508"
+    },
+    {
+        "idiom": "扒手猫",
+        "pinyin": "pá shǒu māo",
+        "explanation": "全国编号-509"
+    },
+    {
+        "idiom": "酷豹",
+        "pinyin": "kù bào",
+        "explanation": "全国编号-510"
+    },
+    {
+        "idiom": "花椰猴",
+        "pinyin": "huā yē hóu",
+        "explanation": "全国编号-511"
+    },
+    {
+        "idiom": "花椰猿",
+        "pinyin": "huā yē yuán",
+        "explanation": "全国编号-512"
+    },
+    {
+        "idiom": "爆香猴",
+        "pinyin": "bào xiāng hóu",
+        "explanation": "全国编号-513"
+    },
+    {
+        "idiom": "爆香猿",
+        "pinyin": "bào xiāng yuán",
+        "explanation": "全国编号-514"
+    },
+    {
+        "idiom": "冷水猴",
+        "pinyin": "lěng shuǐ hóu",
+        "explanation": "全国编号-515"
+    },
+    {
+        "idiom": "冷水猿",
+        "pinyin": "lěng shuǐ yuán",
+        "explanation": "全国编号-516"
+    },
+    {
+        "idiom": "食梦梦",
+        "pinyin": "shí mèng mèng",
+        "explanation": "全国编号-517"
+    },
+    {
+        "idiom": "梦梦蚀",
+        "pinyin": "mèng mèng shí",
+        "explanation": "全国编号-518"
+    },
+    {
+        "idiom": "豆豆鸽",
+        "pinyin": "dòu dòu gē",
+        "explanation": "全国编号-519"
+    },
+    {
+        "idiom": "咕咕鸽",
+        "pinyin": "gū gū gē",
+        "explanation": "全国编号-520"
+    },
+    {
+        "idiom": "高傲雉鸡",
+        "pinyin": "gāo ào zhì jī",
+        "explanation": "全国编号-521"
+    },
+    {
+        "idiom": "斑斑马",
+        "pinyin": "bān bān mǎ",
+        "explanation": "全国编号-522"
+    },
+    {
+        "idiom": "雷电斑马",
+        "pinyin": "léi diàn bān mǎ",
+        "explanation": "全国编号-523"
+    },
+    {
+        "idiom": "石丸子",
+        "pinyin": "shí wán zi",
+        "explanation": "全国编号-524"
+    },
+    {
+        "idiom": "地幔岩",
+        "pinyin": "dì màn yán",
+        "explanation": "全国编号-525"
+    },
+    {
+        "idiom": "庞岩怪",
+        "pinyin": "páng yán guài",
+        "explanation": "全国编号-526"
+    },
+    {
+        "idiom": "滚滚蝙蝠",
+        "pinyin": "gǔn gǔn biān fú",
+        "explanation": "全国编号-527"
+    },
+    {
+        "idiom": "心蝙蝠",
+        "pinyin": "xīn biān fú",
+        "explanation": "全国编号-528"
+    },
+    {
+        "idiom": "螺钉地鼠",
+        "pinyin": "luó dīng dì shǔ",
+        "explanation": "全国编号-529"
+    },
+    {
+        "idiom": "龙头地鼠",
+        "pinyin": "lóng tóu dì shǔ",
+        "explanation": "全国编号-530"
+    },
+    {
+        "idiom": "差不多娃娃",
+        "pinyin": "chà bù duō wá wa",
+        "explanation": "全国编号-531"
+    },
+    {
+        "idiom": "搬运小匠",
+        "pinyin": "bān yùn xiǎo jiàng",
+        "explanation": "全国编号-532"
+    },
+    {
+        "idiom": "铁骨土人",
+        "pinyin": "tiě gǔ tǔ rén",
+        "explanation": "全国编号-533"
+    },
+    {
+        "idiom": "修建老匠",
+        "pinyin": "xiū jiàn lǎo jiàng",
+        "explanation": "全国编号-534"
+    },
+    {
+        "idiom": "圆蝌蚪",
+        "pinyin": "yuán kē dǒu",
+        "explanation": "全国编号-535"
+    },
+    {
+        "idiom": "蓝蟾蜍",
+        "pinyin": "lán chán chú",
+        "explanation": "全国编号-536"
+    },
+    {
+        "idiom": "蟾蜍王",
+        "pinyin": "chán chú wáng",
+        "explanation": "全国编号-537"
+    },
+    {
+        "idiom": "投摔鬼",
+        "pinyin": "tóu shuāi guǐ",
+        "explanation": "全国编号-538"
+    },
+    {
+        "idiom": "打击鬼",
+        "pinyin": "dǎ jī guǐ",
+        "explanation": "全国编号-539"
+    },
+    {
+        "idiom": "虫宝包",
+        "pinyin": "chóng bǎo bāo",
+        "explanation": "全国编号-540"
+    },
+    {
+        "idiom": "宝包茧",
+        "pinyin": "bǎo bāo jiǎn",
+        "explanation": "全国编号-541"
+    },
+    {
+        "idiom": "保姆虫",
+        "pinyin": "bǎo mǔ chóng",
+        "explanation": "全国编号-542"
+    },
+    {
+        "idiom": "百足蜈蚣",
+        "pinyin": "bǎi zú wú gōng",
+        "explanation": "全国编号-543"
+    },
+    {
+        "idiom": "车轮球",
+        "pinyin": "chē lún qiú",
+        "explanation": "全国编号-544"
+    },
+    {
+        "idiom": "蜈蚣王",
+        "pinyin": "wú gōng wáng",
+        "explanation": "全国编号-545"
+    },
+    {
+        "idiom": "木棉球",
+        "pinyin": "mù mián qiú",
+        "explanation": "全国编号-546"
+    },
+    {
+        "idiom": "风妖精",
+        "pinyin": "fēng yāo jīng",
+        "explanation": "全国编号-547"
+    },
+    {
+        "idiom": "百合根娃娃",
+        "pinyin": "bǎi hé gēn wá wa",
+        "explanation": "全国编号-548"
+    },
+    {
+        "idiom": "裙儿小姐",
+        "pinyin": "qún ér xiǎo jiě",
+        "explanation": "全国编号-549"
+    },
+    {
+        "idiom": "野蛮鲈鱼",
+        "pinyin": "yě mán lú yú",
+        "explanation": "全国编号-550"
+    },
+    {
+        "idiom": "黑眼鳄",
+        "pinyin": "hēi yǎn è",
+        "explanation": "全国编号-551"
+    },
+    {
+        "idiom": "混混鳄",
+        "pinyin": "hùn hùn è",
+        "explanation": "全国编号-552"
+    },
+    {
+        "idiom": "流氓鳄",
+        "pinyin": "liú máng è",
+        "explanation": "全国编号-553"
+    },
+    {
+        "idiom": "火红不倒翁",
+        "pinyin": "huǒ hóng bù dǎo wēng",
+        "explanation": "全国编号-554"
+    },
+    {
+        "idiom": "达摩狒狒",
+        "pinyin": "dá mó fèi fèi",
+        "explanation": "全国编号-555"
+    },
+    {
+        "idiom": "沙铃仙人掌",
+        "pinyin": "shā líng xiān rén zhǎng",
+        "explanation": "全国编号-556"
+    },
+    {
+        "idiom": "石居蟹",
+        "pinyin": "shí jū xiè",
+        "explanation": "全国编号-557"
+    },
+    {
+        "idiom": "岩殿居蟹",
+        "pinyin": "yán diàn jū xiè",
+        "explanation": "全国编号-558"
+    },
+    {
+        "idiom": "滑滑小子",
+        "pinyin": "huá huá xiǎo zi",
+        "explanation": "全国编号-559"
+    },
+    {
+        "idiom": "头巾混混",
+        "pinyin": "tóu jīn hùn hùn",
+        "explanation": "全国编号-560"
+    },
+    {
+        "idiom": "象征鸟",
+        "pinyin": "xiàng zhēng niǎo",
+        "explanation": "全国编号-561"
+    },
+    {
+        "idiom": "哭哭面具",
+        "pinyin": "kū kū miàn jù",
+        "explanation": "全国编号-562"
+    },
+    {
+        "idiom": "迭失棺",
+        "pinyin": "dié shī guān",
+        "explanation": "全国编号-563"
+    },
+    {
+        "idiom": "原盖海龟",
+        "pinyin": "yuán gài hǎi guī",
+        "explanation": "全国编号-564"
+    },
+    {
+        "idiom": "肋骨海龟",
+        "pinyin": "lèi gǔ hǎi guī",
+        "explanation": "全国编号-565"
+    },
+    {
+        "idiom": "始祖小鸟",
+        "pinyin": "shǐ zǔ xiǎo niǎo",
+        "explanation": "全国编号-566"
+    },
+    {
+        "idiom": "始祖大鸟",
+        "pinyin": "shǐ zǔ dà niǎo",
+        "explanation": "全国编号-567"
+    },
+    {
+        "idiom": "破破袋",
+        "pinyin": "pò pò dài",
+        "explanation": "全国编号-568"
+    },
+    {
+        "idiom": "灰尘山",
+        "pinyin": "huī chén shān",
+        "explanation": "全国编号-569"
+    },
+    {
+        "idiom": "索罗亚",
+        "pinyin": "suǒ luó yà",
+        "explanation": "全国编号-570"
+    },
+    {
+        "idiom": "索罗亚克",
+        "pinyin": "suǒ luó yà kè",
+        "explanation": "全国编号-571"
+    },
+    {
+        "idiom": "泡沫栗鼠",
+        "pinyin": "pào mò lì shǔ",
+        "explanation": "全国编号-572"
+    },
+    {
+        "idiom": "奇诺栗鼠",
+        "pinyin": "qí nuò lì shǔ",
+        "explanation": "全国编号-573"
+    },
+    {
+        "idiom": "哥德宝宝",
+        "pinyin": "gē dé bǎo bao",
+        "explanation": "全国编号-574"
+    },
+    {
+        "idiom": "哥德小童",
+        "pinyin": "gē dé xiǎo tóng",
+        "explanation": "全国编号-575"
+    },
+    {
+        "idiom": "哥德小姐",
+        "pinyin": "gē dé xiǎo jiě",
+        "explanation": "全国编号-576"
+    },
+    {
+        "idiom": "单卵细胞球",
+        "pinyin": "dān luǎn xì bāo qiú",
+        "explanation": "全国编号-577"
+    },
+    {
+        "idiom": "双卵细胞球",
+        "pinyin": "shuāng luǎn xì bāo qiú",
+        "explanation": "全国编号-578"
+    },
+    {
+        "idiom": "人造细胞卵",
+        "pinyin": "rén zào xì bāo luǎn",
+        "explanation": "全国编号-579"
+    },
+    {
+        "idiom": "鸭宝宝",
+        "pinyin": "yā bǎo bao",
+        "explanation": "全国编号-580"
+    },
+    {
+        "idiom": "舞天鹅",
+        "pinyin": "wǔ tiān é",
+        "explanation": "全国编号-581"
+    },
+    {
+        "idiom": "迷你冰",
+        "pinyin": "mí nǐ bīng",
+        "explanation": "全国编号-582"
+    },
+    {
+        "idiom": "多多冰",
+        "pinyin": "duō duō bīng",
+        "explanation": "全国编号-583"
+    },
+    {
+        "idiom": "双倍多多冰",
+        "pinyin": "shuāng bèi duō duō bīng",
+        "explanation": "全国编号-584"
+    },
+    {
+        "idiom": "四季鹿",
+        "pinyin": "sì jì lù",
+        "explanation": "全国编号-585"
+    },
+    {
+        "idiom": "萌芽鹿",
+        "pinyin": "méng yá lù",
+        "explanation": "全国编号-586"
+    },
+    {
+        "idiom": "电飞鼠",
+        "pinyin": "diàn fēi shǔ",
+        "explanation": "全国编号-587"
+    },
+    {
+        "idiom": "盖盖虫",
+        "pinyin": "gài gài chóng",
+        "explanation": "全国编号-588"
+    },
+    {
+        "idiom": "骑士蜗牛",
+        "pinyin": "qí shì wō niú",
+        "explanation": "全国编号-589"
+    },
+    {
+        "idiom": "哎呀球菇",
+        "pinyin": "āi yā qiú gū",
+        "explanation": "全国编号-590"
+    },
+    {
+        "idiom": "败露球菇",
+        "pinyin": "bài lù qiú gū",
+        "explanation": "全国编号-591"
+    },
+    {
+        "idiom": "轻飘飘",
+        "pinyin": "qīng piāo piāo",
+        "explanation": "全国编号-592"
+    },
+    {
+        "idiom": "胖嘟嘟",
+        "pinyin": "pàng dū dū",
+        "explanation": "全国编号-593"
+    },
+    {
+        "idiom": "保姆曼波",
+        "pinyin": "bǎo mǔ màn bō",
+        "explanation": "全国编号-594"
+    },
+    {
+        "idiom": "电电虫",
+        "pinyin": "diàn diàn chóng",
+        "explanation": "全国编号-595"
+    },
+    {
+        "idiom": "电蜘蛛",
+        "pinyin": "diàn zhī zhū",
+        "explanation": "全国编号-596"
+    },
+    {
+        "idiom": "种子铁球",
+        "pinyin": "zhǒng zi tiě qiú",
+        "explanation": "全国编号-597"
+    },
+    {
+        "idiom": "坚果哑铃",
+        "pinyin": "jiān guǒ yǎ líng",
+        "explanation": "全国编号-598"
+    },
+    {
+        "idiom": "齿轮儿",
+        "pinyin": "chǐ lún ér",
+        "explanation": "全国编号-599"
+    },
+    {
+        "idiom": "齿轮组",
+        "pinyin": "chǐ lún zǔ",
+        "explanation": "全国编号-600"
+    },
+    {
+        "idiom": "齿轮怪",
+        "pinyin": "chǐ lún guài",
+        "explanation": "全国编号-601"
+    },
+    {
+        "idiom": "麻麻小鱼",
+        "pinyin": "má má xiǎo yú",
+        "explanation": "全国编号-602"
+    },
+    {
+        "idiom": "麻麻鳗",
+        "pinyin": "má má mán",
+        "explanation": "全国编号-603"
+    },
+    {
+        "idiom": "麻麻鳗鱼王",
+        "pinyin": "má má mán yú wáng",
+        "explanation": "全国编号-604"
+    },
+    {
+        "idiom": "小灰怪",
+        "pinyin": "xiǎo huī guài",
+        "explanation": "全国编号-605"
+    },
+    {
+        "idiom": "大宇怪",
+        "pinyin": "dà yǔ guài",
+        "explanation": "全国编号-606"
+    },
+    {
+        "idiom": "烛光灵",
+        "pinyin": "zhú guāng líng",
+        "explanation": "全国编号-607"
+    },
+    {
+        "idiom": "灯火幽灵",
+        "pinyin": "dēng huǒ yōu líng",
+        "explanation": "全国编号-608"
+    },
+    {
+        "idiom": "水晶灯火灵",
+        "pinyin": "shuǐ jīng dēng huǒ líng",
+        "explanation": "全国编号-609"
+    },
+    {
+        "idiom": "牙牙",
+        "pinyin": "yá yá",
+        "explanation": "全国编号-610"
+    },
+    {
+        "idiom": "斧牙龙",
+        "pinyin": "fǔ yá lóng",
+        "explanation": "全国编号-611"
+    },
+    {
+        "idiom": "双斧战龙",
+        "pinyin": "shuāng fǔ zhàn lóng",
+        "explanation": "全国编号-612"
+    },
+    {
+        "idiom": "喷嚏熊",
+        "pinyin": "pēn tì xióng",
+        "explanation": "全国编号-613"
+    },
+    {
+        "idiom": "冻原熊",
+        "pinyin": "dòng yuán xióng",
+        "explanation": "全国编号-614"
+    },
+    {
+        "idiom": "几何雪花",
+        "pinyin": "jǐ hé xuě huā",
+        "explanation": "全国编号-615"
+    },
+    {
+        "idiom": "小嘴蜗",
+        "pinyin": "xiǎo zuǐ wō",
+        "explanation": "全国编号-616"
+    },
+    {
+        "idiom": "敏捷虫",
+        "pinyin": "mǐn jié chóng",
+        "explanation": "全国编号-617"
+    },
+    {
+        "idiom": "泥巴鱼",
+        "pinyin": "ní bā yú",
+        "explanation": "全国编号-618"
+    },
+    {
+        "idiom": "功夫鼬",
+        "pinyin": "gōng fū yòu",
+        "explanation": "全国编号-619"
+    },
+    {
+        "idiom": "师父鼬",
+        "pinyin": "shī fu yòu",
+        "explanation": "全国编号-620"
+    },
+    {
+        "idiom": "赤面龙",
+        "pinyin": "chì miàn lóng",
+        "explanation": "全国编号-621"
+    },
+    {
+        "idiom": "泥偶小人",
+        "pinyin": "ní ǒu xiǎo rén",
+        "explanation": "全国编号-622"
+    },
+    {
+        "idiom": "泥偶巨人",
+        "pinyin": "ní ǒu jù rén",
+        "explanation": "全国编号-623"
+    },
+    {
+        "idiom": "驹刀小兵",
+        "pinyin": "jū dāo xiǎo bīng",
+        "explanation": "全国编号-624"
+    },
+    {
+        "idiom": "劈斩司令",
+        "pinyin": "pī zhǎn sī lìng",
+        "explanation": "全国编号-625"
+    },
+    {
+        "idiom": "爆炸头水牛",
+        "pinyin": "bào zhà tóu shuǐ niú",
+        "explanation": "全国编号-626"
+    },
+    {
+        "idiom": "毛头小鹰",
+        "pinyin": "máo tóu xiǎo yīng",
+        "explanation": "全国编号-627"
+    },
+    {
+        "idiom": "勇士雄鹰",
+        "pinyin": "yǒng shì xióng yīng",
+        "explanation": "全国编号-628"
+    },
+    {
+        "idiom": "秃鹰丫头",
+        "pinyin": "tū yīng yā tou",
+        "explanation": "全国编号-629"
+    },
+    {
+        "idiom": "秃鹰娜",
+        "pinyin": "tū yīng nà",
+        "explanation": "全国编号-630"
+    },
+    {
+        "idiom": "熔蚁兽",
+        "pinyin": "róng yǐ shòu",
+        "explanation": "全国编号-631"
+    },
+    {
+        "idiom": "铁蚁",
+        "pinyin": "tiě yǐ",
+        "explanation": "全国编号-632"
+    },
+    {
+        "idiom": "单首龙",
+        "pinyin": "dān shǒu lóng",
+        "explanation": "全国编号-633"
+    },
+    {
+        "idiom": "双首暴龙",
+        "pinyin": "shuāng shǒu bào lóng",
+        "explanation": "全国编号-634"
+    },
+    {
+        "idiom": "三首恶龙",
+        "pinyin": "sān shǒu è lóng",
+        "explanation": "全国编号-635"
+    },
+    {
+        "idiom": "燃烧虫",
+        "pinyin": "rán shāo chóng",
+        "explanation": "全国编号-636"
+    },
+    {
+        "idiom": "火神蛾",
+        "pinyin": "huǒ shén é",
+        "explanation": "全国编号-637"
+    },
+    {
+        "idiom": "勾帕路翁",
+        "pinyin": "gōu pà lù wēng",
+        "explanation": "全国编号-638"
+    },
+    {
+        "idiom": "代拉基翁",
+        "pinyin": "dài lā jī wēng",
+        "explanation": "全国编号-639"
+    },
+    {
+        "idiom": "毕力吉翁",
+        "pinyin": "bì lì jí wēng",
+        "explanation": "全国编号-640"
+    },
+    {
+        "idiom": "龙卷云",
+        "pinyin": "lóng juǎn yún",
+        "explanation": "全国编号-641"
+    },
+    {
+        "idiom": "雷电云",
+        "pinyin": "léi diàn yún",
+        "explanation": "全国编号-642"
+    },
+    {
+        "idiom": "莱希拉姆",
+        "pinyin": "lái xī lā mǔ",
+        "explanation": "全国编号-643"
+    },
+    {
+        "idiom": "捷克罗姆",
+        "pinyin": "jié kè luó mǔ",
+        "explanation": "全国编号-644"
+    },
+    {
+        "idiom": "土地云",
+        "pinyin": "tǔ dì yún",
+        "explanation": "全国编号-645"
+    },
+    {
+        "idiom": "酋雷姆",
+        "pinyin": "qiú léi mǔ",
+        "explanation": "全国编号-646"
+    },
+    {
+        "idiom": "凯路迪欧",
+        "pinyin": "kǎi lù dí ōu",
+        "explanation": "全国编号-647"
+    },
+    {
+        "idiom": "美洛耶塔",
+        "pinyin": "měi luò yē tǎ",
+        "explanation": "全国编号-648"
+    },
+    {
+        "idiom": "盖诺赛克特",
+        "pinyin": "gài nuò sài kè tè",
+        "explanation": "全国编号-649"
+    },
+    {
+        "idiom": "哈力栗",
+        "pinyin": "hā lì lì",
+        "explanation": "全国编号-650"
+    },
+    {
+        "idiom": "胖胖哈力",
+        "pinyin": "pàng pàng hā lì",
+        "explanation": "全国编号-651"
+    },
+    {
+        "idiom": "布里卡隆",
+        "pinyin": "bù lǐ kǎ lóng",
+        "explanation": "全国编号-652"
+    },
+    {
+        "idiom": "火狐狸",
+        "pinyin": "huǒ hú li",
+        "explanation": "全国编号-653"
+    },
+    {
+        "idiom": "长尾火狐",
+        "pinyin": "cháng wěi huǒ hú",
+        "explanation": "全国编号-654"
+    },
+    {
+        "idiom": "妖火红狐",
+        "pinyin": "yāo huǒ hóng hú",
+        "explanation": "全国编号-655"
+    },
+    {
+        "idiom": "呱呱泡蛙",
+        "pinyin": "guā guā pào wā",
+        "explanation": "全国编号-656"
+    },
+    {
+        "idiom": "呱头蛙",
+        "pinyin": "guā tóu wā",
+        "explanation": "全国编号-657"
+    },
+    {
+        "idiom": "甲贺忍蛙",
+        "pinyin": "jiǎ hè rěn wā",
+        "explanation": "全国编号-658"
+    },
+    {
+        "idiom": "掘掘兔",
+        "pinyin": "jué jué tù",
+        "explanation": "全国编号-659"
+    },
+    {
+        "idiom": "掘地兔",
+        "pinyin": "jué dì tù",
+        "explanation": "全国编号-660"
+    },
+    {
+        "idiom": "小箭雀",
+        "pinyin": "xiǎo jiàn què",
+        "explanation": "全国编号-661"
+    },
+    {
+        "idiom": "火箭雀",
+        "pinyin": "huǒ jiàn què",
+        "explanation": "全国编号-662"
+    },
+    {
+        "idiom": "烈箭鹰",
+        "pinyin": "liè jiàn yīng",
+        "explanation": "全国编号-663"
+    },
+    {
+        "idiom": "粉蝶虫",
+        "pinyin": "fěn dié chóng",
+        "explanation": "全国编号-664"
+    },
+    {
+        "idiom": "粉蝶蛹",
+        "pinyin": "fěn dié yǒng",
+        "explanation": "全国编号-665"
+    },
+    {
+        "idiom": "彩粉蝶",
+        "pinyin": "cǎi fěn dié",
+        "explanation": "全国编号-666"
+    },
+    {
+        "idiom": "小狮狮",
+        "pinyin": "xiǎo shī shī",
+        "explanation": "全国编号-667"
+    },
+    {
+        "idiom": "火炎狮",
+        "pinyin": "huǒ yán shī",
+        "explanation": "全国编号-668"
+    },
+    {
+        "idiom": "花蓓蓓",
+        "pinyin": "huā bèi bèi",
+        "explanation": "全国编号-669"
+    },
+    {
+        "idiom": "花叶蒂",
+        "pinyin": "huā yè dì",
+        "explanation": "全国编号-670"
+    },
+    {
+        "idiom": "花洁夫人",
+        "pinyin": "huā jié fū rén",
+        "explanation": "全国编号-671"
+    },
+    {
+        "idiom": "坐骑小羊",
+        "pinyin": "zuò qí xiǎo yáng",
+        "explanation": "全国编号-672"
+    },
+    {
+        "idiom": "坐骑山羊",
+        "pinyin": "zuò qí shān yáng",
+        "explanation": "全国编号-673"
+    },
+    {
+        "idiom": "顽皮熊猫",
+        "pinyin": "wán pí xióng māo",
+        "explanation": "全国编号-674"
+    },
+    {
+        "idiom": "霸道熊猫",
+        "pinyin": "bà dào xióng māo",
+        "explanation": "全国编号-675"
+    },
+    {
+        "idiom": "多丽米亚",
+        "pinyin": "duō lì mǐ yà",
+        "explanation": "全国编号-676"
+    },
+    {
+        "idiom": "妙喵",
+        "pinyin": "miào miāo",
+        "explanation": "全国编号-677"
+    },
+    {
+        "idiom": "超能妙喵",
+        "pinyin": "chāo néng miào miāo",
+        "explanation": "全国编号-678"
+    },
+    {
+        "idiom": "独剑鞘",
+        "pinyin": "dú jiàn qiào",
+        "explanation": "全国编号-679"
+    },
+    {
+        "idiom": "双剑鞘",
+        "pinyin": "shuāng jiàn qiào",
+        "explanation": "全国编号-680"
+    },
+    {
+        "idiom": "坚盾剑怪",
+        "pinyin": "jiān dùn jiàn guài",
+        "explanation": "全国编号-681"
+    },
+    {
+        "idiom": "粉香香",
+        "pinyin": "fěn xiāng xiāng",
+        "explanation": "全国编号-682"
+    },
+    {
+        "idiom": "芳香精",
+        "pinyin": "fāng xiāng jīng",
+        "explanation": "全国编号-683"
+    },
+    {
+        "idiom": "绵绵泡芙",
+        "pinyin": "mián mián pào fú",
+        "explanation": "全国编号-684"
+    },
+    {
+        "idiom": "胖甜妮",
+        "pinyin": "pàng tián nī",
+        "explanation": "全国编号-685"
+    },
+    {
+        "idiom": "好啦鱿",
+        "pinyin": "hǎo lā yóu",
+        "explanation": "全国编号-686"
+    },
+    {
+        "idiom": "乌贼王",
+        "pinyin": "wū zéi wáng",
+        "explanation": "全国编号-687"
+    },
+    {
+        "idiom": "龟脚脚",
+        "pinyin": "guī jiǎo jiǎo",
+        "explanation": "全国编号-688"
+    },
+    {
+        "idiom": "龟足巨铠",
+        "pinyin": "guī zú jù kǎi",
+        "explanation": "全国编号-689"
+    },
+    {
+        "idiom": "垃垃藻",
+        "pinyin": "lā lā zǎo",
+        "explanation": "全国编号-690"
+    },
+    {
+        "idiom": "毒藻龙",
+        "pinyin": "dú zǎo lóng",
+        "explanation": "全国编号-691"
+    },
+    {
+        "idiom": "铁臂枪虾",
+        "pinyin": "tiě bì qiāng xiā",
+        "explanation": "全国编号-692"
+    },
+    {
+        "idiom": "钢炮臂虾",
+        "pinyin": "gāng pào bì xiā",
+        "explanation": "全国编号-693"
+    },
+    {
+        "idiom": "伞电蜥",
+        "pinyin": "sǎn diàn xī",
+        "explanation": "全国编号-694"
+    },
+    {
+        "idiom": "光电伞蜥",
+        "pinyin": "guāng diàn sǎn xī",
+        "explanation": "全国编号-695"
+    },
+    {
+        "idiom": "宝宝暴龙",
+        "pinyin": "bǎo bao bào lóng",
+        "explanation": "全国编号-696"
+    },
+    {
+        "idiom": "怪颚龙",
+        "pinyin": "guài è lóng",
+        "explanation": "全国编号-697"
+    },
+    {
+        "idiom": "冰雪龙",
+        "pinyin": "bīng xuě lóng",
+        "explanation": "全国编号-698"
+    },
+    {
+        "idiom": "冰雪巨龙",
+        "pinyin": "bīng xuě jù lóng",
+        "explanation": "全国编号-699"
+    },
+    {
+        "idiom": "仙子伊布",
+        "pinyin": "xiān zǐ yī bù",
+        "explanation": "全国编号-700"
+    },
+    {
+        "idiom": "摔角鹰人",
+        "pinyin": "shuāi jiǎo yīng rén",
+        "explanation": "全国编号-701"
+    },
+    {
+        "idiom": "咚咚鼠",
+        "pinyin": "dōng dōng shǔ",
+        "explanation": "全国编号-702"
+    },
+    {
+        "idiom": "小碎钻",
+        "pinyin": "xiǎo suì zuàn",
+        "explanation": "全国编号-703"
+    },
+    {
+        "idiom": "黏黏宝",
+        "pinyin": "nián nián bǎo",
+        "explanation": "全国编号-704"
+    },
+    {
+        "idiom": "黏美儿",
+        "pinyin": "nián měi ér",
+        "explanation": "全国编号-705"
+    },
+    {
+        "idiom": "黏美龙",
+        "pinyin": "nián měi lóng",
+        "explanation": "全国编号-706"
+    },
+    {
+        "idiom": "钥圈儿",
+        "pinyin": "yào quān ér",
+        "explanation": "全国编号-707"
+    },
+    {
+        "idiom": "小木灵",
+        "pinyin": "xiǎo mù líng",
+        "explanation": "全国编号-708"
+    },
+    {
+        "idiom": "朽木妖",
+        "pinyin": "xiǔ mù yāo",
+        "explanation": "全国编号-709"
+    },
+    {
+        "idiom": "南瓜精",
+        "pinyin": "nán guā jīng",
+        "explanation": "全国编号-710"
+    },
+    {
+        "idiom": "南瓜怪人",
+        "pinyin": "nán guā guài rén",
+        "explanation": "全国编号-711"
+    },
+    {
+        "idiom": "冰宝",
+        "pinyin": "bīng bǎo",
+        "explanation": "全国编号-712"
+    },
+    {
+        "idiom": "冰岩怪",
+        "pinyin": "bīng yán guài",
+        "explanation": "全国编号-713"
+    },
+    {
+        "idiom": "嗡蝠",
+        "pinyin": "wēng fú",
+        "explanation": "全国编号-714"
+    },
+    {
+        "idiom": "音波龙",
+        "pinyin": "yīn bō lóng",
+        "explanation": "全国编号-715"
+    },
+    {
+        "idiom": "哲尔尼亚斯",
+        "pinyin": "zhé ěr ní yà sī",
+        "explanation": "全国编号-716"
+    },
+    {
+        "idiom": "伊裴尔塔尔",
+        "pinyin": "yī péi ěr tǎ ěr",
+        "explanation": "全国编号-717"
+    },
+    {
+        "idiom": "基格尔德",
+        "pinyin": "jī gé ěr dé",
+        "explanation": "全国编号-718"
+    },
+    {
+        "idiom": "蒂安希",
+        "pinyin": "dì ān xī",
+        "explanation": "全国编号-719"
+    },
+    {
+        "idiom": "胡帕",
+        "pinyin": "hú pà",
+        "explanation": "全国编号-720"
+    },
+    {
+        "idiom": "波尔凯尼恩",
+        "pinyin": "bō ěr kǎi ní ēn",
+        "explanation": "全国编号-721"
+    },
+    {
+        "idiom": "木木枭",
+        "pinyin": "mù mù xiāo",
+        "explanation": "全国编号-722"
+    },
+    {
+        "idiom": "投羽枭",
+        "pinyin": "tóu yǔ xiāo",
+        "explanation": "全国编号-723"
+    },
+    {
+        "idiom": "狙射树枭",
+        "pinyin": "jū shè shù xiāo",
+        "explanation": "全国编号-724"
+    },
+    {
+        "idiom": "火斑喵",
+        "pinyin": "huǒ bān miāo",
+        "explanation": "全国编号-725"
+    },
+    {
+        "idiom": "炎热喵",
+        "pinyin": "yán rè miāo",
+        "explanation": "全国编号-726"
+    },
+    {
+        "idiom": "炽焰咆哮虎",
+        "pinyin": "chì yàn páo xiào hǔ",
+        "explanation": "全国编号-727"
+    },
+    {
+        "idiom": "球球海狮",
+        "pinyin": "qiú qiú hǎi shī",
+        "explanation": "全国编号-728"
+    },
+    {
+        "idiom": "花漾海狮",
+        "pinyin": "huā yàng hǎi shī",
+        "explanation": "全国编号-729"
+    },
+    {
+        "idiom": "西狮海壬",
+        "pinyin": "xī shī hǎi rén",
+        "explanation": "全国编号-730"
+    },
+    {
+        "idiom": "小笃儿",
+        "pinyin": "xiǎo dǔ ér",
+        "explanation": "全国编号-731"
+    },
+    {
+        "idiom": "喇叭啄鸟",
+        "pinyin": "lǎ ba zhuó niǎo",
+        "explanation": "全国编号-732"
+    },
+    {
+        "idiom": "铳嘴大鸟",
+        "pinyin": "chòng zuǐ dà niǎo",
+        "explanation": "全国编号-733"
+    },
+    {
+        "idiom": "猫鼬少",
+        "pinyin": "māo yòu shǎo",
+        "explanation": "全国编号-734"
+    },
+    {
+        "idiom": "猫鼬探长",
+        "pinyin": "māo yòu tàn cháng",
+        "explanation": "全国编号-735"
+    },
+    {
+        "idiom": "强颚鸡母虫",
+        "pinyin": "qiáng è jī mǔ chóng",
+        "explanation": "全国编号-736"
+    },
+    {
+        "idiom": "虫电宝",
+        "pinyin": "chóng diàn bǎo",
+        "explanation": "全国编号-737"
+    },
+    {
+        "idiom": "锹农炮虫",
+        "pinyin": "qiāo nóng pào chóng",
+        "explanation": "全国编号-738"
+    },
+    {
+        "idiom": "好胜蟹",
+        "pinyin": "hào shèng xiè",
+        "explanation": "全国编号-739"
+    },
+    {
+        "idiom": "好胜毛蟹",
+        "pinyin": "hào shèng máo xiè",
+        "explanation": "全国编号-740"
+    },
+    {
+        "idiom": "花舞鸟",
+        "pinyin": "huā wǔ niǎo",
+        "explanation": "全国编号-741"
+    },
+    {
+        "idiom": "萌虻",
+        "pinyin": "méng méng",
+        "explanation": "全国编号-742"
+    },
+    {
+        "idiom": "蝶结萌虻",
+        "pinyin": "dié jié méng méng",
+        "explanation": "全国编号-743"
+    },
+    {
+        "idiom": "岩狗狗",
+        "pinyin": "yán gǒu gǒu",
+        "explanation": "全国编号-744"
+    },
+    {
+        "idiom": "鬃岩狼人",
+        "pinyin": "zōng yán láng rén",
+        "explanation": "全国编号-745"
+    },
+    {
+        "idiom": "弱丁鱼",
+        "pinyin": "ruò dīng yú",
+        "explanation": "全国编号-746"
+    },
+    {
+        "idiom": "好坏星",
+        "pinyin": "hǎo huài xīng",
+        "explanation": "全国编号-747"
+    },
+    {
+        "idiom": "超坏星",
+        "pinyin": "chāo huài xīng",
+        "explanation": "全国编号-748"
+    },
+    {
+        "idiom": "泥驴仔",
+        "pinyin": "ní lǘ zǎi",
+        "explanation": "全国编号-749"
+    },
+    {
+        "idiom": "重泥挽马",
+        "pinyin": "zhòng ní wǎn mǎ",
+        "explanation": "全国编号-750"
+    },
+    {
+        "idiom": "滴蛛",
+        "pinyin": "dī zhū",
+        "explanation": "全国编号-751"
+    },
+    {
+        "idiom": "滴蛛霸",
+        "pinyin": "dī zhū bà",
+        "explanation": "全国编号-752"
+    },
+    {
+        "idiom": "伪螳草",
+        "pinyin": "wěi táng cǎo",
+        "explanation": "全国编号-753"
+    },
+    {
+        "idiom": "兰螳花",
+        "pinyin": "lán táng huā",
+        "explanation": "全国编号-754"
+    },
+    {
+        "idiom": "睡睡菇",
+        "pinyin": "shuì shuì gū",
+        "explanation": "全国编号-755"
+    },
+    {
+        "idiom": "灯罩夜菇",
+        "pinyin": "dēng zhào yè gū",
+        "explanation": "全国编号-756"
+    },
+    {
+        "idiom": "夜盗火蜥",
+        "pinyin": "yè dào huǒ xī",
+        "explanation": "全国编号-757"
+    },
+    {
+        "idiom": "焰后蜥",
+        "pinyin": "yàn hòu xī",
+        "explanation": "全国编号-758"
+    },
+    {
+        "idiom": "童偶熊",
+        "pinyin": "tóng ǒu xióng",
+        "explanation": "全国编号-759"
+    },
+    {
+        "idiom": "穿着熊",
+        "pinyin": "chuān zhe xióng",
+        "explanation": "全国编号-760"
+    },
+    {
+        "idiom": "甜竹竹",
+        "pinyin": "tián zhú zhú",
+        "explanation": "全国编号-761"
+    },
+    {
+        "idiom": "甜舞妮",
+        "pinyin": "tián wǔ nī",
+        "explanation": "全国编号-762"
+    },
+    {
+        "idiom": "甜冷美后",
+        "pinyin": "tián lěng měi hòu",
+        "explanation": "全国编号-763"
+    },
+    {
+        "idiom": "花疗环环",
+        "pinyin": "huā liáo huán huán",
+        "explanation": "全国编号-764"
+    },
+    {
+        "idiom": "智挥猩",
+        "pinyin": "zhì huī xīng",
+        "explanation": "全国编号-765"
+    },
+    {
+        "idiom": "投掷猴",
+        "pinyin": "tóu zhì hóu",
+        "explanation": "全国编号-766"
+    },
+    {
+        "idiom": "胆小虫",
+        "pinyin": "dǎn xiǎo chóng",
+        "explanation": "全国编号-767"
+    },
+    {
+        "idiom": "具甲武者",
+        "pinyin": "jù jiǎ wǔ zhě",
+        "explanation": "全国编号-768"
+    },
+    {
+        "idiom": "沙丘娃",
+        "pinyin": "shā qiū wá",
+        "explanation": "全国编号-769"
+    },
+    {
+        "idiom": "噬沙堡爷",
+        "pinyin": "shì shā bǎo yé",
+        "explanation": "全国编号-770"
+    },
+    {
+        "idiom": "拳海参",
+        "pinyin": "quán hǎi shēn",
+        "explanation": "全国编号-771"
+    },
+    {
+        "idiom": "属性：空",
+        "pinyin": "shǔ xìng ： kōng",
+        "explanation": "全国编号-772"
+    },
+    {
+        "idiom": "银伴战兽",
+        "pinyin": "yín bàn zhàn shòu",
+        "explanation": "全国编号-773"
+    },
+    {
+        "idiom": "小陨星",
+        "pinyin": "xiǎo yǔn xīng",
+        "explanation": "全国编号-774"
+    },
+    {
+        "idiom": "树枕尾熊",
+        "pinyin": "shù zhěn wěi xióng",
+        "explanation": "全国编号-775"
+    },
+    {
+        "idiom": "爆焰龟兽",
+        "pinyin": "bào yàn guī shòu",
+        "explanation": "全国编号-776"
+    },
+    {
+        "idiom": "托戈德玛尔",
+        "pinyin": "tuō gē dé mǎ ěr",
+        "explanation": "全国编号-777"
+    },
+    {
+        "idiom": "谜拟丘",
+        "pinyin": "mí nǐ qiū",
+        "explanation": "全国编号-778"
+    },
+    {
+        "idiom": "磨牙彩皮鱼",
+        "pinyin": "mó yá cǎi pí yú",
+        "explanation": "全国编号-779"
+    },
+    {
+        "idiom": "老翁龙",
+        "pinyin": "lǎo wēng lóng",
+        "explanation": "全国编号-780"
+    },
+    {
+        "idiom": "破破舵轮",
+        "pinyin": "pò pò duò lún",
+        "explanation": "全国编号-781"
+    },
+    {
+        "idiom": "心鳞宝",
+        "pinyin": "xīn lín bǎo",
+        "explanation": "全国编号-782"
+    },
+    {
+        "idiom": "鳞甲龙",
+        "pinyin": "lín jiǎ lóng",
+        "explanation": "全国编号-783"
+    },
+    {
+        "idiom": "杖尾鳞甲龙",
+        "pinyin": "zhàng wěi lín jiǎ lóng",
+        "explanation": "全国编号-784"
+    },
+    {
+        "idiom": "卡璞・鸣鸣",
+        "pinyin": "kǎ pú ・ míng míng",
+        "explanation": "全国编号-785"
+    },
+    {
+        "idiom": "卡璞・蝶蝶",
+        "pinyin": "kǎ pú ・ dié dié",
+        "explanation": "全国编号-786"
+    },
+    {
+        "idiom": "卡璞・哞哞",
+        "pinyin": "kǎ pú ・ mōu mōu",
+        "explanation": "全国编号-787"
+    },
+    {
+        "idiom": "卡璞・鳍鳍",
+        "pinyin": "kǎ pú ・ qí qí",
+        "explanation": "全国编号-788"
+    },
+    {
+        "idiom": "科斯莫古",
+        "pinyin": "kē sī mò gǔ",
+        "explanation": "全国编号-789"
+    },
+    {
+        "idiom": "科斯莫姆",
+        "pinyin": "kē sī mò mǔ",
+        "explanation": "全国编号-790"
+    },
+    {
+        "idiom": "索尔迦雷欧",
+        "pinyin": "suǒ ěr jiā léi ōu",
+        "explanation": "全国编号-791"
+    },
+    {
+        "idiom": "露奈雅拉",
+        "pinyin": "lù nài yǎ lā",
+        "explanation": "全国编号-792"
+    },
+    {
+        "idiom": "虚吾伊德",
+        "pinyin": "xū wú yī dé",
+        "explanation": "全国编号-793"
+    },
+    {
+        "idiom": "爆肌蚊",
+        "pinyin": "bào jī wén",
+        "explanation": "全国编号-794"
+    },
+    {
+        "idiom": "费洛美螂",
+        "pinyin": "fèi luò měi láng",
+        "explanation": "全国编号-795"
+    },
+    {
+        "idiom": "电束木",
+        "pinyin": "diàn shù mù",
+        "explanation": "全国编号-796"
+    },
+    {
+        "idiom": "铁火辉夜",
+        "pinyin": "tiě huǒ huī yè",
+        "explanation": "全国编号-797"
+    },
+    {
+        "idiom": "纸御剑",
+        "pinyin": "zhǐ yù jiàn",
+        "explanation": "全国编号-798"
+    },
+    {
+        "idiom": "恶食大王",
+        "pinyin": "è shí dà wáng",
+        "explanation": "全国编号-799"
+    },
+    {
+        "idiom": "奈克洛兹玛",
+        "pinyin": "nài kè luò zī mǎ",
+        "explanation": "全国编号-800"
+    },
+    {
+        "idiom": "玛机雅娜",
+        "pinyin": "mǎ jī yǎ nà",
+        "explanation": "全国编号-801"
+    },
+    {
+        "idiom": "玛夏多",
+        "pinyin": "mǎ xià duō",
+        "explanation": "全国编号-802"
+    },
+    {
+        "idiom": "毒贝比",
+        "pinyin": "dú bèi bǐ",
+        "explanation": "全国编号-803"
+    },
+    {
+        "idiom": "四颚针龙",
+        "pinyin": "sì è zhēn lóng",
+        "explanation": "全国编号-804"
+    },
+    {
+        "idiom": "垒磊石",
+        "pinyin": "lěi lěi shí",
+        "explanation": "全国编号-805"
+    },
+    {
+        "idiom": "砰头小丑",
+        "pinyin": "pēng tóu xiǎo chǒu",
+        "explanation": "全国编号-806"
+    },
+    {
+        "idiom": "捷拉奥拉",
+        "pinyin": "jié lā ào lā",
+        "explanation": "全国编号-807"
+    },
+    {
+        "idiom": "美录坦",
+        "pinyin": "měi lù tǎn",
+        "explanation": "全国编号-808"
+    },
+    {
+        "idiom": "美录梅塔",
+        "pinyin": "měi lù méi tǎ",
+        "explanation": "全国编号-809"
+    },
+    {
+        "idiom": "敲音猴",
+        "pinyin": "qiāo yīn hóu",
+        "explanation": "全国编号-810"
+    },
+    {
+        "idiom": "啪咚猴",
+        "pinyin": "pā dōng hóu",
+        "explanation": "全国编号-811"
+    },
+    {
+        "idiom": "轰擂金刚猩",
+        "pinyin": "hōng lèi jīn gāng xīng",
+        "explanation": "全国编号-812"
+    },
+    {
+        "idiom": "炎兔儿",
+        "pinyin": "yán tù ér",
+        "explanation": "全国编号-813"
+    },
+    {
+        "idiom": "腾蹴小将",
+        "pinyin": "téng cù xiǎo jiàng",
+        "explanation": "全国编号-814"
+    },
+    {
+        "idiom": "闪焰王牌",
+        "pinyin": "shǎn yàn wáng pái",
+        "explanation": "全国编号-815"
+    },
+    {
+        "idiom": "泪眼蜥",
+        "pinyin": "lèi yǎn xī",
+        "explanation": "全国编号-816"
+    },
+    {
+        "idiom": "变涩蜥",
+        "pinyin": "biàn sè xī",
+        "explanation": "全国编号-817"
+    },
+    {
+        "idiom": "千面避役",
+        "pinyin": "qiān miàn bì yì",
+        "explanation": "全国编号-818"
+    },
+    {
+        "idiom": "贪心栗鼠",
+        "pinyin": "tān xīn lì shǔ",
+        "explanation": "全国编号-819"
+    },
+    {
+        "idiom": "藏饱栗鼠",
+        "pinyin": "cáng bǎo lì shǔ",
+        "explanation": "全国编号-820"
+    },
+    {
+        "idiom": "稚山雀",
+        "pinyin": "zhì shān què",
+        "explanation": "全国编号-821"
+    },
+    {
+        "idiom": "蓝鸦",
+        "pinyin": "lán yā",
+        "explanation": "全国编号-822"
+    },
+    {
+        "idiom": "钢铠鸦",
+        "pinyin": "gāng kǎi yā",
+        "explanation": "全国编号-823"
+    },
+    {
+        "idiom": "索侦虫",
+        "pinyin": "suǒ zhēn chóng",
+        "explanation": "全国编号-824"
+    },
+    {
+        "idiom": "天罩虫",
+        "pinyin": "tiān zhào chóng",
+        "explanation": "全国编号-825"
+    },
+    {
+        "idiom": "以欧路普",
+        "pinyin": "yǐ ōu lù pǔ",
+        "explanation": "全国编号-826"
+    },
+    {
+        "idiom": "狡小狐",
+        "pinyin": "jiǎo xiǎo hú",
+        "explanation": "全国编号-827"
+    },
+    {
+        "idiom": "猾大狐",
+        "pinyin": "huá dà hú",
+        "explanation": "全国编号-828"
+    },
+    {
+        "idiom": "幼棉棉",
+        "pinyin": "yòu mián mián",
+        "explanation": "全国编号-829"
+    },
+    {
+        "idiom": "白蓬蓬",
+        "pinyin": "bái péng péng",
+        "explanation": "全国编号-830"
+    },
+    {
+        "idiom": "毛辫羊",
+        "pinyin": "máo biàn yáng",
+        "explanation": "全国编号-831"
+    },
+    {
+        "idiom": "毛毛角羊",
+        "pinyin": "máo máo jiǎo yáng",
+        "explanation": "全国编号-832"
+    },
+    {
+        "idiom": "咬咬龟",
+        "pinyin": "yǎo yǎo guī",
+        "explanation": "全国编号-833"
+    },
+    {
+        "idiom": "暴噬龟",
+        "pinyin": "bào shì guī",
+        "explanation": "全国编号-834"
+    },
+    {
+        "idiom": "来电汪",
+        "pinyin": "lái diàn wāng",
+        "explanation": "全国编号-835"
+    },
+    {
+        "idiom": "逐电犬",
+        "pinyin": "zhú diàn quǎn",
+        "explanation": "全国编号-836"
+    },
+    {
+        "idiom": "小炭仔",
+        "pinyin": "xiǎo tàn zǎi",
+        "explanation": "全国编号-837"
+    },
+    {
+        "idiom": "大炭车",
+        "pinyin": "dà tàn chē",
+        "explanation": "全国编号-838"
+    },
+    {
+        "idiom": "巨炭山",
+        "pinyin": "jù tàn shān",
+        "explanation": "全国编号-839"
+    },
+    {
+        "idiom": "啃果虫",
+        "pinyin": "kěn guǒ chóng",
+        "explanation": "全国编号-840"
+    },
+    {
+        "idiom": "苹裹龙",
+        "pinyin": "píng guǒ lóng",
+        "explanation": "全国编号-841"
+    },
+    {
+        "idiom": "丰蜜龙",
+        "pinyin": "fēng mì lóng",
+        "explanation": "全国编号-842"
+    },
+    {
+        "idiom": "沙包蛇",
+        "pinyin": "shā bāo shé",
+        "explanation": "全国编号-843"
+    },
+    {
+        "idiom": "沙螺蟒",
+        "pinyin": "shā luó mǎng",
+        "explanation": "全国编号-844"
+    },
+    {
+        "idiom": "古月鸟",
+        "pinyin": "gǔ yuè niǎo",
+        "explanation": "全国编号-845"
+    },
+    {
+        "idiom": "刺梭鱼",
+        "pinyin": "cì suō yú",
+        "explanation": "全国编号-846"
+    },
+    {
+        "idiom": "戽斗尖梭",
+        "pinyin": "hù dòu jiān suō",
+        "explanation": "全国编号-847"
+    },
+    {
+        "idiom": "电音婴",
+        "pinyin": "diàn yīn yīng",
+        "explanation": "全国编号-848"
+    },
+    {
+        "idiom": "颤弦蝾螈",
+        "pinyin": "chàn xián róng yuán",
+        "explanation": "全国编号-849"
+    },
+    {
+        "idiom": "烧火蚣",
+        "pinyin": "shāo huǒ gōng",
+        "explanation": "全国编号-850"
+    },
+    {
+        "idiom": "焚焰蚣",
+        "pinyin": "fén yàn gōng",
+        "explanation": "全国编号-851"
+    },
+    {
+        "idiom": "拳拳蛸",
+        "pinyin": "quán quán shāo",
+        "explanation": "全国编号-852"
+    },
+    {
+        "idiom": "八爪武师",
+        "pinyin": "bā zhuǎ wǔ shī",
+        "explanation": "全国编号-853"
+    },
+    {
+        "idiom": "来悲茶",
+        "pinyin": "lái bēi chá",
+        "explanation": "全国编号-854"
+    },
+    {
+        "idiom": "怖思壶",
+        "pinyin": "bù sī hú",
+        "explanation": "全国编号-855"
+    },
+    {
+        "idiom": "迷布莉姆",
+        "pinyin": "mí bù lì mǔ",
+        "explanation": "全国编号-856"
+    },
+    {
+        "idiom": "提布莉姆",
+        "pinyin": "tí bù lì mǔ",
+        "explanation": "全国编号-857"
+    },
+    {
+        "idiom": "布莉姆温",
+        "pinyin": "bù lì mǔ wēn",
+        "explanation": "全国编号-858"
+    },
+    {
+        "idiom": "捣蛋小妖",
+        "pinyin": "dǎo dàn xiǎo yāo",
+        "explanation": "全国编号-859"
+    },
+    {
+        "idiom": "诈唬魔",
+        "pinyin": "zhà hǔ mó",
+        "explanation": "全国编号-860"
+    },
+    {
+        "idiom": "长毛巨魔",
+        "pinyin": "cháng máo jù mó",
+        "explanation": "全国编号-861"
+    },
+    {
+        "idiom": "堵拦熊",
+        "pinyin": "dǔ lán xióng",
+        "explanation": "全国编号-862"
+    },
+    {
+        "idiom": "喵头目",
+        "pinyin": "miāo tóu mù",
+        "explanation": "全国编号-863"
+    },
+    {
+        "idiom": "魔灵珊瑚",
+        "pinyin": "mó líng shān hú",
+        "explanation": "全国编号-864"
+    },
+    {
+        "idiom": "葱游兵",
+        "pinyin": "cōng yóu bīng",
+        "explanation": "全国编号-865"
+    },
+    {
+        "idiom": "踏冰人偶",
+        "pinyin": "tà bīng rén ǒu",
+        "explanation": "全国编号-866"
+    },
+    {
+        "idiom": "迭失板",
+        "pinyin": "dié shī bǎn",
+        "explanation": "全国编号-867"
+    },
+    {
+        "idiom": "小仙奶",
+        "pinyin": "xiǎo xiān nǎi",
+        "explanation": "全国编号-868"
+    },
+    {
+        "idiom": "霜奶仙",
+        "pinyin": "shuāng nǎi xiān",
+        "explanation": "全国编号-869"
+    },
+    {
+        "idiom": "列阵兵",
+        "pinyin": "liè zhèn bīng",
+        "explanation": "全国编号-870"
+    },
+    {
+        "idiom": "啪嚓海胆",
+        "pinyin": "pā chā hǎi dǎn",
+        "explanation": "全国编号-871"
+    },
+    {
+        "idiom": "雪吞虫",
+        "pinyin": "xuě tūn chóng",
+        "explanation": "全国编号-872"
+    },
+    {
+        "idiom": "雪绒蛾",
+        "pinyin": "xuě róng é",
+        "explanation": "全国编号-873"
+    },
+    {
+        "idiom": "巨石丁",
+        "pinyin": "jù shí dīng",
+        "explanation": "全国编号-874"
+    },
+    {
+        "idiom": "冰砌鹅",
+        "pinyin": "bīng qì é",
+        "explanation": "全国编号-875"
+    },
+    {
+        "idiom": "爱管侍",
+        "pinyin": "ài guǎn shì",
+        "explanation": "全国编号-876"
+    },
+    {
+        "idiom": "莫鲁贝可",
+        "pinyin": "mò lǔ bèi kě",
+        "explanation": "全国编号-877"
+    },
+    {
+        "idiom": "铜象",
+        "pinyin": "tóng xiàng",
+        "explanation": "全国编号-878"
+    },
+    {
+        "idiom": "大王铜象",
+        "pinyin": "dà wáng tóng xiàng",
+        "explanation": "全国编号-879"
+    },
+    {
+        "idiom": "雷鸟龙",
+        "pinyin": "léi niǎo lóng",
+        "explanation": "全国编号-880"
+    },
+    {
+        "idiom": "雷鸟海兽",
+        "pinyin": "léi niǎo hǎi shòu",
+        "explanation": "全国编号-881"
+    },
+    {
+        "idiom": "鳃鱼龙",
+        "pinyin": "sāi yú lóng",
+        "explanation": "全国编号-882"
+    },
+    {
+        "idiom": "鳃鱼海兽",
+        "pinyin": "sāi yú hǎi shòu",
+        "explanation": "全国编号-883"
+    },
+    {
+        "idiom": "铝钢龙",
+        "pinyin": "lǚ gāng lóng",
+        "explanation": "全国编号-884"
+    },
+    {
+        "idiom": "多龙梅西亚",
+        "pinyin": "duō lóng méi xī yà",
+        "explanation": "全国编号-885"
+    },
+    {
+        "idiom": "多龙奇",
+        "pinyin": "duō lóng qí",
+        "explanation": "全国编号-886"
+    },
+    {
+        "idiom": "多龙巴鲁托",
+        "pinyin": "duō lóng bā lǔ tuō",
+        "explanation": "全国编号-887"
+    },
+    {
+        "idiom": "苍响",
+        "pinyin": "cāng xiǎng",
+        "explanation": "全国编号-888"
+    },
+    {
+        "idiom": "藏玛然特",
+        "pinyin": "cáng mǎ rán tè",
+        "explanation": "全国编号-889"
+    },
+    {
+        "idiom": "无极汰那",
+        "pinyin": "wú jí tài nà",
+        "explanation": "全国编号-890"
+    },
+    {
+        "idiom": "熊徒弟",
+        "pinyin": "xióng tú dì",
+        "explanation": "全国编号-891"
+    },
+    {
+        "idiom": "武道熊师",
+        "pinyin": "wǔ dào xióng shī",
+        "explanation": "全国编号-892"
+    },
+    {
+        "idiom": "萨戮德",
+        "pinyin": "sà lù dé",
+        "explanation": "全国编号-893"
+    },
+    {
+        "idiom": "雷吉艾勒奇",
+        "pinyin": "léi jí ài lè qí",
+        "explanation": "全国编号-894"
+    },
+    {
+        "idiom": "雷吉铎拉戈",
+        "pinyin": "léi jí duó lā gē",
+        "explanation": "全国编号-895"
+    },
+    {
+        "idiom": "雪暴马",
+        "pinyin": "xuě bào mǎ",
+        "explanation": "全国编号-896"
+    },
+    {
+        "idiom": "灵幽马",
+        "pinyin": "líng yōu mǎ",
+        "explanation": "全国编号-897"
+    },
+    {
+        "idiom": "蕾冠王",
+        "pinyin": "lěi guān wáng",
+        "explanation": "全国编号-898"
+    },
+    {
+        "idiom": "诡角鹿",
+        "pinyin": "guǐ jiǎo lù",
+        "explanation": "全国编号-899"
+    },
+    {
+        "idiom": "劈斧螳螂",
+        "pinyin": "pī fǔ táng láng",
+        "explanation": "全国编号-900"
+    },
+    {
+        "idiom": "月月熊",
+        "pinyin": "yuè yuè xióng",
+        "explanation": "全国编号-901"
+    },
+    {
+        "idiom": "幽尾玄鱼",
+        "pinyin": "yōu wěi xuán yú",
+        "explanation": "全国编号-902"
+    },
+    {
+        "idiom": "大狃拉",
+        "pinyin": "dà niǔ lā",
+        "explanation": "全国编号-903"
+    },
+    {
+        "idiom": "万针鱼",
+        "pinyin": "wàn zhēn yú",
+        "explanation": "全国编号-904"
+    },
+    {
+        "idiom": "眷恋云",
+        "pinyin": "juàn liàn yún",
+        "explanation": "全国编号-905"
+    },
+    {
+        "idiom": "新叶喵",
+        "pinyin": "xīn yè miāo",
+        "explanation": "全国编号-906"
+    },
+    {
+        "idiom": "蒂蕾喵",
+        "pinyin": "dì lěi miāo",
+        "explanation": "全国编号-907"
+    },
+    {
+        "idiom": "魔幻假面喵",
+        "pinyin": "mó huàn jiǎ miàn miāo",
+        "explanation": "全国编号-908"
+    },
+    {
+        "idiom": "呆火鳄",
+        "pinyin": "dāi huǒ è",
+        "explanation": "全国编号-909"
+    },
+    {
+        "idiom": "炙烫鳄",
+        "pinyin": "zhì tàng è",
+        "explanation": "全国编号-910"
+    },
+    {
+        "idiom": "骨纹巨声鳄",
+        "pinyin": "gǔ wén jù shēng è",
+        "explanation": "全国编号-911"
+    },
+    {
+        "idiom": "润水鸭",
+        "pinyin": "rùn shuǐ yā",
+        "explanation": "全国编号-912"
+    },
+    {
+        "idiom": "涌跃鸭",
+        "pinyin": "yǒng yuè yā",
+        "explanation": "全国编号-913"
+    },
+    {
+        "idiom": "狂欢浪舞鸭",
+        "pinyin": "kuáng huān làng wǔ yā",
+        "explanation": "全国编号-914"
+    },
+    {
+        "idiom": "爱吃豚",
+        "pinyin": "ài chī tún",
+        "explanation": "全国编号-915"
+    },
+    {
+        "idiom": "飘香豚",
+        "pinyin": "piāo xiāng tún",
+        "explanation": "全国编号-916"
+    },
+    {
+        "idiom": "团珠蛛",
+        "pinyin": "tuán zhū zhū",
+        "explanation": "全国编号-917"
+    },
+    {
+        "idiom": "操陷蛛",
+        "pinyin": "cāo xiàn zhū",
+        "explanation": "全国编号-918"
+    },
+    {
+        "idiom": "豆蟋蟀",
+        "pinyin": "dòu xī shuài",
+        "explanation": "全国编号-919"
+    },
+    {
+        "idiom": "烈腿蝗",
+        "pinyin": "liè tuǐ huáng",
+        "explanation": "全国编号-920"
+    },
+    {
+        "idiom": "布拨",
+        "pinyin": "bù bō",
+        "explanation": "全国编号-921"
+    },
+    {
+        "idiom": "布土拨",
+        "pinyin": "bù tǔ bō",
+        "explanation": "全国编号-922"
+    },
+    {
+        "idiom": "巴布土拨",
+        "pinyin": "bā bù tǔ bō",
+        "explanation": "全国编号-923"
+    },
+    {
+        "idiom": "一对鼠",
+        "pinyin": "yí duì shǔ",
+        "explanation": "全国编号-924"
+    },
+    {
+        "idiom": "一家鼠",
+        "pinyin": "yì jiā shǔ",
+        "explanation": "全国编号-925"
+    },
+    {
+        "idiom": "狗仔包",
+        "pinyin": "gǒu zǎi bāo",
+        "explanation": "全国编号-926"
+    },
+    {
+        "idiom": "麻花犬",
+        "pinyin": "má huā quǎn",
+        "explanation": "全国编号-927"
+    },
+    {
+        "idiom": "迷你芙",
+        "pinyin": "mí nǐ fú",
+        "explanation": "全国编号-928"
+    },
+    {
+        "idiom": "奥利纽",
+        "pinyin": "ào lì niǔ",
+        "explanation": "全国编号-929"
+    },
+    {
+        "idiom": "奥利瓦",
+        "pinyin": "ào lì wǎ",
+        "explanation": "全国编号-930"
+    },
+    {
+        "idiom": "怒鹦哥",
+        "pinyin": "nù yīng gē",
+        "explanation": "全国编号-931"
+    },
+    {
+        "idiom": "盐石宝",
+        "pinyin": "yán shí bǎo",
+        "explanation": "全国编号-932"
+    },
+    {
+        "idiom": "盐石垒",
+        "pinyin": "yán shí lěi",
+        "explanation": "全国编号-933"
+    },
+    {
+        "idiom": "盐石巨灵",
+        "pinyin": "yán shí jù líng",
+        "explanation": "全国编号-934"
+    },
+    {
+        "idiom": "炭小侍",
+        "pinyin": "tàn xiǎo shì",
+        "explanation": "全国编号-935"
+    },
+    {
+        "idiom": "红莲铠骑",
+        "pinyin": "hóng lián kǎi qí",
+        "explanation": "全国编号-936"
+    },
+    {
+        "idiom": "苍炎刃鬼",
+        "pinyin": "cāng yán rèn guǐ",
+        "explanation": "全国编号-937"
+    },
+    {
+        "idiom": "光蚪仔",
+        "pinyin": "guāng dǒu zǎi",
+        "explanation": "全国编号-938"
+    },
+    {
+        "idiom": "电肚蛙",
+        "pinyin": "diàn dù wā",
+        "explanation": "全国编号-939"
+    },
+    {
+        "idiom": "电海燕",
+        "pinyin": "diàn hǎi yàn",
+        "explanation": "全国编号-940"
+    },
+    {
+        "idiom": "大电海燕",
+        "pinyin": "dà diàn hǎi yàn",
+        "explanation": "全国编号-941"
+    },
+    {
+        "idiom": "偶叫獒",
+        "pinyin": "ǒu jiào áo",
+        "explanation": "全国编号-942"
+    },
+    {
+        "idiom": "獒教父",
+        "pinyin": "áo jiào fù",
+        "explanation": "全国编号-943"
+    },
+    {
+        "idiom": "滋汁鼹",
+        "pinyin": "zī zhī yǎn",
+        "explanation": "全国编号-944"
+    },
+    {
+        "idiom": "涂标客",
+        "pinyin": "tú biāo kè",
+        "explanation": "全国编号-945"
+    },
+    {
+        "idiom": "纳噬草",
+        "pinyin": "nà shì cǎo",
+        "explanation": "全国编号-946"
+    },
+    {
+        "idiom": "怖纳噬草",
+        "pinyin": "bù nà shì cǎo",
+        "explanation": "全国编号-947"
+    },
+    {
+        "idiom": "原野水母",
+        "pinyin": "yuán yě shuǐ mǔ",
+        "explanation": "全国编号-948"
+    },
+    {
+        "idiom": "陆地水母",
+        "pinyin": "lù dì shuǐ mǔ",
+        "explanation": "全国编号-949"
+    },
+    {
+        "idiom": "毛崖蟹",
+        "pinyin": "máo yá xiè",
+        "explanation": "全国编号-950"
+    },
+    {
+        "idiom": "热辣娃",
+        "pinyin": "rè là wá",
+        "explanation": "全国编号-951"
+    },
+    {
+        "idiom": "狠辣椒",
+        "pinyin": "hěn là jiāo",
+        "explanation": "全国编号-952"
+    },
+    {
+        "idiom": "虫滚泥",
+        "pinyin": "chóng gǔn ní",
+        "explanation": "全国编号-953"
+    },
+    {
+        "idiom": "虫甲圣",
+        "pinyin": "chóng jiǎ shèng",
+        "explanation": "全国编号-954"
+    },
+    {
+        "idiom": "飘飘雏",
+        "pinyin": "piāo piāo chú",
+        "explanation": "全国编号-955"
+    },
+    {
+        "idiom": "超能艳鸵",
+        "pinyin": "chāo néng yàn tuó",
+        "explanation": "全国编号-956"
+    },
+    {
+        "idiom": "小锻匠",
+        "pinyin": "xiǎo duàn jiàng",
+        "explanation": "全国编号-957"
+    },
+    {
+        "idiom": "巧锻匠",
+        "pinyin": "qiǎo duàn jiàng",
+        "explanation": "全国编号-958"
+    },
+    {
+        "idiom": "巨锻匠",
+        "pinyin": "jù duàn jiàng",
+        "explanation": "全国编号-959"
+    },
+    {
+        "idiom": "海地鼠",
+        "pinyin": "hǎi dì shǔ",
+        "explanation": "全国编号-960"
+    },
+    {
+        "idiom": "三海地鼠",
+        "pinyin": "sān hǎi dì shǔ",
+        "explanation": "全国编号-961"
+    },
+    {
+        "idiom": "下石鸟",
+        "pinyin": "xià shí niǎo",
+        "explanation": "全国编号-962"
+    },
+    {
+        "idiom": "波普海豚",
+        "pinyin": "bō pǔ hǎi tún",
+        "explanation": "全国编号-963"
+    },
+    {
+        "idiom": "海豚侠",
+        "pinyin": "hǎi tún xiá",
+        "explanation": "全国编号-964"
+    },
+    {
+        "idiom": "噗隆隆",
+        "pinyin": "pū lóng lóng",
+        "explanation": "全国编号-965"
+    },
+    {
+        "idiom": "普隆隆姆",
+        "pinyin": "pǔ lóng lóng mǔ",
+        "explanation": "全国编号-966"
+    },
+    {
+        "idiom": "摩托蜥",
+        "pinyin": "mó tuō xī",
+        "explanation": "全国编号-967"
+    },
+    {
+        "idiom": "拖拖蚓",
+        "pinyin": "tuō tuō yǐn",
+        "explanation": "全国编号-968"
+    },
+    {
+        "idiom": "晶光芽",
+        "pinyin": "jīng guāng yá",
+        "explanation": "全国编号-969"
+    },
+    {
+        "idiom": "晶光花",
+        "pinyin": "jīng guāng huā",
+        "explanation": "全国编号-970"
+    },
+    {
+        "idiom": "墓仔狗",
+        "pinyin": "mù zǎi gǒu",
+        "explanation": "全国编号-971"
+    },
+    {
+        "idiom": "墓扬犬",
+        "pinyin": "mù yáng quǎn",
+        "explanation": "全国编号-972"
+    },
+    {
+        "idiom": "缠红鹤",
+        "pinyin": "chán hóng hè",
+        "explanation": "全国编号-973"
+    },
+    {
+        "idiom": "走鲸",
+        "pinyin": "zǒu jīng",
+        "explanation": "全国编号-974"
+    },
+    {
+        "idiom": "浩大鲸",
+        "pinyin": "hào dà jīng",
+        "explanation": "全国编号-975"
+    },
+    {
+        "idiom": "轻身鳕",
+        "pinyin": "qīng shēn xuě",
+        "explanation": "全国编号-976"
+    },
+    {
+        "idiom": "吃吼霸",
+        "pinyin": "chī hǒu bà",
+        "explanation": "全国编号-977"
+    },
+    {
+        "idiom": "米立龙",
+        "pinyin": "mǐ lì lóng",
+        "explanation": "全国编号-978"
+    },
+    {
+        "idiom": "弃世猴",
+        "pinyin": "qì shì hóu",
+        "explanation": "全国编号-979"
+    },
+    {
+        "idiom": "土王",
+        "pinyin": "tǔ wáng",
+        "explanation": "全国编号-980"
+    },
+    {
+        "idiom": "奇麒麟",
+        "pinyin": "qí qí lín",
+        "explanation": "全国编号-981"
+    },
+    {
+        "idiom": "土龙节节",
+        "pinyin": "tǔ lóng jié jié",
+        "explanation": "全国编号-982"
+    },
+    {
+        "idiom": "仆刀将军",
+        "pinyin": "pú dāo jiāng jūn",
+        "explanation": "全国编号-983"
+    },
+    {
+        "idiom": "雄伟牙",
+        "pinyin": "xióng wěi yá",
+        "explanation": "全国编号-984"
+    },
+    {
+        "idiom": "吼叫尾",
+        "pinyin": "hǒu jiào wěi",
+        "explanation": "全国编号-985"
+    },
+    {
+        "idiom": "猛恶菇",
+        "pinyin": "měng è gū",
+        "explanation": "全国编号-986"
+    },
+    {
+        "idiom": "振翼发",
+        "pinyin": "zhèn yì fā",
+        "explanation": "全国编号-987"
+    },
+    {
+        "idiom": "爬地翅",
+        "pinyin": "pá dì chì",
+        "explanation": "全国编号-988"
+    },
+    {
+        "idiom": "沙铁皮",
+        "pinyin": "shā tiě pí",
+        "explanation": "全国编号-989"
+    },
+    {
+        "idiom": "铁辙迹",
+        "pinyin": "tiě zhé jì",
+        "explanation": "全国编号-990"
+    },
+    {
+        "idiom": "铁包袱",
+        "pinyin": "tiě bāo fú",
+        "explanation": "全国编号-991"
+    },
+    {
+        "idiom": "铁臂膀",
+        "pinyin": "tiě bì bǎng",
+        "explanation": "全国编号-992"
+    },
+    {
+        "idiom": "铁脖颈",
+        "pinyin": "tiě bó gěng",
+        "explanation": "全国编号-993"
+    },
+    {
+        "idiom": "铁毒蛾",
+        "pinyin": "tiě dú é",
+        "explanation": "全国编号-994"
+    },
+    {
+        "idiom": "铁荆棘",
+        "pinyin": "tiě jīng jí",
+        "explanation": "全国编号-995"
+    },
+    {
+        "idiom": "凉脊龙",
+        "pinyin": "liáng jǐ lóng",
+        "explanation": "全国编号-996"
+    },
+    {
+        "idiom": "冻脊龙",
+        "pinyin": "dòng jǐ lóng",
+        "explanation": "全国编号-997"
+    },
+    {
+        "idiom": "戟脊龙",
+        "pinyin": "jǐ jǐ lóng",
+        "explanation": "全国编号-998"
+    },
+    {
+        "idiom": "索财灵",
+        "pinyin": "suǒ cái líng",
+        "explanation": "全国编号-999"
+    },
+    {
+        "idiom": "赛富豪",
+        "pinyin": "sài fù háo",
+        "explanation": "全国编号-1000"
+    },
+    {
+        "idiom": "古简蜗",
+        "pinyin": "gǔ jiǎn wō",
+        "explanation": "全国编号-1001"
+    },
+    {
+        "idiom": "古剑豹",
+        "pinyin": "gǔ jiàn bào",
+        "explanation": "全国编号-1002"
+    },
+    {
+        "idiom": "古鼎鹿",
+        "pinyin": "gǔ dǐng lù",
+        "explanation": "全国编号-1003"
+    },
+    {
+        "idiom": "古玉鱼",
+        "pinyin": "gǔ yù yú",
+        "explanation": "全国编号-1004"
+    },
+    {
+        "idiom": "轰鸣月",
+        "pinyin": "hōng míng yuè",
+        "explanation": "全国编号-1005"
+    },
+    {
+        "idiom": "铁武者",
+        "pinyin": "tiě wǔ zhě",
+        "explanation": "全国编号-1006"
+    },
+    {
+        "idiom": "故勒顿",
+        "pinyin": "gù lè dùn",
+        "explanation": "全国编号-1007"
+    },
+    {
+        "idiom": "密勒顿",
+        "pinyin": "mì lè dùn",
+        "explanation": "全国编号-1008"
+    },
+    {
+        "idiom": "波荡水",
+        "pinyin": "bō dàng shuǐ",
+        "explanation": "全国编号-1009"
+    },
+    {
+        "idiom": "铁斑叶",
+        "pinyin": "tiě bān yè",
+        "explanation": "全国编号-1010"
+    },
+    {
+        "idiom": "裹蜜虫",
+        "pinyin": "guǒ mì chóng",
+        "explanation": "全国编号-1011"
+    },
+    {
+        "idiom": "斯魔茶",
+        "pinyin": "sī mó chá",
+        "explanation": "全国编号-1012"
+    },
+    {
+        "idiom": "来悲粗茶",
+        "pinyin": "lái bēi cū chá",
+        "explanation": "全国编号-1013"
+    },
+    {
+        "idiom": "够赞狗",
+        "pinyin": "gòu zàn gǒu",
+        "explanation": "全国编号-1014"
+    },
+    {
+        "idiom": "愿增猿",
+        "pinyin": "yuàn zēng yuán",
+        "explanation": "全国编号-1015"
+    },
+    {
+        "idiom": "吉雉鸡",
+        "pinyin": "jí zhì jī",
+        "explanation": "全国编号-1016"
+    },
+    {
+        "idiom": "厄诡椪",
+        "pinyin": "è guǐ pèng",
+        "explanation": "全国编号-1017"
+    },
+    {
+        "idiom": "铝钢桥龙",
+        "pinyin": "lǚ gāng qiáo lóng",
+        "explanation": "全国编号-1018"
+    },
+    {
+        "idiom": "蜜集大蛇",
+        "pinyin": "mì jí dà shé",
+        "explanation": "全国编号-1019"
+    },
+    {
+        "idiom": "破空焰",
+        "pinyin": "pò kōng yàn",
+        "explanation": "全国编号-1020"
+    },
+    {
+        "idiom": "猛雷鼓",
+        "pinyin": "měng léi gǔ",
+        "explanation": "全国编号-1021"
+    },
+    {
+        "idiom": "铁磐岩",
+        "pinyin": "tiě pán yán",
+        "explanation": "全国编号-1022"
+    },
+    {
+        "idiom": "铁头壳",
+        "pinyin": "tiě tóu ké",
+        "explanation": "全国编号-1023"
+    },
+    {
+        "idiom": "太乐巴戈斯",
+        "pinyin": "tài lè bā gē sī",
+        "explanation": "全国编号-1024"
+    },
+    {
+        "idiom": "桃歹郎",
+        "pinyin": "táo dǎi láng",
+        "explanation": "全国编号-1025"
+    }
+]
