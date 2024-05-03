@@ -399,7 +399,10 @@ export async function apply(ctx: Context) {
         let randomWord: string
         let translation: string
         let pinyin: string
-        const randomIdiom = getRandomFromStringList(commonIdiomsList);
+        let randomIdiom=''
+        do{
+          randomIdiom = getRandomFromStringList(commonIdiomsList)
+        }while(exam==='宝可影'&&randomIdiom.length>4)
         let selectedIdiom;
 
 
@@ -448,12 +451,18 @@ export async function apply(ctx: Context) {
 
             while (selectedWords.length < wordleIndex) {
               console.log('1')
-              let randomIdiom = getRandomFromStringList(commonIdiomsList);
+              let randomIdiom=''
+              do{
+                randomIdiom = getRandomFromStringList(commonIdiomsList)
+              }while(exam==='宝可影'&&randomIdiom.length>4)
               let selectedIdiom;
               selectedIdiom = await getSelectedIdiom(randomIdiom);
               while (selectedIdiom.idiom.length !== guessWordLength) {
                 console.log('3')
-                randomIdiom = getRandomFromStringList(commonIdiomsList);
+                let randomIdiom=''
+                do{
+                  randomIdiom = getRandomFromStringList(commonIdiomsList)
+                }while(exam==='宝可影'&&randomIdiom.length>4)
                 selectedIdiom = await getSelectedIdiom(randomIdiom);
               }
               pinyin = selectedIdiom.pinyin
