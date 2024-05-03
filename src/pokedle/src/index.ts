@@ -450,15 +450,17 @@ export async function apply(ctx: Context) {
           for (let wordleIndex = 2; wordleIndex < wordlesNum + 1; wordleIndex++) {
 
             while (selectedWords.length < wordleIndex) {
-              console.log('1')
-              let randomIdiom= getRandomFromStringList(commonIdiomsList)
+              let randomIdiom = getRandomFromStringList(commonIdiomsList);
               let selectedIdiom;
-              selectedIdiom = await getSelectedIdiom(randomIdiom);
-              while (selectedIdiom.idiom.length !== guessWordLength) {
-                console.log('3')
-                let randomIdiom= getRandomFromStringList(commonIdiomsList)
+
+
                 selectedIdiom = await getSelectedIdiom(randomIdiom);
-              }
+                while (selectedIdiom.idiom.length !== guessWordLength) {
+                  randomIdiom = getRandomFromStringList(commonIdiomsList);
+                  selectedIdiom = await getSelectedIdiom(randomIdiom);
+                }
+              
+
               pinyin = selectedIdiom.pinyin
               randomWordExtra = randomIdiom;
               translation = selectedIdiom.explanation
@@ -908,6 +910,8 @@ ${settlementResult}
 `;
 
         if (!config.isTextToImageConversionEnabled && isQQOfficialRobotMarkdownTemplateEnabled && session.platform === 'qq') {
+          if(getUnknown.id=='!'){getUnknown.id='gt'}
+          if(getUnknown.id=='?'){getUnknown.id='wh'}
           const unUrl=await toUrl(ctx, session, `file://${resolve(__dirname, `../../assets/img/unknown/${getUnknown.id}.png`)}`)
           let dimensions = imageSize(imageBuffer)
           const url = await toUrl(ctx, session, imageBuffer)
