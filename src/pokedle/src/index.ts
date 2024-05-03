@@ -969,6 +969,23 @@ ${gameDuration}${answerInfo}${processedResult}`
     }
     )
 
+    ctx.command('wordlegame.玩法介绍', '玩法介绍').action(async ({ session }) => {
+      const md=`
+# 宝可猜名
+      
+---
+## 宝可兜
+      
+- 格子数为待猜的宝可梦的名字字数，当你猜一个后，在名字上面会出现拼音，绿色即为正确，黄色为位置不对，灰色为当前名字里没有这个拼音。
+      
+## 宝可影
+      
+- 格子数为待猜的宝可梦的名字字数，当你猜一个后，会有重叠的笔画出现，笔画越接近，颜色越深（黑色或是灰色）。当笔画完全正确，则是绿色.
+      
+> 奖励：VIP将多获得5000的当日金币获取上限。3周目为积分0-500不等并且会获得一个未知图腾，用来召唤雷吉奇卡斯 。1、2周目为金币0-7500不等。
+`
+      await sendMarkdown(md, session)
+    })
   // wordleGame.查询进度 jd* cxjd*
   ctx.command('wordleGame.查询进度', '查询当前游戏进度')
     .action(async ({ session }) => {
