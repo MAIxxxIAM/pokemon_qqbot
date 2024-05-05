@@ -13,6 +13,17 @@ export function mudPath(a:string){
 
 }
 
+export interface PokemonBase{
+  id: string,
+  name: string,
+  hp: number,
+  att:number,
+  def: number,
+  spa: number,
+  spd: number,
+  spe: number,
+}
+
 export function calculateDistance(x1, y1, x2, y2) {
   let dx = x2 - x1
   let dy = y2 - y1
@@ -333,16 +344,26 @@ export async function censorText(ctx,text: string) {
   return b.attrs.content
 }
 
-export function baseFusion(a:number,b:number,){
-  let max = Math.max(a, b)
-  let min = Math.min(a, b)
-  let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
-  if((max - min) / max >=0.25) c=0
-  if(max==min){c=0.2}
-  max *= 0.8
-  min *= 0.2
-  return Math.floor((max+min)*(1+c))
+export function baseFusion(a:PokemonBase,b:PokemonBase,){
+  return  [
+    String(Math.floor(a.hp*2/3+b.hp*1/3)),
+    String(Math.floor(b.att*2/3+a.att*1/3)),
+    String(Math.floor(b.def*2/3+a.def*1/3)),
+    String(Math.floor(a.spa*2/3+b.spa*1/3)),
+    String(Math.floor(a.spd*2/3+b.spd*1/3)),
+    String(Math.floor(b.spe*2/3+a.spe*1/3))
+  ]
+
 }
+  // let max = Math.max(a, b)
+  // let min = Math.min(a, b)
+  // let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
+  // if((max - min) / max >=0.25) c=0
+  // if(max==min){c=0.2}
+  // max *= 0.8
+  // min *= 0.2
+  // return Math.floor((max+min)*(1+c))
+
 
 function arraysEqual(a: any[], b: any[]): boolean {
   if (a.length !== b.length) return false;

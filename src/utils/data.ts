@@ -12,12 +12,13 @@ import Fishing from '../assets/json/fishing.json'
 import { FishItem} from '../fishing/type'
 import DigItems from '../assets/json/digItem.json'
 import { DigItem } from '../digGame/type'
+import { PokemonBase } from './mothed'
 
 
 export const expToLv= exptolv
 export const expBase = expbase
 export const skillMachine = skillMachines
-export const pokemonBase = Base
+export const pokemonBase:PokemonBase[] = Base.Base
 export const type = Type
 export const battleType = bType
 
