@@ -1,6 +1,6 @@
 import { $, Context, Session } from "koishi"
 import { Pokedex } from "../pokedex/pokedex"
-import { PokemonPower, Skill } from "../battle"
+import { PokemonPower, Skill, Skills } from "../battle"
 import pokemonCal from "../utils/pokemon"
 import { config,Config  } from ".."
 import { natures } from "../utils/data"
@@ -214,6 +214,7 @@ export interface Pokebattle {
     skill: number
     coin?: number
     gold?: number
+    skillSlot?: Skill[]
     changeName?: number
     skillbag?: string[]
     trainer: string[]
@@ -228,6 +229,7 @@ export interface Pokebattle {
     cyberMerit?:number
     ultra?: object
     fly_count?:number
+    battle_log?:string
 }
 
 //宝可梦养成表
@@ -351,6 +353,11 @@ export async function model(ctx: Context) {
             initial: 0,
             nullable: false,
         },
+        skillSlot:{
+            type: 'json',
+            initial: [],
+            nullable: false,
+        },
         skillbag: 'list',
         trainer: 'list',
         trainerNum: 'unsigned',
@@ -365,6 +372,7 @@ export async function model(ctx: Context) {
             initial: 1,
             nullable: false,
         },
+        battle_log: 'string',
     }, {
         primary: "id"
     })

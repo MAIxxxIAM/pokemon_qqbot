@@ -50,11 +50,27 @@ const pokemonCal = {
       let pokeF = poke[0]
       let pokeM = poke[1]
       let BaseList = []
-        BaseList =baseFusion(pokemonBase[pokeF],pokemonBase[pokeM])
+        BaseList = [
+          String(baseFusion(Number(Base[pokeF].hp), Number(Base[pokeM].hp))),
+          String(baseFusion(Number(Base[pokeF].att), Number(Base[pokeM].att))),
+          String(baseFusion(Number(Base[pokeF].def), Number(Base[pokeM].def))),
+          String(baseFusion(Number(Base[pokeF].spa), Number(Base[pokeM].spa))),
+          String(baseFusion(Number(Base[pokeF].spd), Number(Base[pokeM].spd))),
+          String(baseFusion(Number(Base[pokeF].spe), Number(Base[pokeM].spe))),]
       return BaseList
     } catch {
       return []
     }
+    // try {
+    //   let poke = a.split('.')
+    //   let pokeF = poke[0]
+    //   let pokeM = poke[1]
+    //   let BaseList = []
+    //     BaseList =baseFusion(pokemonBase[pokeF],pokemonBase[pokeM])
+    //   return BaseList
+    // } catch {
+    //   return []
+    // }
   },
 
   pokemonlist(a) {

@@ -17,7 +17,7 @@ export interface Battlers{
     battlename: string
     hitSpeed: number
     power: PokemonPower
-    skill: number
+    skill: number|Skill[]
 }
 
 export interface WildPokemon{
@@ -38,6 +38,8 @@ export class Skill {
     dam:number
     hit:number
     descript:string
+    cd?:number
+    round?:number
     constructor (id:string|number){
         const skillId=Number(id)
         const skill=skillMachine.skill[skillId]
@@ -48,6 +50,8 @@ export class Skill {
         this.dam=skill.Dam
         this.hit=skill.hit
         this.descript=skill.descript
+        this.cd=Math.ceil(skill.Dam/49.9)
+        this.round=this.cd
     }
 
 }

@@ -1,4 +1,5 @@
 import { Pokebattle } from ".."
+import { Skill } from "../battle"
 import { PokemonList } from "../model"
 import pokemonCal from "./pokemon"
 
@@ -14,6 +15,7 @@ export class Robot implements Pokebattle {
     base: string[]
     power: string[]
     skill: number
+    skillSlot?: Skill[]
     trainer: string[]
     relex:Date
       
@@ -40,12 +42,13 @@ export class Robot implements Pokebattle {
                         down: 0
                     },
                     natureLevel: 0,
-                    power: [0, 0, 0, 0, 0, 0]
+                    power: [255, 255, 255, 255, 255, 255]
                 }
             ]
         }
         this.power=pokemonCal.power(this.base, this.level, botpoke, this.monster_1)
         this.skill= Math.floor(Math.random()* 150)+1
+        this.skillSlot=[new Skill(Math.floor(Math.random()* 150)+1),new Skill(Math.floor(Math.random()* 150)+1),new Skill(Math.floor(Math.random()* 150)+1),new Skill(Math.floor(Math.random()* 150)+1)]
         this.trainer=['robot']
         this.battleTimes=30
         this.battleToTrainer=30

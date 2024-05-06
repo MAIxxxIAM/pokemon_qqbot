@@ -112,22 +112,30 @@ export async function findFusion(nature:FusionPokemon,playerList:PokemonList){
   return index
 }
 
-export async function getPic(ctx, log, user, tar) {
+export async function getPic(ctx, log, user, tar,full=false) {
   try {
     let att: Pokebattle, def: Pokebattle
-    if (Number(user.power[5]) > Number(tar.power[5])) { att = user; def = tar } else { att = tar; def = user }
+    try{if (Number(user.power[5]) > Number(tar.power[5])) { att = user; def = tar } else { att = tar; def = user }}catch{
+      att = user
+      def = user
+    }
     const attPerson = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/trainer/${att.trainer[0]}.png`)}`)
     const defPerson = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/trainer/${def.trainer[0]}.png`)}`)
     const attPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${att.monster_1.split('.')[0]}/${att.monster_1}.png`)
     const defPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${def.monster_1.split('.')[0]}/${def.monster_1}.png`)
-    const backimage = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/components/battle.png`)}`)
+    const backimage1 = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/components/battle_1.png`)}`)
+    const backimage2 = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/components/battle_2.png`)}`)
+    const backimage3 = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/components/battle_3.png`)}`)
     let array = log.split('\n')
     let attCount: number
     let defCount: number
     if (array.length % 2 == 0) { attCount = array.length / 2; defCount = array.length / 2 - 1 } else { attCount = Math.floor(array.length / 2); defCount = Math.floor(array.length / 2) }
     let dataUrl: any
-    await ctx.canvas.render(712, 750, async (ctx) => {
-      ctx.drawImage(backimage, 0, 0, 712, 750)
+    const height =full&&array.length>=7?400+60*(array.length-1):750
+    await ctx.canvas.render(712, height, async (ctx) => {
+      ctx.drawImage(backimage2, 0, 0, 712,height)
+      ctx.drawImage(backimage1, 0, 0, 712, 560)
+      ctx.drawImage(backimage3, 0, height-110, 712, 110)
       ctx.save()
       ctx.translate(712 / 2, 0)
       ctx.scale(-1, 1)
@@ -140,11 +148,11 @@ export async function getPic(ctx, log, user, tar) {
       ctx.textBaseline = 'middle'
       ctx.font = 'normal 24px zpix'
       ctx.fillStyle = 'white'
-      ctx.fillText(array[array.length - 1], 356, 722)
+      ctx.fillText(array[array.length - 1], 356, height-28)
       ctx.fillStyle = 'black'
       for (let i = 0; i < array.length - 1; i++) {
         ctx.fillText(`⚔️${array[i]}⚔️`, 356, 300 + 60 * (i))
-        if (i > 4) { break }
+        if (i > 4&&!full) { break }
       }
       dataUrl = await ctx.canvas.toDataURL('image/jpeg')
     })
@@ -344,17 +352,27 @@ export async function censorText(ctx,text: string) {
   return b.attrs.content
 }
 
-export function baseFusion(a:PokemonBase,b:PokemonBase,){
-  return  [
-    String(Math.floor(a.hp*2/3+b.hp*1/3)),
-    String(Math.floor(b.att*2/3+a.att*1/3)),
-    String(Math.floor(b.def*2/3+a.def*1/3)),
-    String(Math.floor(a.spa*2/3+b.spa*1/3)),
-    String(Math.floor(a.spd*2/3+b.spd*1/3)),
-    String(Math.floor(b.spe*2/3+a.spe*1/3))
-  ]
-
+export function baseFusion(a:number,b:number,){
+  let max = Math.max(a, b)
+  let min = Math.min(a, b)
+  let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
+  if((max - min) / max >=0.25) c=0
+  if(max==min){c=0.2}
+  max *= 0.8
+  min *= 0.2
+  return Math.floor((max+min)*(1+c))
 }
+// export function baseFusion(a:PokemonBase,b:PokemonBase,){
+//   return  [
+//     String(Math.floor(a.hp*2/3+b.hp*1/3)),
+//     String(Math.floor(b.att*2/3+a.att*1/3)),
+//     String(Math.floor(b.def*2/3+a.def*1/3)),
+//     String(Math.floor(a.spa*2/3+b.spa*1/3)),
+//     String(Math.floor(a.spd*2/3+b.spd*1/3)),
+//     String(Math.floor(b.spe*2/3+a.spe*1/3))
+//   ]
+
+// }
   // let max = Math.max(a, b)
   // let min = Math.min(a, b)
   // let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1

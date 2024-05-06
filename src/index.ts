@@ -16,6 +16,7 @@ import * as fishing from './fishing/index'
 import crypto from 'crypto'
 import * as digGame from './digGame/index'
 import * as handleAndCiying from './pokedle/src'
+import imageSize from 'image-size'
 
 
 import { Robot } from './utils/robot'
@@ -25,6 +26,7 @@ import { Pokedex } from './pokedex/pokedex'
 import { pokebattle } from './battle/pvp'
 import { AddGroup, FusionPokemon, Pokebattle, PokemonList, PrivateResource, Resource, model, IntellegentBody } from './model'
 import { catchPokemon } from './battle/pve'
+import { Skill } from './battle'
 
 
 
@@ -1641,6 +1643,9 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
             return
           } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
         }
+        if(userArr[0].skillSlot.length == 0){
+          await session.send(`对战机制更新。请重新装备技能`)
+        }
         const playerList: PokemonList = await getList(session.userId, ctx, userArr[0].monster_1)
         let spendGold = userVip ? 249 : 500
         spendGold = (userLimit.resource.goldLimit == 0 && userArr[0].level == 100) ? 0 : spendGold
@@ -1651,12 +1656,13 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let img = ''
         if (userArr[0].monster_1 == '0') { commands = `杂交宝可梦` }
         if (userArr[0].skillbag.length == 0) { commands = `技能扭蛋机` }
+        if(userArr[0].skillSlot.length == 0){commands = `装备技能`}
         if (commands) {
           for (let i = 0; i < userArr[0].AllMonster.length; i++) {
-            img += `
-![img#20px #20px](${await toUrl(ctx, session, `${config.图片源}/sr/${userArr[0].AllMonster[i].split('.')[0]}.png`)})`
+            img += `![img#20px #20px](${await toUrl(ctx, session, `${config.图片源}/sr/${userArr[0].AllMonster[i].split('.')[0]}.png`)})`
           }
-          const md = `![img#50px #50px](https://q.qlogo.cn/qqapp/102072441/${session.userId}/640) **LV.${userArr[0].level}**${img}
+          const md = `![img#50px #50px](https://q.qlogo.cn/qqapp/102072441/${session.userId}/640) **LV.${userArr[0].level}**
+${img}
 
 ---
 <@${session.userId}>你还没有${commands}吧
@@ -1736,10 +1742,6 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
           power: tarArr[0].power
         })
         userArr[0].power = pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), userArr[0].level, playerList, userArr[0].monster_1)
-        await ctx.database.set('pokebattle', { id: session.userId }, {
-          gold: { $subtract: [{ $: 'gold' }, spendGold] },
-          power: userArr[0].power
-        })
         await session.send(`${userVip ? `你支付了会员价${spendGold}` : `你支付了${spendGold}`}金币，请稍等，正在发动了宝可梦对战`)
         if (tarArr[0].battleTimes == 0) {
           let noTrainer = battleSuccess ? session.elements[1].attrs.name : isVip(tarArr[0]) ? "[💎VIP]" : '' + (tarArr[0].name || tarArr[0].battlename)
@@ -1751,6 +1753,11 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let loser = battle[2]
         let win_count = 0
         let getScore = 0
+        await ctx.database.set('pokebattle', { id: session.userId }, {
+          gold: { $subtract: [{ $: 'gold' }, spendGold] },
+          power: userArr[0].power,
+          battle_log: battlelog+`??`+tarArr[0].id
+        })
         if (!user) {
           const index = playerList.pokemon.findIndex((pokeId) => pokeId.id === userArr[0].monster_1)
           win_count = (winner == session.userId) ? (playerList.win_count + 1) : 0
@@ -1813,6 +1820,7 @@ ${winner == session.userId ? `金币+${getgold}  ${user ? '指定对战无法获
                   { "buttons": [button(2, "♂ 杂交宝可梦", "/杂交宝可梦", session.userId, "1"), button(2, "📷 捕捉宝可梦", "/捕捉宝可梦", session.userId, "2")] },
                   { "buttons": [button(2, "💳 查看信息", "/查看信息", session.userId, "3"), button(2, "⚔️ 对战", "/对战", session.userId, "4")] },
                   { "buttons": [button(2, "🎯 对手信息", `/查看信息 ${userId}`, session.userId, "5"), button(2, "⚔️ 和他对战", `/对战 ${session.userId}`, session.userId, "6")] },
+                  { "buttons": [button(2, "📕 战斗详情", `/战斗详情 ${session.userId}`, session.userId, "5")] },
                 ]
               },
             },
@@ -1836,6 +1844,27 @@ ${jli}`
     })
 
 
+  ctx.command('宝可梦').subcommand('战斗详情 [id:text]', '查看宝可梦信息').action(async ({ session },id:string) => {
+    if(!id){
+      id=session.userId
+    }
+    const [player] :Pokebattle[]= await ctx.database.get('pokebattle', { id: id })
+    if (!player) {
+      try {
+        await session.execute(`签到`)
+        return
+      } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
+    }
+    const log=player.battle_log.split('??')[0]
+    const tar=player.battle_log.split('??')[1]
+    const tarLog=await ctx.database.get('pokebattle',{id:tar})
+    const img=await getPic(ctx,log,player,tarLog[0],true)
+    let imgBuffer=Buffer.from(img.split(',')[1],'base64')
+    let dimensions = imageSize(imgBuffer)
+    const md = `# <@${session.userId}>战斗详情
+![img#${dimensions.width}px #${dimensions.height}px](${await toUrl(ctx, session, img)})`
+    await sendMarkdown(md, session)
+  })
   ctx.command('宝可梦').subcommand('技能扭蛋机 [count:number]', '消耗扭蛋币，抽取技能')
     .usage(`/ 技能扭蛋机`)
     .action(async ({ session }, count) => {
@@ -1930,11 +1959,11 @@ ${bag.replace(/\n/g, '||')}`
     })
 
 
-  ctx.command('宝可梦').subcommand('装备技能 <skill>', '装备技能')
+  ctx.command('宝可梦').subcommand('装备技能 <skill>', '装备技能',{ minInterval: 1000 })
     .usage(`/装备技能 <技能名字>`)
     .action(async ({ session }, skill) => {
       if (!skill) return `请输入技能名称 例如：【装备技能 大爆炸】`
-      const userArr = await ctx.database.get('pokebattle', { id: session.userId })
+      const userArr:Pokebattle[]= await ctx.database.get('pokebattle', { id: session.userId })
       if (userArr.length == 0) {
         try {
           await session.execute(`签到`)
@@ -1942,11 +1971,41 @@ ${bag.replace(/\n/g, '||')}`
         } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
       if (!userArr[0].skillbag.includes(String(pokemonCal.findskillId(skill)))) return `${h('at', { id: (session.userId) })}你还没有这个技能哦`
+      if(userArr[0].skillSlot.some(skills=>skills.name==skill)) return `你已经装备了该技能`
+      if(userArr[0].skillSlot.length>=4){
+        const getSkill=new Skill(pokemonCal.findskillId(skill))
+        const md=`<@${session.userId}>你的技能栏位已满，请选择替换技能
+当前技能：
 
+> ${getSkill.name} 威力:${getSkill.dam} 属性:${getSkill.type} 类型:${getSkill.category == 1 ? '物理' : "特殊"} 冷却回合:${getSkill.cd}
+
+---
+> ${userArr[0].skillSlot[0].name} 威力：${userArr[0].skillSlot[0].dam} 属性：${userArr[0].skillSlot[0].type} 类型：${userArr[0].skillSlot[0].category == 1 ? '物理' : "特殊"} 冷却回合：${userArr[0].skillSlot[0].cd}
+${userArr[0].skillSlot[1].name} 威力：${userArr[0].skillSlot[1].dam} 属性：${userArr[0].skillSlot[1].type} 类型：${userArr[0].skillSlot[1].category == 1 ? '物理' : "特殊"} 冷却回合：${userArr[0].skillSlot[1].cd}
+${userArr[0].skillSlot[2].name} 威力：${userArr[0].skillSlot[2].dam} 属性：${userArr[0].skillSlot[2].type} 类型：${userArr[0].skillSlot[2].category == 1 ? '物理' : "特殊"} 冷却回合：${userArr[0].skillSlot[2].cd}
+${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性：${userArr[0].skillSlot[3].type} 类型：${userArr[0].skillSlot[3].category == 1 ? '物理' : "特殊"} 冷却回合：${userArr[0].skillSlot[3].cd}`
+        const kb ={
+          keyboard: {
+            content: {
+              "rows": [
+                { "buttons": [button(2, userArr[0].skillSlot[0].name, "1", session.userId, "1"),button(2, userArr[0].skillSlot[1].name, "2", session.userId, "2")] },
+                { "buttons": [button(2, userArr[0].skillSlot[2].name, "3", session.userId, "3"),button(2, userArr[0].skillSlot[3].name, "4", session.userId, "4")] },
+              ]
+            },
+          },
+        }
+        await sendMarkdown(md, session, kb)
+        const reputSkill=await session.prompt(50000)
+        if(!reputSkill)return `操作超时`
+        if(!userArr[0].skillSlot[reputSkill-1])return `输入错误，请重新输入`
+        userArr[0].skillSlot[reputSkill-1]=new Skill(pokemonCal.findskillId(skill))
+      }else{
+        userArr[0].skillSlot.push(new Skill(pokemonCal.findskillId(skill)))
+      }
       await ctx.database.set('pokebattle', { id: session.userId }, {
-        skill: Number(pokemonCal.findskillId(skill)),
+        skillSlot: userArr[0].skillSlot,
       })
-      return `${h('at', { id: (session.userId) })}成功装备了【${skill}】技能`
+      return `${h('at', { id: (session.userId) })}成功装备了【${skill}】技能${userArr[0].skillSlot.length==4?'':`你还可以装备${4-userArr[0].skillSlot.length}个技能哦`}`
     })
 
 

@@ -1,7 +1,7 @@
 import { Pokebattle, logger } from '..';
 import { skillMachine } from '../utils/data';
 import { typeEffect } from '../utils/mothed';
-import { Battlers, PokemonPower } from './';
+import { Battlers, PokemonPower, Skill, Skills } from './';
 import { PVE } from './pve';
 
 export class PVP implements Battlers {
@@ -12,7 +12,8 @@ export class PVP implements Battlers {
     battlename: string
     hitSpeed: number
     power: PokemonPower
-    skill: number
+    // skill: number
+    skill:Skill[]
     constructor(player1:Pokebattle) {
         this.id= player1.id
         this.name= player1.name
@@ -28,35 +29,69 @@ export class PVP implements Battlers {
             specialDefense: Number(player1.power[4]),
             speed: Number(player1.power[5])
         }
-        this.skill= player1.skill
+        this.skill=[]
+        player1.skillSlot?player1.skillSlot.forEach(S => {
+            this.skill.push(new Skill(S.id))
+        }):null
+        this.skill=this.skill.sort((b,a)=>a.dam-b.dam)
     }
     private getKeys<T>(obj: T,category:number): (keyof T) {
         return Object.keys(obj)[category] as (keyof T)
     }
 
     attack(target:PVP){
+      //remake
+      this.skill.forEach(S => {
+        if (S?.round > 0) { S.round-- }
+    })
+      let readySkill = this.skill.find(S =>S?.round == 0)
+      if (!readySkill) {
+        readySkill = new Skill(0)
+    }
+      //old
         const hit=Math.random() <this.hitSpeed/4/256?2:1
-        const skillCategory = skillMachine.skill[this.skill].category
+        const skillCategory = readySkill.category
         const attCategory=skillCategory
         const defCategory=attCategory+1
-        const Effect =typeEffect(this.monster_1,target.monster_1,skillMachine.skill[this.skill].type)
-        let damage = Math.floor(((2 * this.level + 10) / 250 * this.power[this.getKeys(this.power,attCategory)] / (1.7*target.power[this.getKeys(target.power,defCategory)]) * skillMachine.skill[this.skill].Dam + 2) *hit*Effect*(Math.random()*0.15+0.85))
+        const Effect =typeEffect(this.monster_1,target.monster_1,readySkill.type)
+        let damage = Math.floor(((2 * this.level + 10) / 250 * this.power[this.getKeys(this.power,attCategory)] / (1.7*target.power[this.getKeys(target.power,defCategory)]) * readySkill.dam + 2) *hit*Effect*(Math.random()*0.15+0.85))
         target.power.hp = target.power.hp - damage
+        target.power.hp=target.power.hp<0?0:target.power.hp
       const log=  hit==2?(`*${this.battlename}击中要害,对${target.battlename}造成 ${Math.floor(damage)} 伤害*`):
-        (`${this.battlename}的 [${skillMachine.skill[this.skill].skill}]，造成 ${Math.floor(damage)} 伤害,${target.battlename}剩余${Math.floor(target.power.hp)}HP`)
+        (`${this.battlename}的 [${readySkill.name}]，造成 ${Math.floor(damage)} 伤害,${target.battlename}剩余${Math.floor(target.power.hp)}HP`)
+        this.skill.forEach(S => {
+          if (S?.id == readySkill.id) {
+              S.round = S.cd
+          }
+      })
         return log
     }
     wildAttack(target:PVE){
+            //remake
+            this.skill.forEach(S => {
+              if (S?.round > 0) { S.round-- }
+          })
+      
+            let readySkill = this.skill[0]
+            if (!readySkill) {
+              readySkill = new Skill(0)
+          }
+            //old
       const hit=Math.random() <this.hitSpeed/4/256?2:1
-      const skillCategory = skillMachine.skill[this.skill].category
+      const skillCategory = readySkill.category
       const attCategory=skillCategory
       const defCategory=attCategory+1
-      const Effect =typeEffect(this.monster_1,target.id,skillMachine.skill[this.skill].type)
-      let damage = Math.floor(((2 * this.level + 10) / 250 * this.power[this.getKeys(this.power,attCategory)] / (1.7*target.power[this.getKeys(target.power,defCategory)]) * skillMachine.skill[this.skill].Dam + 2) *hit*Effect*(Math.random()*0.15+0.85))
+      const Effect =typeEffect(this.monster_1,target.id,readySkill.type)
+      let damage = Math.floor(((2 * this.level + 10) / 250 * this.power[this.getKeys(this.power,attCategory)] / (1.7*target.power[this.getKeys(target.power,defCategory)]) * readySkill.dam + 2) *hit*Effect*(Math.random()*0.15+0.85))
       target.power.hp = target.power.hp - damage
       target.power.hp=target.power.hp<0?0:target.power.hp
     const log=  hit==2?(`*${this.battlename}击中要害,对${target.name}造成 ${Math.floor(damage)} 伤害*`):
-      (`${this.battlename}的 [${skillMachine.skill[this.skill].skill}]，造成 ${Math.floor(damage)} 伤害,${target.name}剩余${Math.floor(target.power.hp)}HP`)
+      (`${this.battlename}的 [${readySkill.name}]，造成 ${Math.floor(damage)} 伤害,${target.name}剩余${Math.floor(target.power.hp)}HP`)
+      this.skill.forEach(S => {
+        if (S?.id == readySkill.id) {
+            S.round = S.cd
+        }
+    })
       return log
   }
 }
