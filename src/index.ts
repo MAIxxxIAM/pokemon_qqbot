@@ -1859,7 +1859,8 @@ ${jli}`
     const tar=player.battle_log.split('??')[1]
     const tarLog=await ctx.database.get('pokebattle',{id:tar})
     const img=await getPic(ctx,log,player,tarLog[0],true)
-    let imgBuffer=Buffer.from(img.split(',')[1],'base64')
+    const imgContent=img.replace(/^data:image\/\w+;base64,/, "")
+    const imgBuffer = Buffer.from(imgContent, 'base64')
     let dimensions = imageSize(imgBuffer)
     const md = `# <@${session.userId}>战斗详情
 ![img#${dimensions.width}px #${dimensions.height}px](${await toUrl(ctx, session, img)})`

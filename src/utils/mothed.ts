@@ -130,9 +130,8 @@ export async function getPic(ctx, log, user, tar,full=false) {
     let attCount: number
     let defCount: number
     if (array.length % 2 == 0) { attCount = array.length / 2; defCount = array.length / 2 - 1 } else { attCount = Math.floor(array.length / 2); defCount = Math.floor(array.length / 2) }
-    let dataUrl: any
     const height =full&&array.length>=7?400+60*(array.length-1):750
-    await ctx.canvas.render(712, height, async (ctx) => {
+    const dataUrl=await ctx.canvas.render(712, height, async (ctx) => {
       ctx.drawImage(backimage2, 0, 0, 712,height)
       ctx.drawImage(backimage1, 0, 0, 712, 560)
       ctx.drawImage(backimage3, 0, height-110, 712, 110)
@@ -154,9 +153,9 @@ export async function getPic(ctx, log, user, tar,full=false) {
         ctx.fillText(`⚔️${array[i]}⚔️`, 356, 300 + 60 * (i))
         if (i > 4&&!full) { break }
       }
-      dataUrl = await ctx.canvas.toDataURL('image/jpeg')
     })
-    return dataUrl
+    const {src} =dataUrl.attrs
+    return src
   } catch (e) {
     logger.info(e)
     return `渲染失败`
