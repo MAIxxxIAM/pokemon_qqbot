@@ -121,7 +121,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
     })
 
 
-    ctx.command('宝可梦').subcommand('钓鱼',).action(async ({ session }) => {
+    ctx.command('宝可梦').subcommand('钓鱼','3周目才可以使用的功能').action(async ({ session }) => {
         const [player] = await ctx.database.get('pokebattle', session.userId)
         if (!player) {
             await session.execute('签到')

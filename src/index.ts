@@ -60,7 +60,6 @@ export interface Config {
   QQ官方使用MD: boolean
   签到获得个数: number
   是否开启友链: boolean
-  是否开启文本审核: boolean
   金币获取上限: number
   精灵球定价: number
   训练师定价: number
@@ -92,7 +91,6 @@ export const Config = Schema.intersect([
   Schema.object({
     指令使用日志: Schema.boolean().default(false).description('是否输出指令使用日志'),
     是否开启友链: Schema.boolean().default(false).description('是否开启友链'),
-    是否开启文本审核: Schema.boolean().default(false).description('是否开启文本审核'),
   }),
   Schema.object({
     图片源: Schema.string().default('https://gitee.com/maikama/pokemon-fusion-image/raw/master').description(`
@@ -208,12 +206,6 @@ export let legendaryPokemonId = {}
 
 export async function apply(ctx, conf: Config) {
   config = conf
-  if (config.是否开启文本审核) {
-    ctx.on('before-send', async (session: Session) => {
-      const a = await ctx.censor.transform(session.event.message.elements)
-      session.event.message.elements = a
-    })
-  }
   ctx.on('before-send', async (session: Session, msg_id) => {
     const { message } = session.event
     if (session.scope !== 'commands.help.messages' || session.platform !== 'qq') { return }
@@ -227,6 +219,7 @@ export async function apply(ctx, conf: Config) {
     let mdparam = `
 指令  说明`
     for (let i = 0; i < content.length; i++) {
+      if(!content[i][0]) continue
       mdparam += `
 ---
 [${content[i][0]}](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`${content[i][0]}`)}&reply=false&enter=true) ${content[i][1]}
@@ -321,6 +314,7 @@ export async function apply(ctx, conf: Config) {
   })
 
   ctx.on('guild-added', async (session) => {
+    const { id }=session.event._data
     const { group_openid, op_member_openid } = session.event._data.d
     const addGroup: AddGroup[] = await ctx.database.get('pokemon.addGroup', { id: op_member_openid })
     let a: number
@@ -344,6 +338,13 @@ export async function apply(ctx, conf: Config) {
       const resource = new PrivateResource(b.resource.goldLimit)
       await resource.addGold(ctx, a, op_member_openid)
     }
+    const md=`![img #408px #456px](${await toUrl(ctx, session, fs.readFileSync('./friendlink.png'))})
+我是麦麦！(*/ω＼*)。
+是博士做出来帮助训练师们的机器人少女噢~
+✨我有好多好玩的功能！✨
+可以点我头像看 **使用文档**
+或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`
+    sendMarkdown(md, session,null,id)
   })
 
 

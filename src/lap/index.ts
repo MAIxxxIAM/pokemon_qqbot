@@ -33,7 +33,7 @@ export function apply(ctx: Context) {
     }
   })
 
-  ctx.command('宝可梦').subcommand('getChance','领取下一周目资格').action(async ({ session }) => {
+  ctx.command('宝可梦').subcommand('周目内容','周目相关指令').subcommand('getChance','领取下一周目资格').action(async ({ session }) => {
     const [player]=await ctx.database.get('pokebattle',session.userId)
     const chance=await getChance(player,ctx)
     if(chance){
@@ -54,13 +54,13 @@ export function apply(ctx: Context) {
     return `条件不满足，非全图鉴玩家需要满级玩家对战积分排行前十名（每两天排行一次），且每个传说宝可梦至少遇到一次`
   })
 
-  ctx.command('宝可梦').subcommand('刷新字段',{authority: 4}).action(async () => {
+  ctx.command('宝可梦').subcommand('周目内容','周目相关指令').subcommand('刷新字段',{authority: 4}).action(async () => {
     await ctx.database.set('pokemon.resourceLimit', {}, row => ({
       rankScore: 0
     }))
     return '刷新成功'
   })
-  ctx.command('宝可梦').subcommand('lapnext', '进入下一周目')
+  ctx.command('宝可梦').subcommand('周目内容','周目相关指令').subcommand('lapnext', '进入下一周目')
     .alias('下周目').action(async ({ session }) => {
       const { userId } = session
       const [user] = await ctx.database.get('pokebattle', userId)
@@ -132,7 +132,7 @@ export function apply(ctx: Context) {
 
     })
 
-  ctx.command('宝可梦').subcommand('lapTwo', '进入二周目')
+  ctx.command('宝可梦').subcommand('周目内容','周目相关指令').subcommand('lapTwo', '进入二周目')
     .action(async ({ session }) => {
       const { userId, platform } = session
       const userArr = await ctx.database.get('pokebattle', userId)
@@ -211,7 +211,7 @@ export function apply(ctx: Context) {
 
     })
 
-  ctx.command('宝可梦').subcommand('ultra', '传说中的宝可梦收集值')
+  ctx.command('宝可梦').subcommand('周目内容','周目相关指令').subcommand('ultra', '传说中的宝可梦收集值')
     .action(async ({ session }) => {
       const { userId } = session
       const userArr = await ctx.database.get('pokebattle', userId)

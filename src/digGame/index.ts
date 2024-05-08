@@ -7,7 +7,7 @@ import pokemonCal from "../utils/pokemon";
 import { config } from "..";
 
 export async function apply(ctx: any) {
-    ctx.command('宝可梦').subcommand('dig [position:text]')
+    ctx.command('宝可梦').subcommand('化石挖掘','挖掘化石相关指令').subcommand('dig [position:text]')
         .alias('挖掘')
         .action(async ({ session }, position: string) => {
             let MdString = ''
@@ -76,7 +76,7 @@ export async function apply(ctx: any) {
             await ctx.database.set('pokebattle', session.userId, row => ({
                 fossil_bag:player.fossil_bag
             }))}
-            const md = `化石挖掘中
+            const md = `化石挖掘','挖掘化石相关指令中
 ---
 ![img#550px #384px](${await toUrl(ctx, session, src)})
 
@@ -107,7 +107,7 @@ ${MdString}
             }
             await sendMarkdown(md, session, kb)
         })
-        ctx.command('宝可梦').subcommand('切换工具')
+        ctx.command('宝可梦').subcommand('化石挖掘','挖掘化石相关指令').subcommand('切换工具')
         .action(async ({ session }) => {
             const [player]: Pokebattle[] = await ctx.database.get('pokebattle', session.userId)
             if (!player) {
@@ -121,7 +121,7 @@ ${MdString}
             return `工具已切换为${player.tool === 1 ? '镐子' : '锤子'}`
         })
 
-        ctx.command('宝可梦').subcommand('dig').subcommand('售出 <id:text>',{minInterval:2000}).action(async ({ session }, id: string) => {
+        ctx.command('宝可梦').subcommand('化石挖掘','挖掘化石相关指令').subcommand('dig').subcommand('售出 <id:text>',{minInterval:2000}).action(async ({ session }, id: string) => {
             const [player]: Pokebattle[] = await ctx.database.get('pokebattle', session.userId)
             if (!player) {
                 await session.execute('签到') 
@@ -175,7 +175,7 @@ ${MdString}
             return `你售出了${fossil.name}，获得了${fossil.score}积分`
         })
 
-        ctx.command('宝可梦').subcommand('dig').subcommand('融合化石').action(async ({ session }) => {
+        ctx.command('宝可梦').subcommand('化石挖掘','挖掘化石相关指令').subcommand('dig').subcommand('融合化石').action(async ({ session }) => {
             const [player]: Pokebattle[] = await ctx.database.get('pokebattle', session.userId)
             if (!player) {
                 await session.execute('签到') 

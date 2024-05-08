@@ -352,7 +352,10 @@ export async function apply(ctx: Context) {
       .option('wordles', '--wordles <value:number> 同时猜测多个', { fallback: 1 })
       .action(async ({ session, options }) => {
         let { channelId, userId, username, timestamp, platform } = session;
-
+        const [player]:Pokebattle[]=await ctx.database.get('pokebattle',userId)
+        if(!player){
+          await session.execute('签到')
+        }
         username = await getSessionUserName(session)
         await updateNameInPlayerRecord(session, userId, username)
         if (isQQOfficialRobotMarkdownTemplateEnabled && session.platform === 'qq') {

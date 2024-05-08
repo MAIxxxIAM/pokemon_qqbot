@@ -298,7 +298,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
 }
 
 
-export async function sendMarkdown(a: string, session: Session, button = null) {
+export async function sendMarkdown(a: string, session: Session, button = null,eventId=null) {
   const b = getMarkdownParams(a)
  return await session.bot.internal.sendMessage(session.guildId, Object.assign({
     content: "111",
@@ -307,10 +307,9 @@ export async function sendMarkdown(a: string, session: Session, button = null) {
       custom_template_id: '102072441_1711377105',
       params: b
     },
-    msg_id: session.messageId,
     timestamp: session.timestamp,
     msg_seq: Math.floor(Math.random() * 1000000),
-  }, button))
+  }, button,eventId?{event_id:eventId}:{msg_id: session.messageId,}))
 }
 
 export async function toUrl(ctx, session, img) {
