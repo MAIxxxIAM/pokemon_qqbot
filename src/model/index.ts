@@ -372,7 +372,7 @@ export async function model(ctx: Context) {
             initial: 1,
             nullable: false,
         },
-        battle_log: 'string',
+        battle_log: 'text',
     }, {
         primary: "id"
     })
