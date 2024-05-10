@@ -28,7 +28,7 @@ const pokemonCal = {
     try {
       let c = ['0', '0', '0', '0', '0', '0']
       for (let i = 0; i < a.length; i++) {
-        c[i] = String(Math.round((Number(a[i]) + 30 + Math.round(powerUp[i] / 8)) * b / 50 + 5))
+        c[i] = String(Math.round((Number(a[i]) + 30 + powerUp[i] / 8) * b / 50 + 5))
       }
       c[nature.up] = String(Math.ceil(Number(c[nature.up]) * (1+powerNatrue.natureLevel * 0.01)))
       c[nature.down] = String(Math.floor(Number(c[nature.down]) * (1-powerNatrue.natureLevel * 0.01)))
@@ -152,11 +152,8 @@ const pokemonCal = {
   
 
   pokemonskill(a: number) {
-
-    if (Math.random() >= 0.1 * Math.floor(a / 10)) {
-      return Math.floor(Math.random() * 100+1)
-    } else return Math.floor(Math.random() * (111)) + 100
-  },
+  return Math.floor(Math.random() * 210) + 1
+},
 
   skillbag(a: string[]) {
    const b=a.map(Number).sort((a, b) => a - b)

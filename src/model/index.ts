@@ -6,6 +6,7 @@ import { config,Config  } from ".."
 import { natures } from "../utils/data"
 import { DigItem, DigMine } from "../digGame/type"
 import { unknowns } from "../pokedle/src/type/type"
+import { Trainer } from "../trainer/type"
 
 
 //智能体兼容
@@ -219,7 +220,8 @@ export interface Pokebattle {
     skillbag?: string[]
     trainer: string[]
     trainerNum?: number
-    trainerName?: string[]
+    trainerIndex?: number
+    trainer_list?:Trainer[]
     isfish?: boolean
     lapTwo?: boolean
     advanceChance?: boolean
@@ -361,10 +363,23 @@ export async function model(ctx: Context) {
         skillbag: 'list',
         trainer: 'list',
         trainerNum: 'unsigned',
-        trainerName: 'list',
+        trainerIndex:{
+            type: 'unsigned',
+            initial: 0,
+            nullable: false,
+        },
         fly_count: {
             type: 'unsigned',
             initial: 20,
+            nullable: false,
+        },
+        trainer_list:{
+            type: 'json',
+            initial: [{
+                tid:0,
+                name:'默认训练师',
+                source_name:'red'
+            }],
             nullable: false,
         },
         tool:{

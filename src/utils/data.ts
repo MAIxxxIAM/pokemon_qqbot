@@ -13,7 +13,8 @@ import { FishItem} from '../fishing/type'
 import DigItems from '../assets/json/digItem.json'
 import { DigItem } from '../digGame/type'
 import { PokemonBase } from './mothed'
-
+import trainerList from '../assets/json/trainerList.json'
+import { Trainer } from '../trainer/type'
 
 export const expToLv= exptolv
 export const expBase = expbase
@@ -26,3 +27,4 @@ export const skills=new Skills(skillMachines.skill)
 export const natures:Natures[] = nature
 export const fishing:FishItem[] =Fishing
 export const digItems:DigItem[] = DigItems
+export const trainer_list:Trainer[]=trainerList

@@ -119,8 +119,10 @@ export async function getPic(ctx, log, user, tar,full=false) {
       att = user
       def = user
     }
-    const attPerson = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/trainer/${att.trainer[0]}.png`)}`)
-    const defPerson = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/trainer/${def.trainer[0]}.png`)}`)
+    const attTrainer=att.trainer_list.find(train=>train.tid==att.trainerIndex)
+    const defTrainer=def.trainer_list.find(train=>train.tid==def.trainerIndex)
+    const attPerson = await ctx.canvas.loadImage(`${config.图片源}/trainers/${attTrainer.source_name}.png`)
+    const defPerson = await ctx.canvas.loadImage(`${config.图片源}/trainers/${defTrainer.source_name}.png`)
     const attPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${att.monster_1.split('.')[0]}/${att.monster_1}.png`)
     const defPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${def.monster_1.split('.')[0]}/${def.monster_1}.png`)
     const backimage1 = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/components/battle_1.png`)}`)
@@ -200,7 +202,8 @@ export async function getWildPic(ctx, log: string, user: Pokebattle, tar: string
     let player: Pokebattle, wild: string
     player = user
     wild = tar.split('.')[0]
-    const attPerson = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/trainer/${player.trainer[0]}.png`)}`)
+    const playerTrainer=player.trainer_list.find(train=>train.tid==player.trainerIndex)
+    const attPerson = await ctx.canvas.loadImage(`${config.图片源}/trainers/${playerTrainer.source_name}.png`)
     const attPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${player.monster_1.split('.')[0]}/${player.monster_1}.png`)
     const defPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${wild}/${wild}.png`)
     const backimage = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/components/battle.png`)}`)
@@ -287,7 +290,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
           {
             "buttons": [
               button(2, "化石挖掘", "/挖掘 ", session.userId, "w"),
-              button(2, "宝可猜名", "/wordlegame.开始 ", session.userId, "q"),
+              button(2, "宝可猜名", "/开始猜名 ", session.userId, "q"),
             ]
           },
           config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },

@@ -1,4 +1,4 @@
-import { Schema, h, $,is, Context, Session } from 'koishi'
+import { Schema, h, $, is, Context, Session } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
@@ -17,6 +17,7 @@ import crypto from 'crypto'
 import * as digGame from './digGame/index'
 import * as handleAndCiying from './pokedle/src'
 import imageSize from 'image-size'
+import * as trainercmd from './trainer/index'
 
 
 import { Robot } from './utils/robot'
@@ -219,7 +220,7 @@ export async function apply(ctx, conf: Config) {
     let mdparam = `
 指令  说明`
     for (let i = 0; i < content.length; i++) {
-      if(!content[i][0]) continue
+      if (!content[i][0]) continue
       mdparam += `
 ---
 [${content[i][0]}](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`${content[i][0]}`)}&reply=false&enter=true) ${content[i][1]}
@@ -271,7 +272,7 @@ export async function apply(ctx, conf: Config) {
     //   token:1500
     // }))
     await ctx.database.set('pokebattle', {}, row => ({
-      vip: $.if($.gt(row.vip,0), $.sub(row.vip, 1), 0),
+      vip: $.if($.gt(row.vip, 0), $.sub(row.vip, 1), 0),
       fly_count: 20
     }))
   })
@@ -292,7 +293,7 @@ export async function apply(ctx, conf: Config) {
   })
 
   ctx.cron('0 0 */2 * *', async () => {
-    await ctx.database.set('pokemon.resourceLimit', { rank: { $gt: 0 } }, row => ({
+    await ctx.database.set('pokemon.resourceLimit', {}, row => ({
       rank: 0,
     }))
     const unplayer: Pokebattle[] = await ctx.database
@@ -314,7 +315,7 @@ export async function apply(ctx, conf: Config) {
   })
 
   ctx.on('guild-added', async (session) => {
-    const { id }=session.event._data
+    const { id } = session.event._data
     const { group_openid, op_member_openid } = session.event._data.d
     const addGroup: AddGroup[] = await ctx.database.get('pokemon.addGroup', { id: op_member_openid })
     let a: number
@@ -338,13 +339,13 @@ export async function apply(ctx, conf: Config) {
       const resource = new PrivateResource(b.resource.goldLimit)
       await resource.addGold(ctx, a, op_member_openid)
     }
-    const md=`![img #408px #456px](${await toUrl(ctx, session, fs.readFileSync('./friendlink.png'))})
+    const md = `![img #408px #456px](${await toUrl(ctx, session, fs.readFileSync('./friendlink.png'))})
 我是麦麦！(*/ω＼*)。
 是博士做出来帮助训练师们的机器人少女噢~
 ✨我有好多好玩的功能！✨
 可以点我头像看 **使用文档**
 或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`
-    sendMarkdown(md, session,null,id)
+    sendMarkdown(md, session, null, id)
   })
 
 
@@ -354,6 +355,8 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(fishing)
   ctx.plugin(digGame)
   ctx.plugin(handleAndCiying)
+  ctx.plugin(trainercmd)
+
 
   if (config.指令使用日志) {
     ctx.on('command/before-execute', ({ session, command }) => {
@@ -429,6 +432,7 @@ export async function apply(ctx, conf: Config) {
 
   ctx.command('宝可梦').subcommand('宝可梦签到', '每日的宝可梦签到')
     .action(async ({ session }) => {
+      if (session.userId == '') return
       const userArr: Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
       await isResourceLimit(session.userId, ctx)
       const vip = isVip(userArr[0])
@@ -491,8 +495,6 @@ export async function apply(ctx, conf: Config) {
               power: pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew, playerList, userArr[0].monster_1),
               coin: { $add: [{ $: 'coin' }, config.签到获得个数 + vipCoin] },
               gold: { $add: [{ $: 'gold' }, (userArr[0].lap > 2 ? 10000 : 3000) + vipRGold] },
-              trainer: userArr[0].trainer[0] ? userArr[0].trainer : ['0'],
-              trainerName: userArr[0].trainerName[0] ? userArr[0].trainerName : ['默认训练师']
             })
 
             await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
@@ -502,6 +504,7 @@ export async function apply(ctx, conf: Config) {
           //图片服务
           let image = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', '签到.png')}`)
           let pokemonimg = await ctx.canvas.loadImage(`${config.图片源}/sr/0.png`)
+          const playerTrainer = userArr[0].trainer_list.find(train => train.tid == userArr[0].trainerIndex)
           let pokemonimg1 = []
           for (let i = 0; i < userArr[0].AllMonster.length; i++) {
             pokemonimg1[i] = await ctx.canvas.loadImage(`${config.图片源}/sr/${userArr[0].AllMonster[i].split('.')[0]}.png`)
@@ -511,9 +514,7 @@ export async function apply(ctx, conf: Config) {
             ultramonsterimg[i] = await ctx.canvas.loadImage(`${config.图片源}/sr/${banID[i].split('.')[0]}.png`)
           }
           if (userArr[0].monster_1 !== '0') pokemonimg = await ctx.canvas.loadImage(`${config.图片源}/fusion/${userArr[0].monster_1.split('.')[0]}/${userArr[0].monster_1}.png`)
-          let trainers = '0'
-          if (userArr[0].trainer[0] !== '0') { trainers = userArr[0].trainer[0] }
-          let trainerimg = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/trainer/' + trainers + '.png')}`)
+          let trainerimg = await ctx.canvas.loadImage(`${config.图片源}/trainers/${playerTrainer.source_name}.png`)
           let expbar = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', 'expbar.png')}`)
           let overlay = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', 'overlay_exp.png')}`)
           let time = Date.now()
@@ -613,8 +614,6 @@ ${chance ? `---
           AllMonster: [firstMonster,],
           coin: config.签到获得个数,
           gold: 3000,
-          trainer: ['0'],
-          trainerName: ['默认训练师']
         })
         //图片服务
         const bg_img = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', 'spawn.png')}`)
@@ -665,7 +664,7 @@ ${chance ? `---
         } catch (e) { return `请先输入签到指令领取属于你的宝可梦和精灵球` }
 
       } else {
-        if(userArr[0].isPut){
+        if (userArr[0].isPut) {
           return `请先完成放生后再进行捕捉`
         }
         let pokeM = []
@@ -903,7 +902,7 @@ ${(h('at', { id: (session.userId) }))}
             getGold = userArr[0].level > 99 ? Math.floor(pokemonCal.mathRandomInt(200, 400) * vipReward) : 0
             const resource = await isResourceLimit(session.userId, ctx)
             const rLimit = new PrivateResource(resource.resource.goldLimit)
-            getGold=await rLimit.getGold(ctx, getGold, session.userId)
+            getGold = await rLimit.getGold(ctx, getGold, session.userId)
             lvNew = pokemonCal.expCal(userArr[0].level, userArr[0].exp + expGet)[0]
           }
           result = userArr[0].monster_1 == '0' ? true : result
@@ -1074,10 +1073,7 @@ ${(h('at', { id: (session.userId) }))}
           const md = `# <@${session.userId}>选择两只宝可梦
 ![img#512px #381px](${await toUrl(ctx, session, src)})
 ---
-当前你也可以 [点击这里杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(` `)}&reply=false&enter=false)
-
----
-> 听说相同宝可梦也可以杂交，似乎就是会出现基因缺陷`
+当前你也可以 [点击这里杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(` `)}&reply=false&enter=false)`
           const kb = {
             keyboard: {
               content: {
@@ -1297,6 +1293,7 @@ ${(h('at', { id: (session.userId) }))}`
         const playerLimit = await isResourceLimit(session.userId, ctx)
         const infoId = userArr[0].id.length > 15 ? `${userArr[0].id.slice(0, 3)}...${userArr[0].id.slice(-3)}` : userArr[0].id
         const infoName = userArr[0].name ? userArr[0].name : session.username > 10 ? session.username : infoId
+        const playerTrainer = userArr[0].trainer_list.find(train => train.tid == userArr[0].trainerIndex)
         for (let i = 0; i < userArr[0].AllMonster.length; i++) {
           pokemonimg1[i] = await ctx.canvas.loadImage(`${config.图片源}/sr/${userArr[0].AllMonster[i].split('.')[0]}.png`)
         }
@@ -1304,9 +1301,7 @@ ${(h('at', { id: (session.userId) }))}`
           ultramonsterimg[i] = await ctx.canvas.loadImage(`${config.图片源}/sr/${banID[i].split('.')[0]}.png`)
         }
         if (userArr[0].monster_1 !== '0') pokemonimg = await ctx.canvas.loadImage(`${config.图片源}/fusion/${userArr[0].monster_1.split('.')[0]}/${userArr[0].monster_1}.png`)
-        let trainers = '0'
-        if (userArr[0].trainer[0] !== '0') { trainers = userArr[0].trainer[0] }
-        let trainerimg = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `./assets/img/trainer/${trainers}.png`)}`)
+        let trainerimg = await ctx.canvas.loadImage(`${config.图片源}/trainers/${playerTrainer.source_name}.png`)
         const infoImgSelfClassic = await ctx.canvas.render(485, 703, async ctx => {
           ctx.drawImage(infoImgSelf_bg, 0, 0, 485, 703)
           if (userArr[0].monster_1 !== '0') {
@@ -1414,8 +1409,8 @@ ${(h('at', { id: (session.userId) }))}`
         } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
       //图片服务
-      await ctx.database.set('pokebattle', { id: session.userId },row=>({
-        isPut:true
+      await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+        isPut: true
       }))
       const playerList: PokemonList = await getList(session.userId, ctx, userArr[0].monster_1)
       if (pokemon) {
@@ -1470,17 +1465,19 @@ ${(h('at', { id: (session.userId) }))}`
         }
         choose = await session.prompt(20000)
       }
-      if (!choose){
-        await ctx.database.set('pokebattle', { id: session.userId },row=>({
-          isPut:false
+      if (!choose) {
+        await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+          isPut: false
         }))
-         return `${(h('at', { id: (session.userId) }))}你好像还在犹豫，有点舍不得他们`}
+        return `${(h('at', { id: (session.userId) }))}你好像还在犹豫，有点舍不得他们`
+      }
       if (userArr[0].AllMonster[Number(choose) - 1]) {
         if (userArr[0].AllMonster.length === 1) {
-          await ctx.database.set('pokebattle', { id: session.userId },row=>({
-            isPut:false
+          await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+            isPut: false
           }))
-          return `${(h('at', { id: (session.userId) }))}你只剩一只宝可梦了，无法放生`}
+          return `${(h('at', { id: (session.userId) }))}你只剩一只宝可梦了，无法放生`
+        }
         // let discarded=userArr[0].AllMonster[Number(choose)-1]
         let chsNum = Number(choose) - 1
         let baseexp = Number(expBase.exp[Number(String(userArr[0].AllMonster[chsNum]).split('.')[0]) - 1].expbase)
@@ -1528,8 +1525,8 @@ ${!isEvent ? events : ''}
             },
           }
           await sendMarkdown(md, session, kb)
-          await ctx.database.set('pokebattle', { id: session.userId },row=>({
-            isPut:false
+          await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+            isPut: false
           }))
           if (userArr[0].lap < 3 || userArr[0].level < 90) return
           if (!pokemon) {
@@ -1543,8 +1540,8 @@ ${!isEvent ? events : ''}
             }
           }
         } catch (e) {
-          await ctx.database.set('pokebattle', { id: session.userId },row=>({
-            isPut:false
+          await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+            isPut: false
           }))
           return `
 你将【${(pokemonCal.pokemonlist(discarded[0]))}】放生了
@@ -1557,8 +1554,8 @@ ${(pokemonCal.exp_bar(lvNew, expNew))}
 ${(h('at', { id: (session.userId) }))}
         `}
       } else {
-        await ctx.database.set('pokebattle', { id: session.userId },row=>({
-          isPut:false
+        await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+          isPut: false
         }))
         return `你好像想放生一些了不得的东西`
       }
@@ -1628,7 +1625,10 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
 
   ctx.command('宝可梦').subcommand('对战 <user>', '和其他训练师对战', { minInterval: config.对战cd * 1000 })
     .usage(`/对战 @user`)
+    .shortcut(/对战\+(.*)$/, { args: ['$1'] })
     .action(async ({ session }, user) => {
+      const mid = user? user.split('+')[0] : user
+      user= mid
       let battleSuccess = false
       let jli: string = ''
       let robot: Pokebattle
@@ -1644,7 +1644,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
             return
           } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
         }
-        if(userArr[0].skillSlot.length == 0){
+        if (userArr[0].skillSlot.length == 0) {
           await session.send(`对战机制更新。请重新装备技能`)
         }
         const playerList: PokemonList = await getList(session.userId, ctx, userArr[0].monster_1)
@@ -1657,7 +1657,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let img = ''
         if (userArr[0].monster_1 == '0') { commands = `杂交宝可梦` }
         if (userArr[0].skillbag.length == 0) { commands = `技能扭蛋机` }
-        if(userArr[0].skillSlot.length == 0){commands = `装备技能`}
+        if (userArr[0].skillSlot.length == 0) { commands = `装备技能` }
         if (commands) {
           for (let i = 0; i < userArr[0].AllMonster.length; i++) {
             img += `![img#20px #20px](${await toUrl(ctx, session, `${config.图片源}/sr/${userArr[0].AllMonster[i].split('.')[0]}.png`)})`
@@ -1757,7 +1757,7 @@ ${img}
         await ctx.database.set('pokebattle', { id: session.userId }, {
           gold: { $subtract: [{ $: 'gold' }, spendGold] },
           power: userArr[0].power,
-          battle_log: battlelog+`??`+tarArr[0].id
+          battle_log: battlelog + `??` + tarArr[0].id
         })
         if (!user) {
           const index = playerList.pokemon.findIndex((pokeId) => pokeId.id === userArr[0].monster_1)
@@ -1773,7 +1773,7 @@ ${img}
           })
           )
           if (index !== -1) {
-            playerList.pokemon[index].natureLevel =(winner == session.userId)?( 2 * (win_count - 1) > 11 ? 11 : 2 * (win_count - 1)):1
+            playerList.pokemon[index].natureLevel = (winner == session.userId) ? (2 * (win_count - 1) > 11 ? 11 : 2 * (win_count - 1)) : 1
             await ctx.database.set('pokemon.list', { id: session.userId }, row => ({
               win_count: win_count,
               pokemon: playerList.pokemon
@@ -1845,22 +1845,22 @@ ${jli}`
     })
 
 
-  ctx.command('宝可梦').subcommand('战斗详情 [id:text]', '查看宝可梦信息').action(async ({ session },id:string) => {
-    if(!id){
-      id=session.userId
+  ctx.command('宝可梦').subcommand('战斗详情 [id:text]', '查看宝可梦信息').action(async ({ session }, id: string) => {
+    if (!id) {
+      id = session.userId
     }
-    const [player] :Pokebattle[]= await ctx.database.get('pokebattle', { id: id })
+    const [player]: Pokebattle[] = await ctx.database.get('pokebattle', { id: id })
     if (!player) {
       try {
         await session.execute(`签到`)
         return
       } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
     }
-    const log=player.battle_log.split('??')[0]
-    const tar=player.battle_log.split('??')[1]
-    const tarLog=await ctx.database.get('pokebattle',{id:tar})
-    const img=await getPic(ctx,log,player,tarLog[0],true)
-    const imgContent=img.replace(/^data:image\/\w+;base64,/, "")
+    const log = player.battle_log.split('??')[0]
+    const tar = player.battle_log.split('??')[1]
+    const tarLog = await ctx.database.get('pokebattle', { id: tar })
+    const img = await getPic(ctx, log, player, tarLog[0], true)
+    const imgContent = img.replace(/^data:image\/\w+;base64,/, "")
     const imgBuffer = Buffer.from(imgContent, 'base64')
     let dimensions = imageSize(imgBuffer)
     const md = `# <@${session.userId}>战斗详情
@@ -1961,11 +1961,14 @@ ${bag.replace(/\n/g, '||')}`
     })
 
 
-  ctx.command('宝可梦').subcommand('装备技能 <skill>', '装备技能',{ minInterval: 1000 })
+  ctx.command('宝可梦').subcommand('装备技能 <skill>', '装备技能', { minInterval: 1000 })
     .usage(`/装备技能 <技能名字>`)
     .action(async ({ session }, skill) => {
-      if (!skill) return `请输入技能名称 例如：【装备技能 大爆炸】`
-      const userArr:Pokebattle[]= await ctx.database.get('pokebattle', { id: session.userId })
+      if (!skill) {
+        session.execute('查询技能')
+        return `请输入技能名称 例如：【装备技能 大爆炸】`
+      }
+      const userArr: Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
       if (userArr.length == 0) {
         try {
           await session.execute(`签到`)
@@ -1973,10 +1976,10 @@ ${bag.replace(/\n/g, '||')}`
         } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
       }
       if (!userArr[0].skillbag.includes(String(pokemonCal.findskillId(skill)))) return `${h('at', { id: (session.userId) })}你还没有这个技能哦`
-      if(userArr[0].skillSlot.some(skills=>skills.name==skill)) return `你已经装备了该技能`
-      if(userArr[0].skillSlot.length>=4){
-        const getSkill=new Skill(pokemonCal.findskillId(skill))
-        const md=`<@${session.userId}>你的技能栏位已满，请选择替换技能
+      if (userArr[0].skillSlot.some(skills => skills.name == skill)) return `你已经装备了该技能`
+      if (userArr[0].skillSlot.length >= 4) {
+        const getSkill = new Skill(pokemonCal.findskillId(skill))
+        const md = `<@${session.userId}>你的技能栏位已满，请选择替换技能
 当前技能：
 
 > ${getSkill.name} 威力:${getSkill.dam} 属性:${getSkill.type} 类型:${getSkill.category == 1 ? '物理' : "特殊"} 冷却回合:${getSkill.cd}
@@ -1986,28 +1989,28 @@ ${bag.replace(/\n/g, '||')}`
 ${userArr[0].skillSlot[1].name} 威力：${userArr[0].skillSlot[1].dam} 属性：${userArr[0].skillSlot[1].type} 类型：${userArr[0].skillSlot[1].category == 1 ? '物理' : "特殊"} 冷却回合：${userArr[0].skillSlot[1].cd}
 ${userArr[0].skillSlot[2].name} 威力：${userArr[0].skillSlot[2].dam} 属性：${userArr[0].skillSlot[2].type} 类型：${userArr[0].skillSlot[2].category == 1 ? '物理' : "特殊"} 冷却回合：${userArr[0].skillSlot[2].cd}
 ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性：${userArr[0].skillSlot[3].type} 类型：${userArr[0].skillSlot[3].category == 1 ? '物理' : "特殊"} 冷却回合：${userArr[0].skillSlot[3].cd}`
-        const kb ={
+        const kb = {
           keyboard: {
             content: {
               "rows": [
-                { "buttons": [button(2, userArr[0].skillSlot[0].name, "1", session.userId, "1"),button(2, userArr[0].skillSlot[1].name, "2", session.userId, "2")] },
-                { "buttons": [button(2, userArr[0].skillSlot[2].name, "3", session.userId, "3"),button(2, userArr[0].skillSlot[3].name, "4", session.userId, "4")] },
+                { "buttons": [button(2, userArr[0].skillSlot[0].name, "1", session.userId, "1"), button(2, userArr[0].skillSlot[1].name, "2", session.userId, "2")] },
+                { "buttons": [button(2, userArr[0].skillSlot[2].name, "3", session.userId, "3"), button(2, userArr[0].skillSlot[3].name, "4", session.userId, "4")] },
               ]
             },
           },
         }
         await sendMarkdown(md, session, kb)
-        const reputSkill=await session.prompt(50000)
-        if(!reputSkill)return `操作超时`
-        if(!userArr[0].skillSlot[reputSkill-1])return `输入错误，请重新输入`
-        userArr[0].skillSlot[reputSkill-1]=new Skill(pokemonCal.findskillId(skill))
-      }else{
+        const reputSkill = await session.prompt(50000)
+        if (!reputSkill) return `操作超时`
+        if (!userArr[0].skillSlot[reputSkill - 1]) return `输入错误，请重新输入`
+        userArr[0].skillSlot[reputSkill - 1] = new Skill(pokemonCal.findskillId(skill))
+      } else {
         userArr[0].skillSlot.push(new Skill(pokemonCal.findskillId(skill)))
       }
       await ctx.database.set('pokebattle', { id: session.userId }, {
         skillSlot: userArr[0].skillSlot,
       })
-      return `${h('at', { id: (session.userId) })}成功装备了【${skill}】技能${userArr[0].skillSlot.length==4?'':`你还可以装备${4-userArr[0].skillSlot.length}个技能哦`}`
+      return `${h('at', { id: (session.userId) })}成功装备了【${skill}】技能${userArr[0].skillSlot.length == 4 ? '' : `你还可以装备${4 - userArr[0].skillSlot.length}个技能哦`}`
     })
 
 
@@ -2016,7 +2019,6 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
     .action(async ({ session }, skill) => {
       const userArr = await ctx.database.get('pokebattle', { id: session.userId })
       try {
-        if (!userArr[0].skillbag[2] && !skill) return `你的技能还太少，有什么先用着吧，或者输入你想查询的技能名字 例如：【查询技能 大爆炸】`
         let type = skill ? pokemonCal.skillinfo(userArr[0].skillbag, skill, true) : '请选择查询属性,或者查询具体技能'
         if (pokemonCal.findskillId(skill) == 0) {
           const kb = {
@@ -2076,132 +2078,136 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
 
 
   //md重构checkPoint
-  ctx.command('宝可梦').subcommand('更换训练师 <name:string>', '更换训练师,留空则查看所有训练师')
-    .usage(`/更换训练师 <训练师名字>|<空>`)
-    .action(async ({ session }, name) => {
-      const userArr = await ctx.database.get('pokebattle', { id: session.userId })
-      if (userArr.length == 0) {
-        try {
-          await session.execute(`签到`)
-          return
-        } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
-      }
-      if (userArr[0].trainer.length == 1) return `${h('at', { id: (session.userId) })}你只有一个训练师，无法更换`
-      let nameList = `${userArr[0].trainerName.map((item: any, index: number) => `${index + 1}-${item}`).join('\n')}`
-      if (!name) {
-        await session.send(`${h('at', { id: (session.userId) })}请选择你想更换的训练师名字\n${nameList}`)
-        const choose = await session.prompt(20000)
-        if (!choose) return `${h('at', { id: (session.userId) })}你好像还在犹豫，一会再换吧`
-        if (isNaN(Number(choose)) || Number(choose) > userArr[0].trainer.length) return `${h('at', { id: (session.userId) })}输入错误`
-        let newTrainer = moveToFirst(userArr[0].trainer, userArr[0].trainer[Number(choose) - 1])
-        let newTrainerName = moveToFirst(userArr[0].trainerName, userArr[0].trainerName[Number(choose) - 1])
-        await ctx.database.set('pokebattle', { id: session.userId }, {
-          trainer: userArr[0].trainer,
-          trainerName: userArr[0].trainerName
-        })
-        return `${h('at', { id: (session.userId) })}成功更换了训练师${h.image(pathToFileURL(resolve(__dirname, './assets/img/trainer', newTrainer[0] + '.png')).href)}`
-      }
-      if (userArr[0].trainerName.includes(name)) {
-        const distance = userArr[0].trainerName.indexOf(name)
-        let newTrainer = moveToFirst(userArr[0].trainer, userArr[0].trainer[distance])
-        let newTrainerName = moveToFirst(userArr[0].trainerName, name)
-        await ctx.database.set('pokebattle', { id: session.userId }, {
-          trainer: userArr[0].trainer,
-          trainerName: userArr[0].trainerName
-        })
-        return `${h('at', { id: (session.userId) })}成功更换了训练师${h.image(pathToFileURL(resolve(__dirname, './assets/img/trainer', newTrainer[0] + '.png')).href)}`
-      }
+  // ctx.command('宝可梦').subcommand('更换训练师 <name:string>', '更换训练师,留空则查看所有训练师')
+  //   .usage(`/更换训练师 <训练师名字>|<空>`)
+  //   .action(async ({ session }, name) => {
+  //     const userArr = await ctx.database.get('pokebattle', { id: session.userId })
+  //     if (userArr.length == 0) {
+  //       try {
+  //         await session.execute(`签到`)
+  //         return
+  //       } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
+  //     }
+  //     if (userArr[0].trainer.length == 1) return `${h('at', { id: (session.userId) })}你只有一个训练师，无法更换`
+  //     let nameList = `${userArr[0].trainerName.map((item: any, index: number) => `${index + 1}-${item}`).join('\n')}`
+  //     if (!name) {
+  //       await session.send(`${h('at', { id: (session.userId) })}请选择你想更换的训练师名字\n${nameList}`)
+  //       const choose = await session.prompt(20000)
+  //       if (!choose) return `${h('at', { id: (session.userId) })}你好像还在犹豫，一会再换吧`
+  //       if (isNaN(Number(choose)) || Number(choose) > userArr[0].trainer.length) return `${h('at', { id: (session.userId) })}输入错误`
+  //       let newTrainer = moveToFirst(userArr[0].trainer, userArr[0].trainer[Number(choose) - 1])
+  //       let newTrainerName = moveToFirst(userArr[0].trainerName, userArr[0].trainerName[Number(choose) - 1])
+  //       await ctx.database.set('pokebattle', { id: session.userId }, {
+  //         trainer: userArr[0].trainer,
+  //         trainerName: userArr[0].trainerName
+  //       })
+  //       return `${h('at', { id: (session.userId) })}成功更换了训练师${h.image(pathToFileURL(resolve(__dirname, './assets/img/trainer', newTrainer[0] + '.png')).href)}`
+  //     }
+  //     if (userArr[0].trainerName.includes(name)) {
+  //       const distance = userArr[0].trainerName.indexOf(name)
+  //       let newTrainer = moveToFirst(userArr[0].trainer, userArr[0].trainer[distance])
+  //       let newTrainerName = moveToFirst(userArr[0].trainerName, name)
+  //       await ctx.database.set('pokebattle', { id: session.userId }, {
+  //         trainer: userArr[0].trainer,
+  //         trainerName: userArr[0].trainerName
+  //       })
+  //       return `${h('at', { id: (session.userId) })}成功更换了训练师${h.image(pathToFileURL(resolve(__dirname, './assets/img/trainer', newTrainer[0] + '.png')).href)}`
+  //     }
 
-    })
+  //   })
 
 
-  ctx.command('宝可梦').subcommand('盲盒', '开启盲盒，抽取训练师')
-    .usage(`/盲盒`)
-    .action(async ({ session }) => {
-      const userArr = await ctx.database.get('pokebattle', { id: session.userId })
-      if (userArr.length == 0) {
-        try {
-          await session.execute(`签到`)
-          return
-        } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
-      }
-      if (userArr[0].trainerNum < 1) return `${h('at', { id: (session.userId) })}你的盲盒不足，无法开启`
-      if (userArr[0].trainer.length > 121) return `你已经获得了全部训练师`
-      let getTrainer = String(pokemonCal.mathRandomInt(0, 121))
-      while (userArr[0].trainer.includes(getTrainer)) {
-        getTrainer = String(pokemonCal.mathRandomInt(0, 121))
-      }
-      userArr[0].trainer.push(getTrainer)
-      const trainerImg = h.image(pathToFileURL(resolve(__dirname, './assets/img/trainer', getTrainer + '.png')).href)
-      try {
-        await session.bot.internal.sendMessage(session.guildId, {
-          content: "111",
-          msg_type: 2,
-          markdown: {
-            custom_template_id: config.MDid,
-            params: [
-              {
-                key: config.key1,
-                values: [`<@${session.userId}>开启了盲盒`]
-              },
-              {
-                key: config.key2,
-                values: ["[img#128px #128px]"]
-              },
-              {
-                key: config.key3,
-                values: [await toUrl(ctx, session, pathToFileURL(resolve(__dirname, './assets/img/trainer', getTrainer + '.png')).href)]
-              },
-              {
-                key: config.key4,
-                values: [`恭喜你获得了新训练师`]
-              },
-            ]
-          },
-          keyboard: {
-            content: {
-              "rows": [
-                { "buttons": [button(0, '点击输入新训练师名字', "", session.userId, "1", false)] },
-              ]
-            },
-          },
-          msg_id: session.messageId,
-          timestamp: session.timestamp,
-          msg_seq: Math.floor(Math.random() * 1000000),
-        })
-      } catch (e) {
-        await session.send(`${trainerImg}
-恭喜你获得了训练师
-请输入新训练师的名字:________`)
-      }
-      let trainerName = await session.prompt(60000)
-      if (!trainerName) {
-        let randomName = getRandomName(3)
-        let numr = userArr[0].trainerName.push(randomName)
-        await ctx.database.set('pokebattle', { id: session.userId }, {
-          trainerNum: { $subtract: [{ $: 'trainerNum' }, 1] },
-          trainer: userArr[0].trainer,
-          trainerName: userArr[0].trainerName,
-        })
-        return `你好像没有输入名字，训练师已经自动命名为【${randomName}】
-输入【更换训练师】可以更换你的训练师`
-      }
-      trainerName = await censorText(ctx, trainerName)
-      userArr[0].trainerName.push(trainerName)
-      await ctx.database.set('pokebattle', { id: session.userId }, {
-        trainerNum: { $subtract: [{ $: 'trainerNum' }, 1] },
-        trainer: userArr[0].trainer,
-        trainerName: userArr[0].trainerName,
-      })
-      return `你的训练师已经命名为【${trainerName}】
-输入【更换训练师】可以更换你的训练师`
-    })
+  //   ctx.command('宝可梦').subcommand('盲盒', '开启盲盒，抽取训练师')
+  //     .usage(`/盲盒`)
+  //     .action(async ({ session }) => {
+  //       const userArr = await ctx.database.get('pokebattle', { id: session.userId })
+  //       if (userArr.length == 0) {
+  //         try {
+  //           await session.execute(`签到`)
+  //           return
+  //         } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
+  //       }
+  //       if (userArr[0].trainerNum < 1) return `${h('at', { id: (session.userId) })}你的盲盒不足，无法开启`
+  //       if (userArr[0].trainer.length > 121) return `你已经获得了全部训练师`
+  //       let getTrainer = String(pokemonCal.mathRandomInt(0, 121))
+  //       while (userArr[0].trainer.includes(getTrainer)) {
+  //         getTrainer = String(pokemonCal.mathRandomInt(0, 121))
+  //       }
+  //       userArr[0].trainer.push(getTrainer)
+  //       const trainerImg = h.image(pathToFileURL(resolve(__dirname, './assets/img/trainer', getTrainer + '.png')).href)
+  //       try {
+  //         await session.bot.internal.sendMessage(session.guildId, {
+  //           content: "111",
+  //           msg_type: 2,
+  //           markdown: {
+  //             custom_template_id: config.MDid,
+  //             params: [
+  //               {
+  //                 key: config.key1,
+  //                 values: [`<@${session.userId}>开启了盲盒`]
+  //               },
+  //               {
+  //                 key: config.key2,
+  //                 values: ["[img#128px #128px]"]
+  //               },
+  //               {
+  //                 key: config.key3,
+  //                 values: [await toUrl(ctx, session, pathToFileURL(resolve(__dirname, './assets/img/trainer', getTrainer + '.png')).href)]
+  //               },
+  //               {
+  //                 key: config.key4,
+  //                 values: [`恭喜你获得了新训练师`]
+  //               },
+  //             ]
+  //           },
+  //           keyboard: {
+  //             content: {
+  //               "rows": [
+  //                 { "buttons": [button(0, '点击输入新训练师名字', "", session.userId, "1", false)] },
+  //               ]
+  //             },
+  //           },
+  //           msg_id: session.messageId,
+  //           timestamp: session.timestamp,
+  //           msg_seq: Math.floor(Math.random() * 1000000),
+  //         })
+  //       } catch (e) {
+  //         await session.send(`${trainerImg}
+  // 恭喜你获得了训练师
+  // 请输入新训练师的名字:________`)
+  //       }
+  //       let trainerName = await session.prompt(60000)
+  //       if (!trainerName) {
+  //         let randomName = getRandomName(3)
+  //         let numr = userArr[0].trainerName.push(randomName)
+  //         await ctx.database.set('pokebattle', { id: session.userId }, {
+  //           trainerNum: { $subtract: [{ $: 'trainerNum' }, 1] },
+  //           trainer: userArr[0].trainer,
+  //           trainerName: userArr[0].trainerName,
+  //         })
+  //         return `你好像没有输入名字，训练师已经自动命名为【${randomName}】
+  // 输入【更换训练师】可以更换你的训练师`
+  //       }
+  //       trainerName = await censorText(ctx, trainerName)
+  //       userArr[0].trainerName.push(trainerName)
+  //       await ctx.database.set('pokebattle', { id: session.userId }, {
+  //         trainerNum: { $subtract: [{ $: 'trainerNum' }, 1] },
+  //         trainer: userArr[0].trainer,
+  //         trainerName: userArr[0].trainerName,
+  //       })
+  //       return `你的训练师已经命名为【${trainerName}】
+  // 输入【更换训练师】可以更换你的训练师`
+  //     })
 
 
   ctx.command('宝可梦').subcommand('购买 <item:string> [num:number]', '购买物品，或查看商店')
-    .usage(`/购买 <物品名称> [数量]|<空>`)
+    .usage(`/购买 <物品名称> [数量]`)
     .example('购买 精灵球 10')
+    .shortcut(/购买\+(.*)$/, { args: ['$1'] })
     .action(async ({ session }, item, num) => {
+      const mid = item ? item.split('+')[0] : item
+      num = num ? num : item ? item.split('+')[1] : num
+      item = mid
       const { platform } = session
       const userArr: Array<Pokebattle> = await ctx.database.get('pokebattle', { id: session.userId })
       const vip = isVip(userArr[0])
@@ -2215,6 +2221,7 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
           return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球`
         }
       }
+      const playerTrainer = userArr[0].trainer_list.find(train => train.tid == userArr[0].trainerIndex)
       if (!num) num = 1
       num = Math.floor(num)
       if (num < 1) return `宝可梦的世界不支持赊账`
@@ -2228,7 +2235,7 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
           MDreply += `- [${item.name}](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买 ${item.name} `)}&reply=false&enter=false) 价格：${Math.floor(item.price * vipReward)}\n\n`
         })
 
-        const md = `![img#50px #50px](${await toUrl(ctx, session, `file://${resolve(__dirname, `assets/img/trainer/${userArr[0].trainer[0]}.png`)}`)})<@${session.userId}>来到了商店
+        const md = `![img#50px #50px](${`${config.图片源}/trainers/${playerTrainer.source_name}.png`})<@${session.userId}>来到了商店
 
 ---
 商店物品：
@@ -2390,7 +2397,12 @@ ${!isEvent ? events : ''}
     })
 
 
-  ctx.command('宝可梦').subcommand('积分兑换 <items> [number:number]', '通过对战积分兑换').action(async ({ session }, items, number: number) => {
+  ctx.command('宝可梦').subcommand('积分兑换 <items> [number:number]', '通过对战积分兑换')
+  .shortcut(/积分兑换\+(.*)$/, { args: ['$1'] })
+  .action(async ({ session }, items, number: number) => {
+    const mid = items ? items.split('+')[0] : items
+    number= number ? number : items ? items.split('+')[1] : number
+    items = mid
     number = Math.floor(Number(number))
     if (number < 0) return `怎么还有来骗积分的！！！`
     const [player]: Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
@@ -2453,12 +2465,12 @@ ${!isEvent ? events : ''}
         const playerList: PokemonList = await getList(session.userId, ctx, player.monster_1)
         const newNature = new FusionPokemon(player.monster_1, playerList, true)
         await findFusion(newNature, playerList)
-        const isInstall =`是否将${pokemonCal.pokemonlist(player.monster_1)}的性格更改为${newNature.natures.effect}`
+        const isInstall = `是否将${pokemonCal.pokemonlist(player.monster_1)}的性格更改为${newNature.natures.effect}`
         const kb = {
           keyboard: {
             content: {
               "rows": [
-                { "buttons": [button(2, 'Y', "Y", session.userId, "1"),button(2, 'N', "N", session.userId, "2")] },
+                { "buttons": [button(2, 'Y', "Y", session.userId, "1"), button(2, 'N', "N", session.userId, "2")] },
               ]
             },
           },
@@ -2486,7 +2498,7 @@ ${!isEvent ? events : ''}
           const index = await findFusion(newNature, playerList)
           let sum = playerList.pokemon[index].power.reduce((a, b) => a + b, 0);
           if (sum >= 255 * 6) {
-            playerList.pokemon[index].power = playerList.pokemon[index].power.map((a) => a>255?255:a)
+            playerList.pokemon[index].power = playerList.pokemon[index].power.map((a) => a > 255 ? 255 : a)
             await ctx.database.set('pokemon.list', { id: session.userId }, {
               pokemon: playerList.pokemon
             })
@@ -2502,7 +2514,7 @@ ${!isEvent ? events : ''}
           do {
             random = Math.floor(Math.random() * 6);
             value = Math.floor(Math.random() * 5 + 1)
-            up = (playerList.pokemon[index].power[random] <= (255 - value)) ? value : 255-(playerList.pokemon[index].power[random])
+            up = (playerList.pokemon[index].power[random] <= (255 - value)) ? value : 255 - (playerList.pokemon[index].power[random])
           } while (up === 0)
           playerList.pokemon[index].power[random] += up
           await ctx.database.set('pokemon.list', { id: session.userId }, {
@@ -2555,43 +2567,43 @@ ${!isEvent ? events : ''}
 
 
 
-  ctx.command('宝可梦').subcommand('训练师改名', '改动训练师名字').action(async ({ session }) => {
-    const userArr = await ctx.database.get('pokebattle', { id: session.userId })
-    if (userArr.length == 0) {
-      try {
-        await session.execute(`签到`)
-        return
-      } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
-    }
-    const vip = isVip(userArr[0])
-    if (!vip) return `你不是VIP，无法使用此功能`
-    await session.send(`输入当前训练师的新名字`)
-    try {
-      await session.bot.internal.sendMessage(session.channelId, {
-        content: "111",
-        msg_type: 2,
-        keyboard: {
-          content: {
-            "rows": [
-              { "buttons": [button(0, '点击输入新名字', "", session.userId, "1", false)] },
-            ]
-          },
-        },
-        msg_id: session.messageId,
-        timestamp: session.timestamp,
-        msg_seq: Math.floor(Math.random() * 1000000),
-      })
-    } catch {
-      await session.send(`请向机器人回复你想要的训练师名字`)
-    }
-    const newName = await session.prompt(60000)
-    if (!newName) return `你好像没有输入名字`
-    userArr[0].trainerName[0] = await censorText(ctx, newName)
-    await ctx.database.set('pokebattle', { id: session.userId }, {
-      trainerName: userArr[0].trainerName
-    })
-    return `你的训练师名字已经改为${newName}`
-  })
+  // ctx.command('宝可梦').subcommand('训练师改名', '改动训练师名字').action(async ({ session }) => {
+  //   const userArr = await ctx.database.get('pokebattle', { id: session.userId })
+  //   if (userArr.length == 0) {
+  //     try {
+  //       await session.execute(`签到`)
+  //       return
+  //     } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
+  //   }
+  //   const vip = isVip(userArr[0])
+  //   if (!vip) return `你不是VIP，无法使用此功能`
+  //   await session.send(`输入当前训练师的新名字`)
+  //   try {
+  //     await session.bot.internal.sendMessage(session.channelId, {
+  //       content: "111",
+  //       msg_type: 2,
+  //       keyboard: {
+  //         content: {
+  //           "rows": [
+  //             { "buttons": [button(0, '点击输入新名字', "", session.userId, "1", false)] },
+  //           ]
+  //         },
+  //       },
+  //       msg_id: session.messageId,
+  //       timestamp: session.timestamp,
+  //       msg_seq: Math.floor(Math.random() * 1000000),
+  //     })
+  //   } catch {
+  //     await session.send(`请向机器人回复你想要的训练师名字`)
+  //   }
+  //   const newName = await session.prompt(60000)
+  //   if (!newName) return `你好像没有输入名字`
+  //   userArr[0].trainerName[0] = await censorText(ctx, newName)
+  //   await ctx.database.set('pokebattle', { id: session.userId }, {
+  //     trainerName: userArr[0].trainerName
+  //   })
+  //   return `你的训练师名字已经改为${newName}`
+  // })
 }
 export { Pokebattle }
 

@@ -1,6 +1,7 @@
 import { Pokebattle } from ".."
 import { Skill } from "../battle"
 import { PokemonList } from "../model"
+import { Trainer } from "../trainer/type"
 import pokemonCal from "./pokemon"
 
 export class Robot implements Pokebattle {
@@ -17,6 +18,8 @@ export class Robot implements Pokebattle {
     skill: number
     skillSlot?: Skill[]
     trainer: string[]
+    trainerIndex?: number
+    trainer_list?: Trainer[]
     relex:Date
       
     constructor(level:number){
@@ -42,7 +45,7 @@ export class Robot implements Pokebattle {
                         down: 0
                     },
                     natureLevel: 0,
-                    power: [255, 255, 255, 255, 255, 255]
+                    power: [0, 0, 0, 0, 0, 0]
                 }
             ]
         }
@@ -53,5 +56,11 @@ export class Robot implements Pokebattle {
         this.battleTimes=30
         this.battleToTrainer=30
         this.relex=new Date(0)
+        this.trainerIndex=9999
+        this.trainer_list=[{
+            tid:9999,
+            name:'robot',
+            source_name:'robot'
+        }]
     }
 }

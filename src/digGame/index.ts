@@ -76,15 +76,13 @@ export async function apply(ctx: any) {
             await ctx.database.set('pokebattle', session.userId, row => ({
                 fossil_bag:player.fossil_bag
             }))}
-            const md = `化石挖掘','挖掘化石相关指令中
+            const md = `化石挖掘中
 ---
 ![img#550px #384px](${await toUrl(ctx, session, src)})
 
 > 蓝色为当前挖掘位置
 
 > 镐子可以探测化石位置，绿色为4格内，黄色为5-7格，红色为8格以上
-
-> 镐子只能在土块（黄色）区域探测，石块上无法探测，将出现白色框
 
 > 锤子可以砸到周围8格
 

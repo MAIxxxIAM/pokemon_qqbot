@@ -345,7 +345,7 @@ export async function apply(ctx: Context) {
   // zl*
   exams.forEach((exam) => {
     // ks*
-    ctx.command(`wordleGame.开始.${exam}`, `${exam}`)
+    ctx.command(`开始猜名/${exam}`, `${exam}`)
       .option('free', '--free 自由模式', { fallback: false })
       .option('hard', '--hard 困难模式', { fallback: false })
       .option('ultraHardMode', '--uhard 超困难模式', { fallback: false })
@@ -528,7 +528,7 @@ ${wordCount2}${timeLimit}`
 
   })
 
-  ctx.command('wordleGame.未知图腾').action(async ({ session }) => {
+  ctx.command('未知图腾').action(async ({ session }) => {
     const [player]: Pokebattle[] = await ctx.database.get('pokebattle', session.userId)
     if (!player) {
       await session.execute('签到')
@@ -573,8 +573,8 @@ ${unknowns.map((u) => `${u.name}`).join('\n')}
     await sendMarkdown(getMd, session)
 
   })
-  // wordleGame.猜 c* cdc* ccy*
-  ctx.command('wordleGame.猜 [inputWord:text]', '做出一次猜测')
+  // 猜 c* cdc* ccy*
+  ctx.command('猜 [inputWord:text]', '做出一次猜测')
     .option('random', '-r 随机', { fallback: false })
     .action(async ({ session, options }, inputWord) => {
       const [player]: Pokebattle[] = await ctx.database.get('pokebattle', session.userId)
@@ -926,7 +926,7 @@ ${gameDuration}
 ${generateGameEndMessage(gameInfo)}${processedResult}
 ${settlementResult}`
           await sendMessage(session, md, `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode} ？？未知图腾`, 2);
-          if (legendaryPokemonRandom > (99 - player.cyberMerit * 0.02)) {
+          if (legendaryPokemonRandom > (99 - player.cyberMerit * 0.02)&&!isEvent) {
             const key = crypto.createHash('md5').update(session.userId + new Date().getTime()).digest('hex').toUpperCase()
             legendaryPokemonId[key] = '347.347'
             ctx.setTimeout(() => {
@@ -973,7 +973,7 @@ ${gameDuration}${answerInfo}${processedResult}`
     }
     )
 
-    ctx.command('wordlegame.玩法介绍', '玩法介绍').action(async ({ session }) => {
+    ctx.command('玩法介绍', '玩法介绍').action(async ({ session }) => {
       const md=`
 # 宝可猜名
       
@@ -990,8 +990,8 @@ ${gameDuration}${answerInfo}${processedResult}`
 `
       await sendMarkdown(md, session)
     })
-  // wordleGame.查询进度 jd* cxjd*
-  ctx.command('wordleGame.查询进度', '查询当前游戏进度')
+  // 查询进度 jd* cxjd*
+  ctx.command('查询进度', '查询当前游戏进度')
     .action(async ({ session }) => {
       let { channelId, userId, username, user, timestamp } = session
       // 更新玩家记录表中的用户名
@@ -1060,7 +1060,7 @@ ${gameDuration}${answerInfo}${processedResult}`
       // .action
     })
   // pyscb* pysc*
-  ctx.command('wordleGame.拼音速查表', '查看拼音速查表')
+  ctx.command('拼音速查表', '查看拼音速查表')
     .action(async ({ session }) => {
       let { channelId, userId, username } = session
       // 更新玩家记录表中的用户名
@@ -1111,8 +1111,8 @@ ${gameDuration}${answerInfo}${processedResult}`
       await sendMessage(session, md, ``);
     })
 
-  // wordleGame.结束 s* js*
-  ctx.command('wordleGame.结束', '结束游戏')
+  // 结束猜名 s* js*
+  ctx.command('结束猜名', '结束游戏')
     .action(async ({ session }) => {
       const [player]: Pokebattle[] = await ctx.database.get('pokebattle', session.userId)
       if (!player) {
@@ -1130,7 +1130,7 @@ ${gameDuration}${answerInfo}${processedResult}`
       }
       // 玩家记录输
       await updatePlayerRecordsLose(channelId, gameInfo)
-      // 结束
+      // 结束猜名
       const processedResult: string = gameInfo.wordlesNum > 1 ? `\n${await processExtraGameRecords(channelId)}` : '';
       await endGame(channelId)
       const duration = calculateGameDuration(Number(gameInfo.timestamp), timestamp);
@@ -2190,25 +2190,25 @@ ${content}
 
     const mapCommandToDataValue = (command: string) => {
       const commandMappings: Record<string, string> = {
-        '加入游戏': 'wordlegame.加入',
-        '开始游戏': 'wordlegame.开始',
-        '查询玩家记录': 'wordlegame.查询玩家记录',
-        '猜测': 'wordlegame.猜',
-        '随机猜测': 'wordlegame.猜 -r',
+        '加入游戏': '加入',
+        '开始游戏': '开始猜名',
+        '查询玩家记录': '查询玩家记录',
+        '猜测': '猜',
+        '随机猜测': '猜 -r',
         '输入': '',
-        '排行榜': 'wordlegame.排行榜',
-        '玩法介绍': 'wordlegame.玩法介绍',
-        '退出游戏': 'wordlegame.退出',
-        '查单词': 'wordlegame.查单词',
-        '查成语': 'wordlegame.查成语',
-        '单词查找器': 'wordlegame.单词查找器',
-        '查询进度': 'wordlegame.查询进度',
-        '拼音速查表': 'wordlegame.拼音速查表',
-        '结束游戏': 'wordlegame.结束',
-        '再来一把': 'wordlegame.开始',
-        '再来一把宝可兜': 'wordlegame.开始.宝可兜',
-        '再来一把宝可影': 'wordlegame.开始.宝可影',
-        '？？未知图腾': 'wordlegame.未知图腾',
+        '排行榜': '排行榜',
+        '玩法介绍': '玩法介绍',
+        '退出游戏': '退出',
+        '查单词': '查单词',
+        '查成语': '查成语',
+        '单词查找器': '单词查找器',
+        '查询进度': '查询进度',
+        '拼音速查表': '拼音速查表',
+        '结束游戏': '结束猜名',
+        '再来一把': '开始猜名',
+        '再来一把宝可兜': '宝可兜',
+        '再来一把宝可影': '宝可影',
+        '？？未知图腾': '未知图腾',
       };
 
       return commandMappings[command];
