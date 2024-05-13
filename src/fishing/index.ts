@@ -37,7 +37,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 当前赛博功德值:${player.cyberMerit+1}`
         const getMd = (item: FishItem) => `${regex.test(player.name) ? player.name : `<@${session.userId}>`}获得了${item.name[Math.floor(Math.random() * item.name.length)]}
         
-> 价值${item.points*(player.lap<3?50:1)+Fishspend}${player.lap<3?'金币':'积分'}
+> 价值${item.points*(player.lap<3?50:1)+player.lap<3?Fishspend:0}${player.lap<3?'金币':'积分'}
 
 ---
 ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}

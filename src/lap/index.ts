@@ -4,6 +4,7 @@ import { Pokebattle, config, Config } from '../index';
 import { button, getChance, getList, getMarkdownParams, sendMarkdown, toUrl } from '../utils/mothed';
 import pokemonCal from '../utils/pokemon';
 import { PokemonList, Resource } from '../model';
+import { Skill } from '../battle';
 
 export const name = 'lapTwo'
 
@@ -56,10 +57,13 @@ export function apply(ctx: Context) {
 
   ctx.command('宝可梦').subcommand('周目内容','周目相关指令').subcommand('刷新字段',{authority:4}).action(async () => {
     // @ts-ignore
-      await ctx.database.set('pokebattle',{},row=>({
-        trainerIndex:0,
-        trainerNum:$.add(row.trainerNum,$.length(row.trainer),10)
-      }))
+     const players =await ctx.database.get('pokebattle',{})
+      for(const player of players){
+        player.skillSlot=player.skillSlot.map((item)=>{return new Skill(item.id)})
+        await ctx.database.set('pokebattle',player.id,{
+          skillSlot:player.skillSlot
+        })
+      }
     return '刷新成功'
   })
   ctx.command('宝可梦').subcommand('周目内容','周目相关指令').subcommand('lapnext', '进入下一周目')
