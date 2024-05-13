@@ -26,7 +26,7 @@ export async function apply(ctx: Context) {
         }))
         let regex = /^[\u4e00-\u9fa5]{2,6}$/
 
-        const isEvent = player.lap < 3 &&  player.level < 90
+        const isEvent = player.lap < 3 ||  player.level < 90
         const noneMd = `${regex.test(player.name) ? player.name : `<@${session.userId}>`}的运气极佳，幸运女神都有点嫉妒
 
 > 但是你什么都没钓到
@@ -37,7 +37,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 当前赛博功德值:${player.cyberMerit+1}`
         const getMd = (item: FishItem) => `${regex.test(player.name) ? player.name : `<@${session.userId}>`}获得了${item.name[Math.floor(Math.random() * item.name.length)]}
         
-> 价值${item.points}积分
+> 价值${item.points*(player.lap<3?50:1)+Fishspend}${player.lap<3?'金币':'积分'}
 
 ---
 ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
@@ -47,6 +47,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
         session.userId = d.group_member_openid
         session.channelId = d.group_openid
         const fished: '普通鱼饵' | '高级鱼饵' = d.data.resolved.button_data.split('=')[1]
+        const Fishspend = fished === '普通鱼饵' ? 2000 : 2300
         let getFish = fishGame.fish(Lucky[fished],player.cyberMerit)
         // if(session.userId=='262D994B2D838AD0F1B65FC272BB85BA'){
         //     getFish={
@@ -62,13 +63,13 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
             return
         }
         if (getFish.legendaryPokemon) {
-            if(player?.level<90) {
+            if(player?.level<90||player?.lap<3){
                 const weak=`<@${session.userId}>你太弱小了
 
 ---
 盖欧卡看了你一眼，并摇了摇头
 
-> 你的等级好像无法收复它`
+> 你当前好像无法收复它`
                 await sendMarkdown(weak, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, });
                 return
             }
@@ -114,21 +115,22 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
             //copy
         } else {
             await sendMarkdown(getMd(getFish), session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
-            await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
+            player.lap<3?await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+                gold: $.add(row.gold, getFish.points*50+Fishspend)
+            })):await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
                 rankScore: $.add(row.rankScore, getFish.points)
             }))
         }
     })
 
 
-    ctx.command('宝可梦').subcommand('钓鱼','3周目才可以使用的功能').action(async ({ session }) => {
+    ctx.command('宝可梦').subcommand('钓鱼','赛博钓鱼').action(async ({ session }) => {
         const [player] = await ctx.database.get('pokebattle', session.userId)
         if (!player) {
             await session.execute('签到')
             return
         }
         if (player.isfish) return '你已经在钓鱼了'
-        if(player?.lap<3) return `未进入3周目，无法参与钓鱼活动。`
         const fishMd = `<@${session.userId}>来到了湖边，准备开始钓鱼
 
 ---
@@ -138,9 +140,11 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 - [高级鱼饵 2300金币](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`高级鱼饵`)}&reply=false&enter=true)  会员专属鱼饵，多0.5%好运气
 `
 
-        await sendMarkdown(fishMd, session)
+       const fishId= await sendMarkdown(fishMd, session)
 
         const fished = await session.prompt(20000)
+
+        session.bot.deleteMessage(session.channelId, fishId.id)
 
         const Fishspend = fished === '普通鱼饵' ? 2000 : 2300
         if (player.gold < Fishspend) {

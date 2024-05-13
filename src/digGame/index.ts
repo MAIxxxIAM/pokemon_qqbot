@@ -10,6 +10,7 @@ export async function apply(ctx: any) {
     ctx.command('宝可梦').subcommand('化石挖掘','挖掘化石相关指令').subcommand('dig [position:text]')
         .alias('挖掘')
         .action(async ({ session }, position: string) => {
+            let msg_id={id:''}
             let MdString = ''
             let dataUrl: any
             let stats: MStats
@@ -92,7 +93,7 @@ export async function apply(ctx: any) {
 
 ${MdString}
 
-> 注：化石当前可售出为积分，集齐15种化石后，可以融合为传说中的宝可梦——固拉多`
+> 注：化石3周目后可售出为积分，3周目前可出售为金币。集齐15种化石后，可以融合为传说中的宝可梦——固拉多`
             const kb = {
                 keyboard: {
                     content: {
@@ -103,7 +104,13 @@ ${MdString}
                     },
                 }
             }
-            await sendMarkdown(md, session, kb)
+            msg_id= await sendMarkdown(md, session, kb)
+           try{
+             digGames?.msg_id?await session.bot.deleteMessage(session.channelId,digGames.msg_id):null
+           }catch(e){}
+            await ctx.database.set('pokemon.digChannel', session.channelId, row => ({
+                msg_id: msg_id.id,
+            }))
         })
         ctx.command('宝可梦').subcommand('化石挖掘','挖掘化石相关指令').subcommand('切换工具')
         .action(async ({ session }) => {
@@ -125,7 +132,6 @@ ${MdString}
                 await session.execute('签到') 
                 return
             }
-            if(player.lap<3) return '三周目后才可售出化石，当前可积攒在背包中'
             if(!id){
                 const md =`请点击你要售出的化石`
                 let kb={
@@ -167,10 +173,12 @@ ${MdString}
             await ctx.database.set('pokebattle', session.userId, row => ({
                 fossil_bag: player.fossil_bag
              }))
-            await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
+           player.lap>=3? await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
                 rankScore: $.add(row.rankScore, fossil.score)
+            })):await ctx.database.set('pokebattle', { id: session.userId }, row => ({
+                gold:$.add(row.gold,fossil.score*10)
             }))
-            return `你售出了${fossil.name}，获得了${fossil.score}积分`
+            return `你售出了${fossil.name}，获得了${fossil.score*(player.lap>=3?1:10)}${player.lap>=3?'积分':'金币'}`
         })
 
         ctx.command('宝可梦').subcommand('化石挖掘','挖掘化石相关指令').subcommand('dig').subcommand('融合化石').action(async ({ session }) => {

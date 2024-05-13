@@ -314,6 +314,19 @@ export async function sendMarkdown(a: string, session: Session, button = null,ev
     msg_seq: Math.floor(Math.random() * 1000000),
   }, button,eventId?{event_id:eventId}:{msg_id: session.messageId,}))
 }
+export async function sendNoticeMarkdown(a: string, session: Session, button = null) {
+  const b = getMarkdownParams(a)
+ return await session.bot.internal.sendMessage(session.guildId, {
+    content: "111",
+    msg_type: 2,
+    markdown: {
+      custom_template_id: '102072441_1711377105',
+      params: b
+    },
+    timestamp: session.timestamp,
+    msg_seq: Math.floor(Math.random() * 1000000),
+  })
+}
 
 export async function toUrl(ctx, session, img) {
   // if(ctx.get('server.temp')?.upload){

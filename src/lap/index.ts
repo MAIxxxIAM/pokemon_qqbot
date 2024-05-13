@@ -258,15 +258,23 @@ ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${'🟩'.repeat(Math.floor(u
     })
 
     // ctx.command('test').action(async ({session})=>{
-    //   console.log('test')
-    //   const unplayer:Pokebattle[]=await ctx.database.select('pokebattle').where(row=>$.or(row.advanceChance,$.eq(row.lap,3))).execute()
-    //   const ban=unplayer.map((item)=>item.id)
-    //   console.log(ban)
-    //  const player:Resource[]= await ctx.database.select('pokemon.resourceLimit')
-    //  .where({id:{$nin:ban}})
-    //  .orderBy('rankScore', 'desc').limit(10)
-    //   .execute()
-    //   console.log(player)
+    // //   console.log('test')
+    // //   const unplayer:Pokebattle[]=await ctx.database.select('pokebattle').where(row=>$.or(row.advanceChance,$.eq(row.lap,3))).execute()
+    // //   const ban=unplayer.map((item)=>item.id)
+    // //   console.log(ban)
+    // //  const player:Resource[]= await ctx.database.select('pokemon.resourceLimit')
+    // //  .where({id:{$nin:ban}})
+    // //  .orderBy('rankScore', 'desc').limit(10)
+    // //   .execute()
+    //   // console.log(player)
+    //   const [plauer]=await ctx.database.get('pokebattle',session.userId)
+    //   console.log((plauer.date+28800)/86400)
+    //   console.log((Math.round(Number(new Date()) / 1000)+28850)/86400-1)
+    //   await ctx.database.set('pokebattle', {}, row => ({
+    //     checkInDays:$.if($.eq($.divide($.add(row.date,28800),86400),(Math.round(Number(new Date()) / 1000)+28850)/86400-1), row.checkInDays, 0),
+    //     vip: $.if($.gt(row.vip, 0), $.sub(row.vip, 1), 0),
+    //     fly_count: 20
+    //   }))
     // })
 
 }

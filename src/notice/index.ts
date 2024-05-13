@@ -1,6 +1,6 @@
 import { Context } from "koishi";
 import { config,Config  } from "..";
-import { button, sendMarkdown, urlbutton } from "../utils/mothed"
+import { button, sendMarkdown, sendNoticeMarkdown, urlbutton } from "../utils/mothed"
 
 
 export async function apply(ctx: Context) {
@@ -16,7 +16,7 @@ ${notice}`
         return text
     })
 
-    ctx.command('宝可梦').subcommand('notice', '宝可梦公告').subcommand('nset <notices:string> <newOrOld:string>', '设置宝可梦公告', { authority: 4 }).action(async ({ session }, notices: string,newOrOld:string) => {
+    ctx.command('宝可梦').subcommand('notice', '宝可梦公告').subcommand('nset <notices:text> <newOrOld:string>', '设置宝可梦公告', { authority: 4 }).action(async ({ session }, notices: string,newOrOld:string) => {
         if(newOrOld=='o'){
             const notice = await ctx.database.get('pokemon.notice',{})
             if (notice.length === 0) {
@@ -86,6 +86,41 @@ ${notice}`
         }
 
     })
+
+    ctx.command('宝可梦').subcommand('发送公告 <msg:text>', {authority:4}).action(async ({ session },msg) => {
+        const groups=await ctx.database.get('channel', { platform:session.platform })
+        const notices=await ctx.database.get('pokemon.notice',{})
+        const notice=notices[notices.length-1]
+        if(groups.length===0){
+            return '未查询到群信息'
+        }
+        if(!msg){
+          msg=notice.notice
+        }
+        const group_id=groups.map(group=>group.id)
+        const md=`# 宝可梦公告
+---
+${msg}`
+       const kb={
+          keyboard: {
+            content: {
+              "rows": [
+                { "buttons": [urlbutton(2, "查看麦麦文档", 'https://docs.qq.com/doc/DTUJ6S3ZMUVZWaVRm', session.userId, "11")] },
+                { "buttons": [button(2, "签到", '签到', session.userId, "11")] },
+              ]
+            },
+          },
+        }
+        group_id.forEach(async group=>{
+          session.guildId=group
+         try{
+          console.log(session.guildId)
+          const mid= await sendNoticeMarkdown(md,session,kb)
+          ctx.sleep(200)
+          console.log(mid)
+         }catch(e){console.log(e)}
+        })
+      })
 
     ctx.command('领取麦麦 <text>').action(async ({ session },text) => {
         const [pokeplayer]=await ctx.database.get('pokebattle', { id: session.userId })

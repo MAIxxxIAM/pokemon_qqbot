@@ -1,4 +1,4 @@
-import { expToLv, skillMachine, pokemonBase, battleType } from './data'
+import { expToLv, skillMachine, pokemonBase, battleType, skills } from './data'
 
 import {config,Config} from '../index';
 
@@ -152,7 +152,7 @@ const pokemonCal = {
   
 
   pokemonskill(a: number) {
-  return Math.floor(Math.random() * 210) + 1
+  return Math.floor(Math.random() * (skills.skills.length-1)) + 1
 },
 
   skillbag(a: string[]) {

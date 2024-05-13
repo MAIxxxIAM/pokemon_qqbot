@@ -181,6 +181,7 @@ export interface Resource {
 // }
 export interface DigChannel {
     id: string
+    msg_id: string
     digGames: DigMine
     channelCD: Date
 }
@@ -196,6 +197,7 @@ export interface Pokebattle {
     id: string
     name: string
     date?: number
+    checkInDays?: number
     fossil_bag?: DigItem[]
     unknowns_bag?: unknowns[]
     captureTimes?: number
@@ -300,6 +302,7 @@ export async function model(ctx: Context) {
         id: 'string',
         name: 'string',
         date: 'integer',
+        checkInDays: 'unsigned',
         fossil_bag: {
             type: 'json',
             initial: [],
@@ -434,6 +437,7 @@ export async function model(ctx: Context) {
     ctx.model.extend('pokemon.digChannel', {
         id: 'string',
         digGames: 'json',
+        msg_id: 'string',
         channelCD:{
             type: 'timestamp',
             initial: new Date(0),
