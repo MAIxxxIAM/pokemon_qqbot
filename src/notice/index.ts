@@ -4,7 +4,9 @@ import { button, sendMarkdown, sendNoticeMarkdown, urlbutton } from "../utils/mo
 
 
 export async function apply(ctx: Context) {
-    ctx.command('宝可梦').subcommand('notice', '宝可梦公告').action(async ({session}) => {
+    ctx.command('宝可梦').subcommand('notice', '宝可梦公告')
+    .alias('公告')
+    .action(async ({session}) => {
         const notices = await ctx.database.get('pokemon.notice',{})
         if (notices.length === 0) {
             return '暂无公告'
@@ -142,7 +144,7 @@ ${msg}`
                     },
                   },
                 }
-                await sendMarkdown(md, session, kb)
+                await sendMarkdown(ctx,md, session, kb)
                 return
         }
         const [player]= await ctx.database.get('intellegentBody' as any, { open_token: text,id:{$ne:session.userId} })

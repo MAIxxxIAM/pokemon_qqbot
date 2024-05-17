@@ -546,7 +546,7 @@ ${wordCount2}${timeLimit}`
 \`\`\`
 ${unknowns.map((u) => `${u.name}`).join('\n')}
 \`\`\``
-      await sendMarkdown(md, session)
+      await sendMarkdown(ctx,md, session)
       return
     }
     pokeDex.pull('346.346', player)
@@ -570,7 +570,7 @@ ${unknowns.map((u) => `${u.name}`).join('\n')}
             
 已经放入图鉴`
 
-    await sendMarkdown(getMd, session)
+    await sendMarkdown(ctx,getMd, session)
 
   })
   // 猜 c* cdc* ccy*
@@ -988,7 +988,7 @@ ${gameDuration}${answerInfo}${processedResult}`
       
 > 奖励：VIP将多获得5000的当日金币获取上限。3周目为积分0-500不等并且会获得一个未知图腾，用来召唤雷吉奇卡斯 。1、2周目为金币0-7500不等。
 `
-      await sendMarkdown(md, session)
+      await sendMarkdown(ctx,md, session)
     })
   // 查询进度 jd* cxjd*
   ctx.command('查询进度', '查询当前游戏进度')
@@ -2080,7 +2080,7 @@ ${gridHtml}
           },
         }
       }
-      const result = await await sendMarkdown(message, session, kb)
+      const result = await await sendMarkdown(ctx,message, session, kb)
 
       messageId = result.id;
 

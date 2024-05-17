@@ -187,8 +187,7 @@ const pokemonCal = {
         }
       }else{skill[i] = a[i]}
     }
-
-    skill.sort((a, b) => { return Number(b) - Number(a) })
+    console.log(skill)
     let skillInfo = []
     for(let j=0;j<skill.length;j++) {
       skillInfo.push(`${skillMachine.skill[skill[j]].skill}:${skillMachine.skill[skill[j]].Dam} 类型:${skillMachine.skill[skill[j]].category===1?'物理':'特殊'} 属性:${skillMachine.skill[skill[j]].type}`)

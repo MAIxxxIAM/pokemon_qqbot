@@ -90,6 +90,7 @@ declare module 'koishi' {
         'pokemon.addGroup': AddGroup
         'intellegentBody': IntellegentBody
         'pokemon.digChannel': DigChannel
+        'pokemon.isPokemon': IsPokemon
     }
 }
 //邀请表
@@ -179,6 +180,11 @@ export interface Resource {
 //     id: string
 //     pokemonBag: PokeBag
 // }
+export interface IsPokemon {
+    id:string
+    pokemon_cmd:boolean
+}
+
 export interface DigChannel {
     id: string
     msg_id: string
@@ -293,6 +299,16 @@ export async function model(ctx: Context) {
         token:{
             type: 'unsigned',
             initial:1000,
+            nullable: false,
+        }
+    }
+    )
+    ctx.model.extend('pokemon.isPokemon', 
+    {
+        id: 'string',
+        pokemon_cmd:{
+            type: 'boolean',
+            initial:true,
             nullable: false,
         }
     }

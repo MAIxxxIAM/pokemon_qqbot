@@ -1,8 +1,8 @@
-import { Schema, h, $, is, Context, Session } from 'koishi'
+import { Schema, h, $, is, Context, Session, App } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
-import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion } from './utils/mothed'
+import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion, actionbutton } from './utils/mothed'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import * as fs from 'fs'
@@ -18,6 +18,7 @@ import * as digGame from './digGame/index'
 import * as handleAndCiying from './pokedle/src'
 import imageSize from 'image-size'
 import * as trainercmd from './trainer/index'
+import { } from 'koishi-plugin-markdown-to-image-service'
 
 
 import { Robot } from './utils/robot'
@@ -36,7 +37,7 @@ import { Skill } from './battle'
 export const name = 'pokemon'
 
 export const inject = {
-  required: ['database', 'downloads', 'canvas', 'cron'],
+  required: ['database', 'downloads', 'canvas', 'cron', 'markdownToImage'],
   optional: ['censor']
 }
 
@@ -209,8 +210,9 @@ export async function apply(ctx, conf: Config) {
   config = conf
   ctx.on('before-send', async (session: Session, msg_id) => {
     const { message } = session.event
-    if (session.scope !== 'commands.help.messages' || session.platform !== 'qq') { return }
-    let content = message.elements[0].attrs.content.split('\n')
+    if (session.scope !== 'commands.help.messages') { return }
+    let content = message.elements[0].attrs.content?.split('\n')
+    if (!content) return
     content.splice(0, 2)
     content = content.map((item) => {
       const a = item.split('  ')
@@ -226,24 +228,10 @@ export async function apply(ctx, conf: Config) {
 [${content[i][0]}](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`${content[i][0]}`)}&reply=false&enter=true) ${content[i][1]}
 `
     }
-
-    mdparam += `
-
-> 点击即可发送指令`
-    const b = getMarkdownParams(mdparam)
     try {
       // const a = await sendMsg(session)
-      const id = msg_id.session.event._data.d.id
-      await session.bot.internal.sendMessage(session.channelId, {
-        content: "111",
-        msg_type: 2,
-        markdown: {
-          custom_template_id: '102072441_1711377105',
-          params: b
-        },
-        msg_id: id,
-        timestamp: session.timestamp,
-      })
+      session.messageId = msg_id.session.event._data?.d.id
+      await sendMarkdown(ctx, mdparam, session,)
       session.event.message.elements = []
       return
     } catch (e) {
@@ -310,6 +298,15 @@ export async function apply(ctx, conf: Config) {
   ctx.on('guild-added', async (session) => {
     const { id } = session.event._data
     const { group_openid, op_member_openid } = session.event._data.d
+    let [channel] = await ctx.database.get('pokemon.isPokemon', { id: group_openid })
+    if (!channel) {
+      channel = await ctx.database.create('pokemon.isPokemon', { id: group_openid }, {
+        pokemon_cmd: false
+      })
+    }
+    await ctx.database.set('pokemon.isPokemon', { id: group_openid }, row => ({
+      pokemon_cmd: false
+    }))
     const addGroup: AddGroup[] = await ctx.database.get('pokemon.addGroup', { id: op_member_openid })
     let a: number
     if (addGroup.length == 0) {
@@ -338,7 +335,7 @@ export async function apply(ctx, conf: Config) {
 ✨我有好多好玩的功能！✨
 可以点我头像看 **使用文档**
 或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`
-    sendMarkdown(md, session, null, id)
+    sendMarkdown(ctx, md, session, null, id)
   })
 
 
@@ -360,7 +357,60 @@ export async function apply(ctx, conf: Config) {
       })
     })
   }
+  ctx.on('interaction/button', async (session,) => {
+    const { id, d } = session.event._data
+    const state = d.data.resolved.button_id
+    if (state !== 'ispokemon') return
+    const { group_openid, op_member_openid } = session.event._data.d
+    let [channel] = await ctx.database.get('pokemon.isPokemon', { id: group_openid })
+    if (!channel) { channel = await ctx.database.create('pokemon.isPokemon', { id: group_openid }) }
+    await ctx.database.set('pokemon.isPokemon', { id: group_openid }, row => ({
+      pokemon_cmd: $.if(row.pokemon_cmd, false, true)
+    }))
+    const md = `已${channel.pokemon_cmd ? '关闭' : '开启'}宝可梦功能`
+    await sendMarkdown(ctx, md, session, null, id)
+  })
 
+  ctx.on('command/before-execute', async (argv) => {
+    const { session } = argv
+    const { channelId, platform } = session
+    if (platform != 'qq') return
+    let [channel] = await ctx.database.get('pokemon.isPokemon', { id: channelId })
+    if (!channel) {
+      channel = await ctx.database.create('pokemon.isPokemon', { id: channelId }, {
+        pokemon_cmd: false
+      })
+    }
+    let cmd = argv.command
+    let name = cmd?.name
+    do {
+      name = cmd?.name
+      if (name == '宝可梦签到' || name == '宝可梦') break
+      cmd = cmd?.parent
+    } while (cmd?.name)
+    if (name == '宝可梦' && !channel.pokemon_cmd) {
+      const md = `本群已关闭宝可梦功能，如要开启请联系管理员点击下面按钮
+---
+> 宝可梦功能十分刷屏，如介意请勿开启
+**关闭时，仅可使用签到功能**
+可使用 **关闭/开启宝可梦** 来开启或关闭宝可梦功能`
+      const kb = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                "buttons": [
+                  actionbutton('关闭/开启宝可梦功能', !channel.isPokemon ? '1' : '0', session.userId, 'ispokemon', Date.now() + 5000, 1),
+                ]
+              },
+            ]
+          },
+        },
+      }
+      await sendMarkdown(ctx, md, session, kb)
+      return ``
+    }
+  })
   logger = ctx.logger('pokemon')
 
   try {
@@ -422,6 +472,33 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(lapTwo)
 
   ctx.plugin(pokedex)
+
+  ctx.command('宝可梦功能开关', '开启或关闭宝可梦功能').shortcut(/(关闭|开启)宝可梦/)
+    .action(async ({ session }) => {
+      const { channelId, platform } = session
+      if (platform != 'qq') return `非qq群暂时无法使用此功能`
+      let [channel] = await ctx.database.get('pokemon.isPokemon', { id: channelId })
+      if (!channel) { channel = await ctx.database.create('pokemon.isPokemon', { id: channelId }) }
+      const md = `本群已${channel.pokemon_cmd ? '开启' : '关闭'}宝可梦功能，如要${channel.pokemon_cmd ? '关闭' : '开启'}请联系管理员点击下面按钮
+---
+> 宝可梦功能十分刷屏，如介意请勿开启
+**关闭时，仅可使用签到功能**
+可使用 **关闭/开启宝可梦** 来开启或关闭宝可梦功能`
+      const kb = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                "buttons": [
+                  actionbutton('关闭/开启宝可梦功能', !channel.isPokemon ? '1' : '0', session.userId, 'ispokemon', Date.now() + 5000, 1),
+                ]
+              },
+            ]
+          },
+        },
+      }
+      await sendMarkdown(ctx, md, session, kb)
+    })
 
   ctx.command('宝可梦').subcommand('宝可梦签到', '每日的宝可梦签到')
     .action(async ({ session }) => {
@@ -579,7 +656,7 @@ ${chance ? `---
 
 [领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)` : ' '} 
 `
-            sendMarkdown(md, session, normalKb(session, userArr))
+            sendMarkdown(ctx, md, session, normalKb(session, userArr))
 
             //连续签到
             if (userArr[0].lap < 3 || checkDays !== dateNow) return
@@ -607,7 +684,7 @@ ${chance ? `---
             
 已经放入图鉴`
 
-            await sendMarkdown(getMd, session)
+            await sendMarkdown(ctx, getMd, session)
 
           } catch (e) {
             console.log(e)
@@ -658,7 +735,7 @@ ${chance ? `---
 ![img#512px #384px](${await toUrl(ctx, session, src)})
 ---
 - [点击获取宝可梦帮助](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`
-          await sendMarkdown(md, session)
+          await sendMarkdown(ctx, md, session)
         } catch (e) {
           return h.image(src)
         }
@@ -778,7 +855,7 @@ ${chance ? `---
 
 > tip:"⬛"的个数，表示的是宝可梦名字的长度
 `
-            capturMessage = await sendMarkdown(md, session, { keyboard: { content: catchbutton(black[0], black[1], black[2], session.userId), }, })
+            capturMessage = await sendMarkdown(ctx, md, session, { keyboard: { content: catchbutton(black[0], black[1], black[2], session.userId), }, })
           } catch (e) {
             capturMessage = await session.send(`${h.image(src)}
 \n
@@ -831,7 +908,7 @@ ${(h('at', { id: (session.userId) }))}
 ---
 - 精灵球 -1`
               try {
-                await sendMarkdown(md, session, kb)
+                await sendMarkdown(ctx, md, session, kb)
                 try { await session.bot.deleteMessage(session.channelId, capturMessage.id) } catch { try { session.bot.deleteMessage(session.channelId, capturMessage) } catch { } }
                 return
               } catch {
@@ -877,7 +954,7 @@ ${(h('at', { id: (session.userId) }))}
 
 ---
 > <@${session.userId}>再接再厉`
-                await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },] }, }, })
+                await sendMarkdown(ctx, md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },] }, }, })
                 try { await session.bot.deleteMessage(session.channelId, capturMessage.id) } catch { try { session.bot.deleteMessage(session.channelId, capturMessage) } catch { } }
                 await ctx.database.set('pokebattle', { id: session.userId }, row => ({
                   cyberMerit: 0
@@ -898,7 +975,7 @@ ${(h('at', { id: (session.userId) }))}
                 
 ---
 **传说宝可梦——${pokemonCal.pokemonlist(poke)}**`
-                await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },] }, }, })
+                await sendMarkdown(ctx, md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] },] }, }, })
                 try { await session.bot.deleteMessage(session.channelId, capturMessage.id) } catch { try { session.bot.deleteMessage(session.channelId, capturMessage) } catch { } }
                 return
               } catch (e) {
@@ -947,7 +1024,7 @@ ${(h('at', { id: (session.userId) }))}
 ---
 > ${userArr[0].lapTwo ? "你集齐了5只传说宝可梦\n据说多遇到几次就可以捕捉他们了" : "tips: “大灾变” 事件后的宝可梦好像并不能进行战斗了"}
 ${userArr[0].level > 99 ? `满级后，无法获得经验\n金币+${getGold}` : `你获得了${expGet}点经验值\nEXP:${pokemonCal.exp_bar(lvNew, expNew)}`}`
-            await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] }, userArr[0].AllMonster.length === 5 ? { "buttons": [button(2, `放生宝可梦`, "/放生", session.userId, "2")] } : null,] }, }, })
+            await sendMarkdown(ctx, md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `继续捕捉宝可梦`, "/捕捉宝可梦", session.userId, "1")] }, userArr[0].AllMonster.length === 5 ? { "buttons": [button(2, `放生宝可梦`, "/放生", session.userId, "2")] } : null,] }, }, })
           } catch (e) {
             await session.send(`${h.image(picture)}
 ${result ? '恭喜你捕捉到了宝可梦！' : '很遗憾，宝可梦逃走了！'}
@@ -1017,7 +1094,7 @@ ${result ? '恭喜你捕捉到了宝可梦！' : '很遗憾，宝可梦逃走了
                   },
                 },
               }
-              fullId = await sendMarkdown(md, session, kb)
+              fullId = await sendMarkdown(ctx, md, session, kb)
             } catch (e) {
               fullId = await session.send(`\n
 你的背包中已经有6只原生宝可梦啦
@@ -1124,7 +1201,7 @@ ${(h('at', { id: (session.userId) }))}
               },
             },
           }
-          fusionId = await sendMarkdown(md, session, kb)
+          fusionId = await sendMarkdown(ctx, md, session, kb)
         } catch (e) {
           fusionId = await session.send(`\n${image}
 回复【编号】 【编号】进行杂交
@@ -1214,7 +1291,7 @@ ${point}
 ---
 宝可梦属性：${getType(dan[1]).join(' ')}
 `
-                sonId = await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(0, "✅Yes", "Y", session.userId, "1"), button(0, "❌No", "N", session.userId, "2")] },] }, }, })
+                sonId = await sendMarkdown(ctx, md, session, { keyboard: { content: { "rows": [{ "buttons": [button(0, "✅Yes", "Y", session.userId, "1"), button(0, "❌No", "N", session.userId, "2")] },] }, }, })
               } catch (e) {
                 sonId = await session.send(`
 ${img_zj}
@@ -1255,7 +1332,7 @@ ${point}
 速度：${playerPower[5]}  ${Math.sign(Number(playerPower[5]) - userArr[0].power[5]) >= 0 ? '+' + (Number(playerPower[5]) - userArr[0].power[5]) : '' + (Number(playerPower[5]) - userArr[0].power[5])}
 ${point}
 `
-                  await sendMarkdown(md, session)
+                  await sendMarkdown(ctx, md, session)
                   return
                 case 'n':
                 case 'N':
@@ -1391,9 +1468,10 @@ ${(h('at', { id: (session.userId) }))}`
 
         const { src } = infoImgSelfClassic.attrs
         //图片服务
+        let md = ''
+        const chance = await getChance(userArr[0], ctx)
         try {
-          const chance = await getChance(userArr[0], ctx)
-          const md = `# <@${userId}>的训练师卡片
+          md = `# <@${userId}>的训练师卡片
 ![img#485px #703px](${await toUrl(ctx, session, src)})
 [📃 问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可问答`)}&reply=false&enter=true) || [⚔️ 对战](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战`)}&reply=false&enter=true) || [📕 属性](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/属性`)}&reply=false&enter=true)
 
@@ -1419,10 +1497,33 @@ ${chance ? `你当前可以领取三周目资格
 [领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)` : ' '} 
 
 > *邀请麦麦子到其他群做客可以增加3w获取上限哦~o(*////▽////*)q`
-          await sendMarkdown(md, session, normalKb(session, userArr as Pokebattle[]))
+          await sendMarkdown(ctx, md, session, normalKb(session, userArr as Pokebattle[]))
         } catch (e) {
-          return `${h.image(src)}
-${(h('at', { id: (session.userId) }))}`
+          md = `# ${userArr[0].name}的训练师卡片
+![img#485px #703px](${await toUrl(ctx, session, src)})
+[📃 宝可问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可问答`)}&reply=false&enter=true) || [⚔️ 对战](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战`)}&reply=false&enter=true) || [📕 属性](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/属性`)}&reply=false&enter=true)
+
+[🛒 购买](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买`)}&reply=false&enter=true) || [🔈 公告](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/notice`)}&reply=false&enter=true) || [🔖 宝可梦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)
+
+[🏆 使用](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=false) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交宝可梦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
+
+---
+- 对战积分：${playerLimit.rankScore}
+- 积分排名：${userArr[0].lap > 2 ? `不计入排名` : playerLimit.rank ? playerLimit.rank : `未进入前十`}
+- 金币获取剩余：${playerLimit.resource.goldLimit}
+- 宝可梦属性：${getType(userArr[0].monster_1).join(' ')}
+
+---
+${userArr[0].advanceChance ? `你当前可以进入三周目
+
+[/lapnext](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/lapnext`)}&reply=false&enter=true)` : ' '}
+${chance ? `你当前可以领取三周目资格
+
+[/getchance](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)` : ' '} 
+
+> *邀请麦麦子到其他群做客可以增加3w获取上限哦~o(*////▽////*)q`
+          const imgBuffer = await ctx.markdownToImage.convertToImage(md.replace('<@${userId}>的', ''))
+          return `${h.image(imgBuffer, 'image/png')}`
         }
       } else {
         try {
@@ -1496,7 +1597,7 @@ ${(h('at', { id: (session.userId) }))}`
           }
           const md = `# <@${session.userId}>选择放生宝可梦
 ![img#512px #381px](${await toUrl(ctx, session, src)})`
-          putMessage = await sendMarkdown(md, session, kb)
+          putMessage = await sendMarkdown(ctx, md, session, kb)
 
         } catch (e) {
           putMessage = await session.send(`\n${image}
@@ -1568,7 +1669,7 @@ ${!isEvent ? events : ''}
             },
           }
           try { await session.bot.deleteMessage(session.channelId, putMessage.id) } catch { }
-          await sendMarkdown(md, session, kb)
+          await sendMarkdown(ctx, md, session, kb)
           await ctx.database.set('pokebattle', { id: session.userId }, row => ({
             isPut: false
           }))
@@ -1655,7 +1756,7 @@ ${point}
 ${(toDo)}
 性格：${playerList.pokemon[index]?.natures?.effect ? playerList.pokemon[index].natures.effect : '未加载'}
 ${point}`
-        await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(0, "♂ 杂交宝可梦", "/杂交宝可梦", session.userId, "1"), button(0, "📷 捕捉宝可梦", "/捕捉宝可梦", session.userId, "2")] }, { "buttons": [button(0, "💳 查看信息", "/查看信息", session.userId, "3"), button(0, "⚔️ 对战", "/对战", session.userId, "4")] },] }, }, })
+        await sendMarkdown(ctx, md, session, { keyboard: { content: { "rows": [{ "buttons": [button(0, "♂ 杂交宝可梦", "/杂交宝可梦", session.userId, "1"), button(0, "📷 捕捉宝可梦", "/捕捉宝可梦", session.userId, "2")] }, { "buttons": [button(0, "💳 查看信息", "/查看信息", session.userId, "3"), button(0, "⚔️ 对战", "/对战", session.userId, "4")] },] }, }, })
       } catch (e) {
         console.log(e)
         return `\u200b
@@ -1717,7 +1818,7 @@ ${img}
 <@${session.userId}>你还没有${commands}吧
 点击👉 [${commands}](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/${commands}`)}&reply=false&enter=fales)
 `
-          await sendMarkdown(md, session)
+          await sendMarkdown(ctx, md, session)
           return
         }
         if (!user) {
@@ -1890,9 +1991,11 @@ ${winner == session.userId ? `金币+${getgold}  ${user ? '指定对战无法获
             },
           }
           session.bot.deleteMessage(session.channelId, readyMessage)
-          await sendMarkdown(md, session, kb);
+          await sendMarkdown(ctx, md, session, kb);
           if (userArr[0].lap < 3 || userArr[0].level < 90 || userArr[0].fossil_bag.length < 1) return
           if (!canLegendaryPokemon || (win_count - 1) < 30) return
+          const pokedex = new Pokedex(userArr[0]);
+          if (pokedex.check('348.348')) return
           (legendaryPokemonRandom > (90 - userArr[0].cyberMerit * 0.04)) ?
             await session.send(`接下来你将和盖诺赛克特对战...`)
             : null
@@ -1943,7 +2046,7 @@ ${jli}`
     let dimensions = imageSize(imgBuffer)
     const md = `# <@${session.userId}>战斗详情
 ![img#${dimensions.width}px #${dimensions.height}px](${await toUrl(ctx, session, img)})`
-    await sendMarkdown(md, session)
+    await sendMarkdown(ctx, md, session)
   })
   ctx.command('宝可梦').subcommand('技能扭蛋机 [count:number]', '消耗扭蛋币，抽取技能')
     .usage(`/技能扭蛋机`)
@@ -1988,9 +2091,11 @@ ${jli}`
       await ctx.database.set('pokebattle', { id: session.userId }, {
         skillbag: userArr[0].skillbag
       })
+      let md = ''
+      const point = '```'
       try {
-        const point = '```'
-        const md = `# <@${session.userId}> 扭蛋结果
+
+        md = `# <@${session.userId}> 扭蛋结果
 你抽取了${count}个技能
 重复技能将被换成金币
 
@@ -2005,9 +2110,24 @@ ${point}
 ---
 > 点击后输入数字
 即可连续抽取技能👉 [技能扭蛋机](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/技能扭蛋机`)}&reply=false&enter=false)`
-        await sendMarkdown(md, session)
+        await sendMarkdown(ctx, md, session)
       } catch {
-        await session.send(`你抽取了${count}个技能\n重复技能将被换成金币\n${skilllist.join('\n')}\n金币+${getgold}`)
+        md = `# 扭蛋结果
+你抽取了${count}个技能
+重复技能将被换成金币
+        
+---
+${point}
+${skilllist.join('\n')}
+${point}
+        
+---
+金币+${getgold}
+
+---
+> 指令 \`\`\`/技能扭蛋机\`\`\`后加数字可以抽取多个技能`
+        const imgBuffer = await ctx.markdownToImage.convertToImage(md)
+        await session.send(h.image(imgBuffer, 'image/png'))
       }
     })
 
@@ -2031,7 +2151,7 @@ ${point}
 ${point}
 ${bag}
 ${point}`
-      try { await sendMarkdown(md, session) } catch {
+      try { await sendMarkdown(ctx, md, session) } catch {
         return `\u200b
 你当前的技能：
 ${bag.replace(/\n/g, '||')}`
@@ -2077,7 +2197,7 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
             },
           },
         }
-        await sendMarkdown(md, session, kb)
+        await sendMarkdown(ctx, md, session, kb)
         const reputSkill = await session.prompt(50000)
         if (!reputSkill) return `操作超时`
         if (!userArr[0].skillSlot[reputSkill - 1]) return `输入错误，请重新输入`
@@ -2144,7 +2264,7 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
               },
             },
           }
-          await sendMarkdown(type, session, kb)
+          await sendMarkdown(ctx, type, session, kb)
           return
         }
         return `${skill}的技能信息：\n威力：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].Dam}\n类型：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].category == 1 ? '物理' : "特殊"}\n属性：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].type}\n描述：${skillMachine.skill[Number(pokemonCal.findskillId(skill))].descript}`
@@ -2225,7 +2345,7 @@ ${MDreply}
           },
         }
         try {
-          await sendMarkdown(md, session, kb)
+          await sendMarkdown(ctx, md, session, kb)
         } catch (e) {
           return `网络繁忙，再试一次`
         }
@@ -2294,7 +2414,7 @@ ${!isEvent ? events : ''}
 当前飞机航行事件 ${userArr[0].fly_count - addFlyCount} / 20
 
 当前赛博功德值:${userArr[0].cyberMerit + addMerits}`
-        await sendMarkdown(md, session)
+        await sendMarkdown(ctx, md, session)
         if (userArr[0].fly_count < 1) return
         if (isEvent) return
         if (legendaryPokemonRandom > (99 - userArr[0].cyberMerit * 0.04)) {
@@ -2361,6 +2481,7 @@ ${!isEvent ? events : ''}
       const mid = items ? items.split('+')[0] : items
       number = number ? number : items ? items.split('+')[1] : number
       items = mid
+      if (!number) number = 1
       number = Math.floor(Number(number))
       if (number < 0) return `怎么还有来骗积分的！！！`
       const [player]: Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
@@ -2400,7 +2521,7 @@ ${!isEvent ? events : ''}
 `
 
       if (!items) {
-        await sendMarkdown(market, session)
+        await sendMarkdown(ctx, market, session)
         return
       }
       if (!item.includes(items)) return `没有这个道具`
@@ -2434,7 +2555,7 @@ ${!isEvent ? events : ''}
               },
             },
           }
-          msgId = await sendMarkdown(isInstall, session, kb)
+          msgId = await sendMarkdown(ctx, isInstall, session, kb)
           const choose = await session.prompt(20000)
           const isChoose = choose == 'Y' ? true : false
           if (!isChoose) {
@@ -2454,33 +2575,45 @@ ${!isEvent ? events : ''}
         }
         case "荣誉勋章":
           let msgId = { id: '' }
+          let msg = ''
           const powerDesc = ["生命", "攻击", "防御", "特攻", "特防", "速度"]
           {
-            if (limit.rankScore < 200) return `你的积分不足`
+            if (limit.rankScore < 200 * number) return `你的积分不足`
             const playerList: PokemonList = await getList(session.userId, ctx, player.monster_1)
             const newNature = new FusionPokemon(player.monster_1, playerList)
             const index = await findFusion(newNature, playerList)
-            let sum = playerList.pokemon[index].power.reduce((a, b) => a + b, 0);
-            if (sum >= 255 * 6) {
-              playerList.pokemon[index].power = playerList.pokemon[index].power.map((a) => a > 255 ? 255 : a)
-              await ctx.database.set('pokemon.list', { id: session.userId }, {
-                pokemon: playerList.pokemon
-              })
-              const playerPower = pokemonCal.power(pokemonCal.pokeBase(player.monster_1), player.level, playerList, player.monster_1)
-              await ctx.database.set('pokebattle', { id: session.userId }, row => ({
-                power: playerPower
-              }))
-              return `你的宝可梦已经非常强大了`
-            }
             let random = 0
             let value = 0
             let up = 0
-            do {
-              random = Math.floor(Math.random() * 6);
-              value = Math.floor(Math.random() * 5 + 1)
-              up = (playerList.pokemon[index].power[random] <= (255 - value)) ? value : 255 - (playerList.pokemon[index].power[random])
-            } while (up === 0)
-            playerList.pokemon[index].power[random] += up
+            let add = {}
+            let count = 0
+            for (let i = 0; i < number; i++) {
+              let sum = playerList.pokemon[index].power.reduce((a, b) => a + b, 0);
+              if (sum >= 255 * 6) {
+                playerList.pokemon[index].power = playerList.pokemon[index].power.map((a) => a > 255 ? 255 : a)
+                await ctx.database.set('pokemon.list', { id: session.userId }, {
+                  pokemon: playerList.pokemon
+                })
+                msg += '努力值已满\n'
+                break
+              }
+              count++
+              do {
+                random = Math.floor(Math.random() * 6);
+                value = Math.floor(Math.random() * 5 + 1)
+                up = (playerList.pokemon[index].power[random] <= (255 - value)) ? value : 255 - (playerList.pokemon[index].power[random])
+              } while (up === 0)
+              playerList.pokemon[index].power[random] += up
+              add[powerDesc[random]] = (add?.[powerDesc[random]] ? add?.[powerDesc[random]] : 0) + up
+
+            }
+            msg += `兑换了${count}个勋章\n`
+            for (let i in add) {
+              msg += `${i}努力值+${add[i]}\n`
+            }
+
+            msgId = await session.send(`成功给${newNature.name}添加了荣誉勋章,${msg}花费了${count * 200}积分`)
+            //写入数据库
             await ctx.database.set('pokemon.list', { id: session.userId }, {
               pokemon: playerList.pokemon
             })
@@ -2489,11 +2622,10 @@ ${!isEvent ? events : ''}
               power: playerPower
             }))
             await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
-              rankScore: $.sub(row.rankScore, 200),
+              rankScore: $.sub(row.rankScore, 200 * count),
             }))
-            msgId = await session.send(`成功给${newNature.name}添加了荣誉勋章，提升了${up}点${powerDesc[random]}努力值`)
             ctx.setTimeout(() => {
-              session.bot.deleteMessage(session.channelId, msgId.id)
+              try { session.bot.deleteMessage(session.channelId, msgId.id) } catch { session.bot.deleteMessage(session.channelId, msgId) }
             }, 5000)
             return
           }
@@ -2518,7 +2650,7 @@ ${!isEvent ? events : ''}
                 },
               },
             }
-            await sendMarkdown(md, session, kb)
+            await sendMarkdown(ctx, md, session, kb)
           }
           await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
             rankScore: $.sub(row.rankScore, number),

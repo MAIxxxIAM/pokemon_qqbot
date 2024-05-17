@@ -49,7 +49,7 @@ export function apply(ctx: Context) {
 ## 三周目开启条件
 - 非全图鉴玩家需要满级玩家对战积分排行前十名（每两天排行一次）
 - 每个传说宝可梦至少遇到一次`
-      await sendMarkdown(md,session)
+      await sendMarkdown(ctx,md,session)
       return
     }
     return `条件不满足，非全图鉴玩家需要满级玩家对战积分排行前十名（每两天排行一次），且每个传说宝可梦至少遇到一次`
@@ -104,7 +104,7 @@ export function apply(ctx: Context) {
             },
           },
         }
-        await sendMarkdown(md, session, kb)
+        await sendMarkdown(ctx,md, session, kb)
       } catch {
         await session.send(`\u200b是否进入下一周目
 进入下一周目,你的等级将会清空

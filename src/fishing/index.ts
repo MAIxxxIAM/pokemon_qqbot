@@ -37,7 +37,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 当前赛博功德值:${player.cyberMerit+1}`
         const getMd = (item: FishItem) => `${regex.test(player.name) ? player.name : `<@${session.userId}>`}获得了${item.name[Math.floor(Math.random() * item.name.length)]}
         
-> 价值${item.points*(player.lap<3?50:1)+player.lap<3?Fishspend:0}${player.lap<3?'金币':'积分'}
+> 价值${(item.points*(player.lap<3?50:1))+(player.lap<3?Fishspend:0)}${player.lap<3?'金币':'积分'}
 
 ---
 ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
@@ -59,7 +59,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
         //     }
         // }
         if (!getFish) {
-            await sendMarkdown(noneMd, session,{keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
+            await sendMarkdown(ctx,noneMd, session,{keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
             return
         }
         if (getFish.legendaryPokemon) {
@@ -70,7 +70,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 盖欧卡看了你一眼，并摇了摇头
 
 > 你当前好像无法收复它`
-                await sendMarkdown(weak, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, });
+                await sendMarkdown(ctx,weak, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, });
                 return
             }
             //copy
@@ -86,7 +86,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
       
 ---
 **传说宝可梦——${pokemonCal.pokemonlist(getFish.name[0])}**`
-                await sendMarkdown(md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
+                await sendMarkdown(ctx,md, session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
                 await ctx.database.set('pokebattle', { id: session.userId }, {
                     ultra: player.ultra,
                     cyberMerit:0
@@ -114,7 +114,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
             }
             //copy
         } else {
-            await sendMarkdown(getMd(getFish), session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
+            await sendMarkdown(ctx,getMd(getFish), session, { keyboard: { content: { "rows": [{ "buttons": [button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1")] },] }, }, })
             player.lap<3?await ctx.database.set('pokebattle', { id: session.userId }, row => ({
                 gold: $.add(row.gold, getFish.points*50+Fishspend)
             })):await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
@@ -125,6 +125,8 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 
 
     ctx.command('宝可梦').subcommand('钓鱼','赛博钓鱼').action(async ({ session }) => {
+        const {platform}=session
+        if(platform!=='qq') return `非qq群不支持钓鱼功能`
         const [player] = await ctx.database.get('pokebattle', session.userId)
         if (!player) {
             await session.execute('签到')
@@ -140,7 +142,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 - [高级鱼饵 2300金币](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`高级鱼饵`)}&reply=false&enter=true)  会员专属鱼饵，多0.5%好运气
 `
 
-       const fishId= await sendMarkdown(fishMd, session)
+       const fishId= await sendMarkdown(ctx,fishMd, session)
 
         const fished = await session.prompt(20000)
 
@@ -148,7 +150,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
 
         const Fishspend = fished === '普通鱼饵' ? 2000 : 2300
         if (player.gold < Fishspend) {
-            await sendMarkdown(`<@${session.userId}>你的金币不足`, session)
+            await sendMarkdown(ctx,`<@${session.userId}>你的金币不足`, session)
             return
         }
         if (fished === '高级鱼饵' && player?.vip < 1) {
@@ -177,7 +179,7 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
             const reelMd = `<@${session.userId}>有东西咬钩，开始收杆
 ---
 **请5秒内点击收杆按钮**`
-            const { id } = await sendMarkdown(reelMd, session, actionbuttons)
+            const { id } = await sendMarkdown(ctx,reelMd, session, actionbuttons)
             ctx.setTimeout(async () => {
                 session.bot.deleteMessage(session.channelId, id)
                 await ctx.database.set('pokebattle', session.userId, row => ({
@@ -191,13 +193,13 @@ ${(!isEvent&&player.cyberMerit < 100 )?'你净化了水质 赛博功德+1':''}
         // const getFish = fishingGame.fish(Luckly[fished])
         // const reelInTime = getFish?.reelInTime
         // if (!getFish) {
-        //   await sendMarkdown(noneMd,session)
+        //   await sendMarkdown(ctx,noneMd,session)
         //   return
         // }
         // if(getFish.legendaryPokemon) {
 
         // }else{
-        //     await sendMarkdown(getMd(getFish),session)
+        //     await sendMarkdown(ctx,getMd(getFish),session)
         //     await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
         //         rankScore: $.add(row.rankScore,getFish.points)
         //     }))

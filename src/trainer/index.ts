@@ -37,7 +37,7 @@ export async function apply(ctx:Context) {
             },
           },
     }
-    await sendMarkdown(md,session,kb)
+    await sendMarkdown(ctx,md,session,kb)
     let newName=await session.prompt(30000)
     if(!newName) newName=randomTrainer.source_name
     randomTrainer.name=newName
@@ -53,7 +53,7 @@ export async function apply(ctx:Context) {
 
 - [点击更换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/更换训练师 ${randomTrainer.name}`)}&reply=false&enter=true)
 - [继续开启盲盒](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/盲盒`)}&reply=false&enter=true)`
-    try{await sendMarkdown(md2,session)}catch{
+    try{await sendMarkdown(ctx,md2,session)}catch{
       const md3=`<@${session.userId}>成功收集训练家${randomTrainer.source_name}！
 
 ---
@@ -63,7 +63,7 @@ export async function apply(ctx:Context) {
       
 - [点击更换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/更换训练师 -t ${randomTrainer.tid}`)}&reply=false&enter=true)
 - [继续开启盲盒](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/盲盒`)}&reply=false&enter=true)`
-      await sendMarkdown(md3,session)
+      await sendMarkdown(ctx,md3,session)
     }
     })
 
@@ -79,7 +79,7 @@ export async function apply(ctx:Context) {
       }
       if(!tid){
         const md=`<@${session.userId}>请输入正确的训练师编号`
-        await sendMarkdown(md,session)
+        await sendMarkdown(ctx,md,session)
         await session.execute(`/更换训练师`)
         return
       }
@@ -94,19 +94,19 @@ export async function apply(ctx:Context) {
                 },
               },
         }
-        await sendMarkdown(md,session,kb)
+        await sendMarkdown(ctx,md,session,kb)
         return
       }
       const isTrainer=player.trainer_list.find(trainers=>trainers.tid==tid)
       if(!isTrainer){
         const md=`<@${session.userId}>没有找到该训练师`
-        await sendMarkdown(md,session)
+        await sendMarkdown(ctx,md,session)
         await session.execute(`/更换训练师`)
         return
       }
       if(!newName){
         const md=`<@${session.userId}>请输入正确的训练师名字`
-        await sendMarkdown(md,session)
+        await sendMarkdown(ctx,md,session)
         await session.execute(`/更换训练师 -t ${Math.floor(tid/10)}`)
         return
       }
@@ -117,12 +117,12 @@ ${isTrainer.name}➣${newName}`
 
 > 当前名字中含有违禁词`
       try{
-        await sendMarkdown(md,session)
+        await sendMarkdown(ctx,md,session)
         await ctx.database.set('pokebattle',{id:session.userId},row=>({
           trainer_list:player.trainer_list.map(trainers=>trainers.tid==tid?{...trainers,name:newName}:trainers)
         }))
       }catch{
-        await sendMarkdown(faileChange,session)
+        await sendMarkdown(ctx,faileChange,session)
       }
     })
 
@@ -169,7 +169,7 @@ ${isTrainer.name}➣${newName}`
               },
         }
         try{
-          await sendMarkdown(md,session,kb)}catch(e){
+          await sendMarkdown(ctx,md,session,kb)}catch(e){
             listContent=`训练师列表 (${options.page}/${Math.ceil(trainerList.length/10)}) ：
 ---`
                     for (let index = startIndex; index < endIndex; index++) {
@@ -182,7 +182,7 @@ ${isTrainer.name}➣${newName}`
 > 当前自定义名字存在违禁词，已重置为默认名字
 
 点击按钮后输入名称更换训练师`
-                    await sendMarkdown(md,session,kb)
+                    await sendMarkdown(ctx,md,session,kb)
         }
         return
       }
@@ -201,7 +201,7 @@ ${isTrainer.name}➣${newName}`
                 },
               },
         }
-        await sendMarkdown(md,session,kb)
+        await sendMarkdown(ctx,md,session,kb)
         return
       }
       await ctx.database.set('pokebattle',{id:session.userId},row=>({
@@ -219,6 +219,6 @@ ${isTrainer.name}➣${newName}`
           ]
         },
       },}
-      await sendMarkdown(md2,session,kb)
+      await sendMarkdown(ctx,md2,session,kb)
     })
 }

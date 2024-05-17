@@ -353,6 +353,6 @@ ${'```'}
 
 ---
 你还有${miss[1]}只宝可梦没有收集`
-           await sendMarkdown(md, session)
+           await sendMarkdown(ctx,md, session)
         })
 }

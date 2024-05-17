@@ -1,12 +1,12 @@
 import { resolve } from 'path'
 import { Pokebattle, logger, config, shop, testcanvas, Config } from '..'
 import { type, battleType } from './data'
-import { Context, Session ,Element} from 'koishi'
+import { Context, Session ,Element, h} from 'koishi'
 import { WildPokemon } from '../battle'
 import { } from 'koishi-plugin-cron'
 import { FusionPokemon, Natures, PokemonList } from '../model'
 import { DigMine, StoneType } from '../digGame/type'
-
+import imageSize from 'image-size'
 
 export function mudPath(a:string){
   return `${testcanvas}${resolve(__dirname, `../assets/img/digGame/${StoneType[a]}.png`)}`
@@ -301,9 +301,13 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
 }
 
 
-export async function sendMarkdown(a: string, session: Session, button = null,eventId=null) {
+export async function sendMarkdown(ctx:Context,a: string, session: Session, button = null,eventId=null) {
   const b = getMarkdownParams(a)
- return await session.bot.internal.sendMessage(session.guildId, Object.assign({
+  const {platform} = session 
+  const md=a.replace(`<@${session.userId}>`,'你的')
+  let c:any
+ try{
+  c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
     content: "111",
     msg_type: 2,
     markdown: {
@@ -312,7 +316,34 @@ export async function sendMarkdown(a: string, session: Session, button = null,ev
     },
     timestamp: session.timestamp,
     msg_seq: Math.floor(Math.random() * 1000000),
-  }, button,eventId?{event_id:eventId}:{msg_id: session.messageId,}))
+  },platform=='qq'? button:null,eventId?{event_id:eventId}:{msg_id: session.messageId,}))
+}catch{
+ let buttons=button?button.keyboard.content.rows.map(row=>row.buttons):[]
+ buttons=buttons.flat()
+ const buttonName=buttons.map(button=>{if(button.action.type==2){return `${button.action.data}➣${button.render_data.label}`}})
+  const d=await ctx.markdownToImage.convertToImage(md)
+const size = imageSize(d)
+  c= await session.send(`
+
+${buttonName.length==0?'':'@后可用指令：'+'\n'+buttonName.join('\n')}
+${h.image(d,'image/png')}
+`)}
+return c
+}
+
+function splitArray(input, parts) {
+  let result = [];
+  for (let i = 0; i < parts; i++) {
+      result.push([]);
+  }
+  let partLength = Math.ceil(input.length / parts);
+  for (let i = 0; i < input.length; i++) {
+      if (i % partLength === 0 && i !== 0) {
+          partLength = Math.ceil((input.length - i) / (parts - (i / partLength)));
+      }
+      result[Math.floor(i / partLength)].push(input[i]);
+  }
+  return result;
 }
 export async function sendNoticeMarkdown(a: string, session: Session, button = null) {
   const b = getMarkdownParams(a)
@@ -569,7 +600,7 @@ export function urlbutton(pt: number, a: string, b: string, d: string, c: string
     },
   }
 }
-export function actionbutton(a: string, 数据: string, 权限: string,消息Id: string, 时间戳: number) {
+export function actionbutton(a: string, 数据: string, 权限: string,消息Id: string, 时间戳: number,按钮权限=0) {
   return {
     "id":消息Id,
     "render_data": {
@@ -579,7 +610,7 @@ export function actionbutton(a: string, 数据: string, 权限: string,消息Id:
     "action": {
       "type": 1,
       "permission": {
-        "type": 0,
+        "type": 按钮权限,
         "specify_user_ids": [权限]
       },
       "unsupport_tips": "请输入@Bot",

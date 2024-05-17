@@ -104,7 +104,7 @@ ${MdString}
                     },
                 }
             }
-            msg_id= await sendMarkdown(md, session, kb)
+            msg_id= await sendMarkdown(ctx,md, session, kb)
            try{
              digGames?.msg_id?await session.bot.deleteMessage(session.channelId,digGames.msg_id):null
            }catch(e){}
@@ -151,7 +151,7 @@ ${MdString}
                     if (fossilBtn?.buttons.length >=2) {i++}
                     fossilBtn.buttons =  fossilBtn?.buttons.concat(button(0, `${f.name}x${f.number}`, `/售出 ${f.id}`, session.userId, f.id))
                 })
-                await sendMarkdown(md, session, kb)
+                await sendMarkdown(ctx,md, session, kb)
                 return
             }
             const fossil = player.fossil_bag.find(f => f.id === id)
@@ -222,6 +222,6 @@ ${MdString}
             
 已经放入图鉴`
 
-            await sendMarkdown(getMd, session)
+            await sendMarkdown(ctx,getMd, session)
         })
 }
