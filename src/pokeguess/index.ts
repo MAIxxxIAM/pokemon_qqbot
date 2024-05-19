@@ -1,9 +1,12 @@
-import { h } from "koishi"
+import { $, h } from "koishi"
 import { config } from ".."
 import { button, isResourceLimit, isVip, toUrl } from "../utils/mothed"
 import { PokeGuess } from "./pokeguess"
-import { PrivateResource } from "../model"
-
+import { Pokebattle, PrivateResource } from "../model"
+import { Pokedex } from "../pokedex/pokedex"
+import crypto from 'crypto'
+import { legendaryPokemonId } from ".."
+import pokemonCal from "../utils/pokemon"
 
 
 
@@ -15,14 +18,14 @@ export async function  apply ( ctx ) {
         const q= new PokeGuess()
         const qImage = await q.q(ctx)
         const aImage = await q.a(ctx)
-        const players=await ctx.database.get('pokebattle', { id: session.userId })
-        if (players.length === 0) {
+        const [player]:Pokebattle[]=await ctx.database.get('pokebattle', { id: session.userId })
+        if (!player) {
             await session.execute('签到')
             return
         }
-        const player = players[0]
+
         const vip = isVip(player)
-        const vipRGold = vip ? 150 : 0
+        const vipRGold = vip ? 1500 : 0
         try{
             await session.bot.internal.sendMessage(session.channelId, {
                 content: "111",
@@ -125,18 +128,23 @@ ${h('image', { url:qImage})}
             y = `,当前回答受到传说中的宝可梦的加成，奖励增加`
           }
         if (y_n) {
-
-          let addgole = 100 + vipRGold + 50 * player.ultramonster.length
+          let addgole = 1000 + vipRGold + 200 * player.ultramonster.length
           const resource = await isResourceLimit(session.userId, ctx)
           const rLimit = new PrivateResource(resource.resource.goldLimit)
           addgole =await rLimit.getGold(ctx, addgole, session.userId)
           player.gold += addgole
-          end = `回答正确\r你获得了${addgole}金币~${y}`
+          end = `回答正确\r你获得了${addgole}金币${player.lap==3?',5 积分':''}~${y}`
+          player.lap==3?await ctx.database.set('pokemon.resourceLimit', { id: player.id}, row =>
+            ({
+              rankScore: $.add(row.rankScore, 5),
+            })
+            ):null
       }
       else {
         end = `回答错误\r正确答案是${right}`
       }
-       
+       const legendaryPokemonRandom = Math.floor(Math.random() * 100)
+      //  const legendaryPokemonRandom = 99
         try{
             await session.bot.internal.sendMessage(session.guildId, {
                 content: "111",
@@ -184,6 +192,22 @@ ${end}
 当前金币：${player.gold}
 `)
         }
+        const legendaryPokemon=y_n?'343.343':'344.344'
+        if (player.lap < 3 || player.level < 90) return
+        const pokedex = new Pokedex(player);
+        if (pokedex.check(legendaryPokemon)) return
+        (legendaryPokemonRandom > (90 - player.cyberMerit * 0.04)) ?
+          await session.send(`接下来你将和${pokemonCal.pokemonlist(legendaryPokemon)}对战...`)
+          : null
+        if (legendaryPokemonRandom > (90 - player.cyberMerit * 0.04)) {
+          const key = crypto.createHash('md5').update(session.userId + new Date().getTime()).digest('hex').toUpperCase()
+          legendaryPokemonId[key] = legendaryPokemon
+          await session.execute(`捕捉宝可梦 ${key}`)
+          await ctx.setTimeout(() => {
+            delete legendaryPokemonId[key];
+          }, 2000);
+        }
+        return
     })
 
 }

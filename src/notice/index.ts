@@ -114,11 +114,11 @@ ${msg}`
           },
         }
         group_id.forEach(async group=>{
-          session.guildId=group
+          session.channelId=group
          try{
-          console.log(session.guildId)
+          console.log(session.channelId)
           const mid= await sendNoticeMarkdown(md,session,kb)
-          ctx.sleep(200)
+          ctx.sleep(500)
           console.log(mid)
          }catch(e){console.log(e)}
         })

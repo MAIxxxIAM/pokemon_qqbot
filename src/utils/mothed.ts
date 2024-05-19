@@ -347,7 +347,7 @@ function splitArray(input, parts) {
 }
 export async function sendNoticeMarkdown(a: string, session: Session, button = null) {
   const b = getMarkdownParams(a)
- return await session.bot.internal.sendMessage(session.guildId, {
+ return await session.bot.internal.sendMessage(session.channelId, {
     content: "111",
     msg_type: 2,
     markdown: {
