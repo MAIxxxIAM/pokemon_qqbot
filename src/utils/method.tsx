@@ -7,7 +7,7 @@ import { } from 'koishi-plugin-cron'
 import { FusionPokemon, Natures, PokemonList } from '../model'
 import { DigMine, StoneType } from '../dig_game/type'
 import imageSize from 'image-size'
-import {transform } from 'koishi-plugin-markdown'
+import { } from 'koishi-plugin-text-censor'
 
 export function mudPath(a: string) {
   return `${testcanvas}${resolve(__dirname, `../assets/img/digGame/${StoneType[a]}.png`)}`
@@ -438,10 +438,10 @@ export function typeEffect(a: string, b: string, skillType: string) {
 
 }
 
-export async function censorText(ctx, text: string) {
+export async function censorText(ctx:Context, text: string) {
   const a: Element[] = [Element('text', { content: text })]
-  const [b] = await ctx.censor.transform(a)
-  return b.attrs.content
+  const b = <censor>{a}</censor>
+  return b.children[0].attrs.content
 }
 
 export function baseFusion(a: number, b: number,) {

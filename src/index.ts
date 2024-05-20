@@ -571,6 +571,7 @@ export async function apply(ctx, conf: Config) {
               rankScore: $.add(row.rankScore, vipScore ? 300 : 0)
             }))
           } catch (e) { 
+            console.log(e)
             return `请再试一次` }
           //图片服务
           let image = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', '签到.png')}`)
@@ -657,7 +658,17 @@ ${chance ? `---
 
 [领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)` : ' '} 
 `
-            sendMarkdown(ctx, md, session, normalKb(session, userArr))
+const kb={
+  keyboard: {
+    content: {
+      "rows": [
+        { "buttons": [urlbutton(2, "查看麦麦文档", 'https://docs.qq.com/doc/DTUJ6S3ZMUVZWaVRm', session.userId, "11")] },
+        { "buttons": [button(2, "签到", '签到', session.userId, "qd"),button(2, "面板", '查看信息', session.userId, "xx")] },
+      ]
+    },
+  },
+}
+            sendMarkdown(ctx, md, session, kb)
 
             //连续签到
             if (userArr[0].lap < 3 || checkDays !== dateNow) return
