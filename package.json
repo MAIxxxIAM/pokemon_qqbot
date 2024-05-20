@@ -15,7 +15,7 @@
     "plugin"
   ],
   "peerDependencies": {
-    "koishi": "^4.17.5",
+    "koishi": "^4.17.6",
     "koishi-plugin-downloads": "^0.1.3"
   },
   "koishi": {
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@koishijs/censor": "*",
+    "koishi-plugin-markdown": "*",
     "pidusage": "*"
   },
   "repository": {

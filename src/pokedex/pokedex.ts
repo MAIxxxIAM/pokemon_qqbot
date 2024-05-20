@@ -2,7 +2,7 @@ import { Context, h } from "koishi"
 import { Pokebattle, config, testcanvas,Config  } from ".."
 import { resolve } from "path"
 import pokemonCal from "../utils/pokemon"
-import { button, sendMarkdown, toUrl } from "../utils/mothed"
+import { button, sendMarkdown, toUrl } from "../utils/method"
 import { expBase } from "../utils/data"
 
 export class Pokedex {

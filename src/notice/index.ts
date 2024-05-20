@@ -1,6 +1,7 @@
 import { Context } from "koishi";
 import { config,Config  } from "..";
-import { button, sendMarkdown, sendNoticeMarkdown, urlbutton } from "../utils/mothed"
+import { button, sendMarkdown, sendNoticeMarkdown, urlbutton } from "../utils/method"
+import { PNotice } from "../model";
 
 
 export async function apply(ctx: Context) {
@@ -89,10 +90,14 @@ ${notice}`
 
     })
 
-    ctx.command('宝可梦').subcommand('发送公告 <msg:text>', {authority:4}).action(async ({ session },msg) => {
+    ctx.command('宝可梦').subcommand('发送公告 <msg:text>', {authority:0}).action(async ({ session },msg) => {
         const groups=await ctx.database.get('channel', { platform:session.platform })
-        const notices=await ctx.database.get('pokemon.notice',{})
-        const notice=notices[notices.length-1]
+        const notices:PNotice[]=await ctx.database.get('pokemon.notice',{})
+        let notice:PNotice
+        if(notices.length===0&&!msg){
+          return '未查询到公告信息'
+        }
+        notice=notices[notices.length-1]
         if(groups.length===0){
             return '未查询到群信息'
         }
@@ -113,15 +118,14 @@ ${msg}`
             },
           },
         }
-        group_id.forEach(async group=>{
+        for(let group of group_id){
           session.channelId=group
          try{
-          console.log(session.channelId)
           const mid= await sendNoticeMarkdown(md,session,kb)
-          ctx.sleep(500)
-          console.log(mid)
+         await ctx.sleep(500)
+          // console.log(mid)
          }catch(e){console.log(e)}
-        })
+        }
       })
 
     ctx.command('领取麦麦 <text>').action(async ({ session },text) => {

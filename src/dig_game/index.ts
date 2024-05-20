@@ -1,6 +1,6 @@
 import { DigMine, MStats } from "./type";
 import { DigChannel, Pokebattle } from "../model";
-import { button, calculateDistance, getMinePosition, minePic,  sendMarkdown, toUrl } from "../utils/mothed";
+import { button, calculateDistance, getMinePosition, minePic,  sendMarkdown, toUrl } from "../utils/method";
 import { $ } from "koishi";
 import { Pokedex } from "../pokedex/pokedex";
 import pokemonCal from "../utils/pokemon";

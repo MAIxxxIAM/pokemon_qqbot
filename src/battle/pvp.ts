@@ -1,6 +1,6 @@
 import { Pokebattle, logger } from '..';
 import { skillMachine } from '../utils/data';
-import { typeEffect } from '../utils/mothed';
+import { typeEffect } from '../utils/method';
 import { Battlers, PokemonPower, Skill, Skills } from './';
 import { PVE } from './pve';
 

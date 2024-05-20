@@ -2,7 +2,7 @@ import { PokemonPower, WildPokemon } from ".";
 import { config, logger, Config } from "..";
 import { Pokebattle, PokemonList } from "../model";
 import { skillMachine, skills } from "../utils/data";
-import { getType, typeEffect } from "../utils/mothed";
+import { getType, typeEffect } from "../utils/method";
 import pokemonCal from "../utils/pokemon";
 import { PVP } from "./pvp";
 

@@ -11,7 +11,7 @@ import {
 import { getUknowns } from './utils/motheds';
 import { config, legendaryPokemonId, Pokebattle } from '../../index';
 import crypto from 'crypto'
-import { isResourceLimit, sendMarkdown, toUrl } from '../../utils/mothed';
+import { isResourceLimit, sendMarkdown, toUrl } from '../../utils/method';
 import { PrivateResource } from '../../model';
 import { Pokedex } from '../../pokedex/pokedex';
 import pokemonCal from '../../utils/pokemon';
@@ -843,7 +843,7 @@ ${unknowns.map((u) => `${u.name}`).join('\n')}
         await ctx.database.set('pokebattle', { id: session.userId }, row => ({
           unknowns_bag:player.unknowns_bag.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)),
           gold: $.if($.lt(row.lap, 3), $.add(row.gold, 750 * gameInfo.remainingGuessesCount), row.gold),
-          cyberMerit: $.if(!isEvent, $.add(row.cyberMerit, addMerits), row.cyberMerit),
+          cyberMerit:  $.add(row.cyberMerit, addMerits),
         }))
         if (player.lap == 3) {
           await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
@@ -915,7 +915,7 @@ ${settlementResult}
           const unUrl=await toUrl(ctx, session, `file://${resolve(__dirname, `../../assets/img/unknown/${getUnknown.id}.png`)}`)
           let dimensions = imageSize(imageBuffer)
           const url = await toUrl(ctx, session, imageBuffer)
-          const events = (legendaryPokemonRandom > (99 - player.cyberMerit * 0.02)) ? `有个身影为你点赞` : `赛博功德+1`
+          const events =`赛博功德+5`+ ((legendaryPokemonRandom > (99 - player.cyberMerit * 0.02)) ? `有个身影为你点赞` : ``)
           const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})
 <@${session.userId}>
 太棒了，你猜出来了！

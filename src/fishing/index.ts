@@ -1,7 +1,7 @@
 import { $, Context } from "koishi"
 import { fishing } from "../utils/data"
 import { FishItem, FishingGame, Lucky } from "./type"
-import { actionbutton, button, sendMarkdown, toUrl } from "../utils/mothed"
+import { actionbutton, button, sendMarkdown, toUrl } from "../utils/method"
 import pokemonCal from "../utils/pokemon"
 import { config } from ".."
 import { Pokedex } from "../pokedex/pokedex"

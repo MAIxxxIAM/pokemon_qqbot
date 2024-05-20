@@ -1,7 +1,7 @@
 import { Context, Schema,$ } from 'koishi'
 
 import { Pokebattle, config, Config } from '../index';
-import { button, getChance, getList, getMarkdownParams, sendMarkdown, toUrl } from '../utils/mothed';
+import { button, getChance, getList, getMarkdownParams, sendMarkdown, toUrl } from '../utils/method';
 import pokemonCal from '../utils/pokemon';
 import { PokemonList, Resource } from '../model';
 import { Skill } from '../battle';

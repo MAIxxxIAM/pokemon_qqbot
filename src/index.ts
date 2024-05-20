@@ -2,7 +2,7 @@ import { Schema, h, $, is, Context, Session, App } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
-import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion, actionbutton } from './utils/mothed'
+import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion, actionbutton } from './utils/method'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import * as fs from 'fs'
@@ -14,7 +14,7 @@ import * as pokedex from './pokedex/pokedex'
 import * as notice from './notice/index'
 import * as fishing from './fishing/index'
 import crypto from 'crypto'
-import * as digGame from './digGame/index'
+import * as digGame from './dig_game/index'
 import * as handleAndCiying from './pokedle/src'
 import imageSize from 'image-size'
 import * as trainercmd from './trainer/index'
@@ -570,7 +570,8 @@ export async function apply(ctx, conf: Config) {
             await ctx.database.set('pokemon.resourceLimit', { id: session.userId }, row => ({
               rankScore: $.add(row.rankScore, vipScore ? 300 : 0)
             }))
-          } catch (e) { return `请再试一次` }
+          } catch (e) { 
+            return `请再试一次` }
           //图片服务
           let image = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, './assets/img/components', '签到.png')}`)
           let pokemonimg = await ctx.canvas.loadImage(`${config.图片源}/sr/0.png`)
@@ -791,6 +792,19 @@ ${chance ? `---
               black[i] = "✨" + black[i] + "✨"
             }
           }
+          const noHasRandomPokemon=Math.random()*100
+        const noHasPoke=noHasRandomPokemon>(99-userArr[0].cyberMerit*0.5)
+          if(noHasRandomPokemon>(99-userArr[0].cyberMerit*0.5)){
+            for(let i = 1 ; i<catchPokemonNumber[userArr[0].area][1];i++){
+              if(!pokeDex.check(`${i}.${i}`)&&!lapThree.includes(`${i}.${i}`)){
+                const randomNo=Math.floor(Math.random()*3)
+                grassMonster[randomNo]=i
+                pokeM[randomNo]=i+'.'+i
+                black[randomNo]=`✨${pokemonCal.pokemonlist(i+'.'+i)}✨`
+                break
+              }
+            }
+          }
           if (legendaryPokemonId?.[key] !== undefined) {
             const pokename = pokemonCal.pokemonlist(legendaryPokemonId?.[key])
             const pokeID = legendaryPokemonId?.[key].split('.')[0]
@@ -853,7 +867,7 @@ ${chance ? `---
 ---
 **一周目时，传说中的宝可梦(神兽)是不会放进背包的哦**
 
-> tip:"⬛"的个数，表示的是宝可梦名字的长度
+> tip:"⬛"的个数，表示的是宝可梦名字的长度${noHasPoke?'，按钮上有闪光，可能是遇到了你没有的宝可梦哦~':'，听说赛博功德越高，越容易收集到没有的宝可梦'}
 `
             capturMessage = await sendMarkdown(ctx, md, session, { keyboard: { content: catchbutton(black[0], black[1], black[2], session.userId), }, })
           } catch (e) {
@@ -1035,12 +1049,13 @@ ${result ? '恭喜你捕捉到了宝可梦！' : '很遗憾，宝可梦逃走了
           if (!result) {
             return
           }
-          await ctx.database.set('pokebattle', { id: session.userId }, {
+          await ctx.database.set('pokebattle', { id: session.userId }, row=>({
             captureTimes: userArr[0].captureTimes - catchCose,
             exp: expNew,
             level: lvNew,
-            gold: userArr[0].gold + getGold
-          })
+            gold: userArr[0].gold + getGold,
+            cyberMerit:$.if(noHasPoke,$.floor($.divide(row.cyberMerit, 2)),row.cyberMerit)
+          }))
           if (userArr[0].AllMonster.length < 6) {//背包空间
             let five: string = ''
             if (userArr[0].AllMonster.length === 5) five = `\n你的背包已经满了,你可以通过 放生 指令，放生宝可梦`//背包即满
@@ -1496,7 +1511,7 @@ ${chance ? `你当前可以领取三周目资格
 
 [领取](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)` : ' '} 
 
-> *邀请麦麦子到其他群做客可以增加3w获取上限哦~o(*////▽////*)q`
+> *邀请麦麦子到其他群做客可以增加3w获取上限哦~o\(\*\/\/\/\/\▽\/\/\/\/\*\)q`
           await sendMarkdown(ctx, md, session, normalKb(session, userArr as Pokebattle[]))
         } catch (e) {
           md = `# ${userArr[0].name}的训练师卡片
@@ -1521,7 +1536,7 @@ ${chance ? `你当前可以领取三周目资格
 
 [/getchance](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/getchance`)}&reply=false&enter=true)` : ' '} 
 
-> *邀请麦麦子到其他群做客可以增加3w获取上限哦~o(*////▽////*)q`
+> *邀请麦麦子到其他群做客可以增加3w获取上限哦~o\(\*\/\/\/\/\▽\/\/\/\/\*\)q`
           const imgBuffer = await ctx.markdownToImage.convertToImage(md.replace('<@${userId}>的', ''))
           return `${h.image(imgBuffer, 'image/png')}`
         }
@@ -1634,8 +1649,8 @@ ${chance ? `你当前可以领取三周目资格
         const rLimit = new PrivateResource(resource.resource.goldLimit)
         getGold = await rLimit.getGold(ctx, getGold, session.userId)
         const legendaryPokemonRandom = Math.random() * 100
-        const events = pokemon ? `捕捉途中放生宝可梦，好像什么都无法发生` : (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : `将宝可梦放生后，身心受到了净化
-赛博功德+1`)
+        const events =`将宝可梦放生后，身心受到了净化赛博功德+1
+`+pokemon ? `捕捉途中放生宝可梦，好像什么都无法发生` : (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : ``)
         const addMerits = userArr[0].cyberMerit > 99 ? 0 : 1
         const isEvent = userArr[0].lap < 3 || userArr[0].level < 90
         await ctx.database.set('pokebattle', { id: session.userId }, row => ({
@@ -1643,7 +1658,7 @@ ${chance ? `你当前可以领取三周目资格
           level: lvNew,
           exp: expNew,
           power: pokemonCal.power(pokemonCal.pokeBase(userArr[0].monster_1), lvNew, playerList, userArr[0].monster_1),
-          cyberMerit: $.if(!isEvent, $.add(row.cyberMerit, addMerits), row.cyberMerit),
+          cyberMerit: $.add(row.cyberMerit, addMerits),
         }))
         try {
           const src = pokemonCal.pokemomPic(discarded[0], false).toString().match(/src="([^"]*)"/)[1]
@@ -1786,13 +1801,14 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let randomUser: { id: string }
         const userArr: Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
         const userLimit = await isResourceLimit(session.userId, ctx)
-        const userVip = isVip(userArr[0])
         if (userArr.length == 0) {
           try {
             await session.execute(`签到`)
             return
           } catch (e) { return `请先输入 签到 领取属于你的宝可梦和精灵球` }
         }
+        const userVip = isVip(userArr[0])
+        const winRate=userArr[0].win_count / userArr[0].total_battle
         if (userArr[0].skillSlot.length == 0) {
           await session.send(`对战机制更新。请重新装备技能`)
         }
@@ -1835,7 +1851,8 @@ ${img}
               ))
               .execute()
             canLegendaryPokemon = true
-            if (randomID.length == 0) {
+            const random = Math.random()
+            if (randomID.length == 0||random>winRate) {
               canLegendaryPokemon = false
               randomID = await ctx.database
                 .select('pokebattle')
@@ -1917,11 +1934,13 @@ ${img}
         let loser = battle[2]
         let win_count = 0
         let getScore = 0
-        await ctx.database.set('pokebattle', { id: session.userId }, {
-          gold: { $subtract: [{ $: 'gold' }, spendGold] },
+        await ctx.database.set('pokebattle', { id: session.userId }, row=>({
+          gold: $.sub(row.gold,spendGold),
+          total_battle: $.add(row.total_battle,1),
+          win_count: $.add(row.win_count, winner == session.userId ? 1 : 0),
           power: userArr[0].power,
           battle_log: battlelog + `??` + tarArr[0].id
-        })
+        }))
         if (!user) {
           const index = playerList.pokemon.findIndex((pokeId) => pokeId.id === userArr[0].monster_1)
           win_count = (winner == session.userId) ? (playerList.win_count + 1) : 0
@@ -2400,7 +2419,7 @@ tips:${tips}`
         await ctx.database.set('pokebattle', { id: session.userId }, row => ({
           gold: $.sub(row.gold, Math.floor(500 * vipReward)),
           area: areaId,
-          cyberMerit: $.if(!isEvent, $.add(row.cyberMerit, addMerits), row.cyberMerit),
+          cyberMerit: $.add(row.cyberMerit, addMerits),
           fly_count: $.if(!isEvent, $.sub(row.fly_count, addFlyCount), row.fly_count)
         }))
 

@@ -1,23 +1,24 @@
-import { resolve } from 'path'
+import { parse, resolve } from 'path'
 import { Pokebattle, logger, config, shop, testcanvas, Config } from '..'
 import { type, battleType } from './data'
-import { Context, Session ,Element, h} from 'koishi'
+import { Context, Session, Element, h } from 'koishi'
 import { WildPokemon } from '../battle'
 import { } from 'koishi-plugin-cron'
 import { FusionPokemon, Natures, PokemonList } from '../model'
-import { DigMine, StoneType } from '../digGame/type'
+import { DigMine, StoneType } from '../dig_game/type'
 import imageSize from 'image-size'
+import {transform } from 'koishi-plugin-markdown'
 
-export function mudPath(a:string){
+export function mudPath(a: string) {
   return `${testcanvas}${resolve(__dirname, `../assets/img/digGame/${StoneType[a]}.png`)}`
 
 }
 
-export interface PokemonBase{
+export interface PokemonBase {
   id: string,
   name: string,
   hp: number,
-  att:number,
+  att: number,
   def: number,
   spa: number,
   spd: number,
@@ -30,49 +31,49 @@ export function calculateDistance(x1, y1, x2, y2) {
   return Math.sqrt(dx * dx + dy * dy)
 }
 
-export async function minePic(ctx,digGame:DigMine,sign?:{x:number,y:number,color:string}){
-  const digGamePositionX=digGame.item.x
-  const digGamePositionY=digGame.item.y
-  const mineBack=await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/digGame/miningbg.png`)}`)
-  const fissureMud=await ctx.canvas.loadImage(mudPath('fissureMud'))
-  const mud=await ctx.canvas.loadImage(mudPath('mud'))
-  const fissureStone=await ctx.canvas.loadImage(mudPath('fissureStone'))
-  const stone=await ctx.canvas.loadImage(mudPath('stone'))
-  const hardStone=await ctx.canvas.loadImage(mudPath('hardStone'))
-  const largeStone=await ctx.canvas.loadImage(mudPath('largeStone'))
-  const empty=await ctx.canvas.loadImage(mudPath('empty'))
-  const hs=await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/digGame/${digGame.item.id}.png`)}`)
-  const stoneList={fissureMud,mud,fissureStone,stone,hardStone,largeStone,empty}
-  const dataUrl=ctx.canvas.render(550,384,async (ctx)=>{
-    ctx.drawImage(mineBack,0,0,550,384)
+export async function minePic(ctx, digGame: DigMine, sign?: { x: number, y: number, color: string }) {
+  const digGamePositionX = digGame.item.x
+  const digGamePositionY = digGame.item.y
+  const mineBack = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/digGame/miningbg.png`)}`)
+  const fissureMud = await ctx.canvas.loadImage(mudPath('fissureMud'))
+  const mud = await ctx.canvas.loadImage(mudPath('mud'))
+  const fissureStone = await ctx.canvas.loadImage(mudPath('fissureStone'))
+  const stone = await ctx.canvas.loadImage(mudPath('stone'))
+  const hardStone = await ctx.canvas.loadImage(mudPath('hardStone'))
+  const largeStone = await ctx.canvas.loadImage(mudPath('largeStone'))
+  const empty = await ctx.canvas.loadImage(mudPath('empty'))
+  const hs = await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/digGame/${digGame.item.id}.png`)}`)
+  const stoneList = { fissureMud, mud, fissureStone, stone, hardStone, largeStone, empty }
+  const dataUrl = ctx.canvas.render(550, 384, async (ctx) => {
+    ctx.drawImage(mineBack, 0, 0, 550, 384)
     for (let i = 0; i < 13; i++) {
-        for (let j = 0; j < 10; j++) {
-            ctx.drawImage(stoneList[StoneType[digGame.grid[i][j]]],i*32+39,j*32+64,32,32)
-            if(digGamePositionX==i&&digGamePositionY==j&&digGame.grid[i][j]==0){
-               ctx.drawImage(hs,i*32+39,j*32+64,32,32)
-             }
-              if(!sign) continue 
-              if(sign.x==i&&sign.y==j){
-                ctx.strokeStyle=sign.color
-                ctx.lineWidth = 2
-                ctx.strokeRect(i*32+40,j*32+65,30,30)
-              }
+      for (let j = 0; j < 10; j++) {
+        ctx.drawImage(stoneList[StoneType[digGame.grid[i][j]]], i * 32 + 39, j * 32 + 64, 32, 32)
+        if (digGamePositionX == i && digGamePositionY == j && digGame.grid[i][j] == 0) {
+          ctx.drawImage(hs, i * 32 + 39, j * 32 + 64, 32, 32)
         }
+        if (!sign) continue
+        if (sign.x == i && sign.y == j) {
+          ctx.strokeStyle = sign.color
+          ctx.lineWidth = 2
+          ctx.strokeRect(i * 32 + 40, j * 32 + 65, 30, 30)
+        }
+      }
     }
-})
-return dataUrl
+  })
+  return dataUrl
 }
 
-export function getMinePosition(a:string){
-  const [letters]=a.match(/[a-zA-Z]/g)
-  let position=[0,0]
-  const [numbers]=a.match(/\d+/g)
-  position[1]=Number(numbers)-1
+export function getMinePosition(a: string) {
+  const [letters] = a.match(/[a-zA-Z]/g)
+  let position = [0, 0]
+  const [numbers] = a.match(/\d+/g)
+  position[1] = Number(numbers) - 1
   let ascii = letters.charCodeAt(0);
   if (ascii >= 97) {
-    position[0]= ascii - 97
+    position[0] = ascii - 97
   } else {
-    position[0]= ascii - 65
+    position[0] = ascii - 65
   }
   return position
 }
@@ -85,15 +86,15 @@ export async function isResourceLimit(userId: string, ctx: Context) {
     return resources[0]
   }
 }
-export async function getList(userId: string, ctx: Context,first?:string) {
+export async function getList(userId: string, ctx: Context, first?: string) {
   const resources = await ctx.database.get('pokemon.list', { id: userId })
-  const index=resources[0]?.pokemon.findIndex((pokeId)=>pokeId.id===first)
+  const index = resources[0]?.pokemon.findIndex((pokeId) => pokeId.id === first)
   if (resources.length == 0) {
     return await ctx.database.create('pokemon.list', { id: userId, pokemon: [new FusionPokemon(first)] })
   } else {
-    if(index==-1){
+    if (index == -1) {
       resources[0].pokemon.push(new FusionPokemon(first))
-      await ctx.database.set('pokemon.list', { id: userId }, row=>({
+      await ctx.database.set('pokemon.list', { id: userId }, row => ({
         pokemon: resources[0].pokemon
       }))
     }
@@ -101,26 +102,26 @@ export async function getList(userId: string, ctx: Context,first?:string) {
   }
 }
 
-export async function findFusion(nature:FusionPokemon,playerList:PokemonList){
-  let index=playerList?.pokemon.findIndex(a=>a.id==nature.id)
-  if(index==-1){
+export async function findFusion(nature: FusionPokemon, playerList: PokemonList) {
+  let index = playerList?.pokemon.findIndex(a => a.id == nature.id)
+  if (index == -1) {
     playerList.pokemon.push(nature)
-    index=playerList.pokemon.length-1
-  }else{
-    playerList.pokemon[index]=nature
+    index = playerList.pokemon.length - 1
+  } else {
+    playerList.pokemon[index] = nature
   }
   return index
 }
 
-export async function getPic(ctx, log, user, tar,full=false) {
+export async function getPic(ctx, log, user, tar, full = false) {
   try {
     let att: Pokebattle, def: Pokebattle
-    try{if (Number(user.power[5]) > Number(tar.power[5])) { att = user; def = tar } else { att = tar; def = user }}catch{
+    try { if (Number(user.power[5]) > Number(tar.power[5])) { att = user; def = tar } else { att = tar; def = user } } catch {
       att = user
       def = user
     }
-    const attTrainer=att.trainer_list.find(train=>train.tid==att.trainerIndex)
-    const defTrainer=def.trainer_list.find(train=>train.tid==def.trainerIndex)
+    const attTrainer = att.trainer_list.find(train => train.tid == att.trainerIndex)
+    const defTrainer = def.trainer_list.find(train => train.tid == def.trainerIndex)
     const attPerson = await ctx.canvas.loadImage(`${config.图片源}/trainers/${attTrainer.source_name}.png`)
     const defPerson = await ctx.canvas.loadImage(`${config.图片源}/trainers/${defTrainer.source_name}.png`)
     const attPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${att.monster_1.split('.')[0]}/${att.monster_1}.png`)
@@ -132,11 +133,11 @@ export async function getPic(ctx, log, user, tar,full=false) {
     let attCount: number
     let defCount: number
     if (array.length % 2 == 0) { attCount = array.length / 2; defCount = array.length / 2 - 1 } else { attCount = Math.floor(array.length / 2); defCount = Math.floor(array.length / 2) }
-    const height =full&&array.length>=7?400+60*(array.length-1):750
-    const dataUrl=await ctx.canvas.render(712, height, async (ctx) => {
-      ctx.drawImage(backimage2, 0, 0, 712,height)
+    const height = full && array.length >= 7 ? 400 + 60 * (array.length - 1) : 750
+    const dataUrl = await ctx.canvas.render(712, height, async (ctx) => {
+      ctx.drawImage(backimage2, 0, 0, 712, height)
       ctx.drawImage(backimage1, 0, 0, 712, 560)
-      ctx.drawImage(backimage3, 0, height-110, 712, 110)
+      ctx.drawImage(backimage3, 0, height - 110, 712, 110)
       ctx.save()
       ctx.translate(712 / 2, 0)
       ctx.scale(-1, 1)
@@ -149,14 +150,14 @@ export async function getPic(ctx, log, user, tar,full=false) {
       ctx.textBaseline = 'middle'
       ctx.font = 'normal 24px zpix'
       ctx.fillStyle = 'white'
-      ctx.fillText(array[array.length - 1], 356, height-28)
+      ctx.fillText(array[array.length - 1], 356, height - 28)
       ctx.fillStyle = 'black'
       for (let i = 0; i < array.length - 1; i++) {
         ctx.fillText(`⚔️${array[i]}⚔️`, 356, 300 + 60 * (i))
-        if (i > 4&&!full) { break }
+        if (i > 4 && !full) { break }
       }
     })
-    const {src} =dataUrl.attrs
+    const { src } = dataUrl.attrs
     return src
   } catch (e) {
     logger.info(e)
@@ -202,7 +203,7 @@ export async function getWildPic(ctx, log: string, user: Pokebattle, tar: string
     let player: Pokebattle, wild: string
     player = user
     wild = tar.split('.')[0]
-    const playerTrainer=player.trainer_list.find(train=>train.tid==player.trainerIndex)
+    const playerTrainer = player.trainer_list.find(train => train.tid == player.trainerIndex)
     const attPerson = await ctx.canvas.loadImage(`${config.图片源}/trainers/${playerTrainer.source_name}.png`)
     const attPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${player.monster_1.split('.')[0]}/${player.monster_1}.png`)
     const defPokemon = await ctx.canvas.loadImage(`${config.图片源}/fusion/${wild}/${wild}.png`)
@@ -261,7 +262,7 @@ export function moveToFirst(array: any[], element: any) {
   return array
 }
 
-export function normalKb(session: Session, userArr: Pokebattle[]){
+export function normalKb(session: Session, userArr: Pokebattle[]) {
   return {
     keyboard: {
       content: {
@@ -293,7 +294,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
               button(2, "宝可猜名", "/开始猜名 ", session.userId, "q"),
             ]
           },
-          config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'),urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"),button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
+          config.是否开启友链 ? { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, "🔗友链", "/friendlink", session.userId, "13"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] } : { "buttons": [button(2, '📖 图鉴', '/查看图鉴', session.userId, 'cmd'), urlbutton(2, "邀请", config.bot邀请链接, session.userId, "11"), button(2, userArr[0]?.lapTwo ? "收集进度" : "进入二周目", userArr[0]?.lapTwo ? "/ultra" : "/laptwo", session.userId, "14")] },
         ]
       },
     },
@@ -301,53 +302,99 @@ export function normalKb(session: Session, userArr: Pokebattle[]){
 }
 
 
-export async function sendMarkdown(ctx:Context,a: string, session: Session, button = null,eventId=null) {
+export async function sendMarkdown(ctx: Context, a: string, session: Session, button = null, eventId = null) {
   const b = getMarkdownParams(a)
-  const {platform} = session 
-  const md=a.replace(`<@${session.userId}>`,'你的')
-  let c:any
- try{
-  c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
-    content: "111",
-    msg_type: 2,
-    markdown: {
-      custom_template_id: '102072441_1711377105',
-      params: b
-    },
-    timestamp: session.timestamp,
-    msg_seq: Math.floor(Math.random() * 1000000),
-  },platform=='qq'? button:null,eventId?{event_id:eventId}:{msg_id: session.messageId,}))
-}catch{
- let buttons=button?button.keyboard.content.rows.map(row=>row.buttons):[]
- buttons=buttons.flat()
- const buttonName=buttons.map(button=>{if(button.action.type==2){return `${button.action.data}➣${button.render_data.label}`}})
-  const d=await ctx.markdownToImage.convertToImage(md)
-const size = imageSize(d)
-  c= await session.send(`
+  const { platform } = session
+  const md = a.replace(`<@${session.userId}>`, '你的')
+  let c: any
+  switch (platform) {
+    case 'qq':
+    case 'qqguild':
+      try {
+        c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
+          content: "111",
+          msg_type: 2,
+          markdown: {
+            custom_template_id: '102072441_1711377105',
+            params: b
+          },
+          timestamp: session.timestamp,
+          msg_seq: Math.floor(Math.random() * 1000000),
+        }, platform == 'qq' ? button : null, eventId ? { event_id: eventId } : { msg_id: session.messageId, }))
+      } catch {
+        let buttons = button ? button.keyboard.content.rows.map(row => row.buttons) : []
+        buttons = buttons.flat()
+        const buttonName = buttons.map(button => { if (button.action.type == 2) { return `${button.action.data}➣${button.render_data.label}` } })
+        const d = await ctx.markdownToImage.convertToImage(md)
+        const size = imageSize(d)
+        c = await session.send(`${buttonName.length == 0 ? '' : '@后可用指令：' + '\n' + buttonName.join('\n')}
+${h.image(d, 'image/png')}
+`)
+      }
+      break
 
-${buttonName.length==0?'':'@后可用指令：'+'\n'+buttonName.join('\n')}
-${h.image(d,'image/png')}
-`)}
-return c
+    //telegram兼容
+    case 'telegram':
+      const url=a.match(/https?:\/\/[^\s]+/g)
+      let outUrlMarkdown = a
+      .replace(`<@${session.userId}>`, '你的')
+      .replace(/\[([^\]]+)\]\([^\)]+\)/g, '')
+      .replace(/\!/g, '')
+      .replace(/\|\|/g, '')
+      .replace(/\#/g, '')
+      .replace(/\> /g, '>')
+      .replace(/\-\-\-/g, '')
+      .replace(/\-/g, '>')
+      .replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1')
+      .replace(/\n\n+/g, '\n')
+      .replace(/\n+/g, '\n')
+      .replace(/(.)(>)/g, '$1\\$2')
+      let buttons = button ? button.keyboard.content.rows.map(row => row.buttons) : []
+      buttons = buttons.flat()
+      const buttonName = buttons.flatMap((button, index) => {
+        if (button.action.type == 2) {
+          const buttonElement =  (<button id={button.id} type='input' text={button.action.data} theme='primary'>{button.render_data.label}</button>)
+          return index % 2 === 1 ? [buttonElement, <br/>] : [buttonElement]
+        }
+        return []
+      })
+      console.log(outUrlMarkdown,url)
+     try{ c=await session['telegram'].sendMessage({
+        chat_id:session.channelId,
+        text:outUrlMarkdown+(url?('\n\n'+url[0]).replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1'):''),
+        parse_mode:'MarkdownV2'
+    })
+      await session.send(<message>可用指令：
+        {buttonName}
+        </message>)
+  }catch(e){
+      console.log(e)
+    }
+  //     c=await session.send(<message>
+  //       {transform(outUrlMarkdown)}
+  //       {buttonName}
+  //     </message>)
+  }
+  return c
 }
 
 function splitArray(input, parts) {
   let result = [];
   for (let i = 0; i < parts; i++) {
-      result.push([]);
+    result.push([]);
   }
   let partLength = Math.ceil(input.length / parts);
   for (let i = 0; i < input.length; i++) {
-      if (i % partLength === 0 && i !== 0) {
-          partLength = Math.ceil((input.length - i) / (parts - (i / partLength)));
-      }
-      result[Math.floor(i / partLength)].push(input[i]);
+    if (i % partLength === 0 && i !== 0) {
+      partLength = Math.ceil((input.length - i) / (parts - (i / partLength)));
+    }
+    result[Math.floor(i / partLength)].push(input[i]);
   }
   return result;
 }
 export async function sendNoticeMarkdown(a: string, session: Session, button = null) {
   const b = getMarkdownParams(a)
- return await session.bot.internal.sendMessage(session.channelId, {
+  return await session.bot.internal.sendMessage(session.channelId, {
     content: "111",
     msg_type: 2,
     markdown: {
@@ -375,12 +422,12 @@ export async function toUrl(ctx, session, img) {
   //   const url = `http://multimedia.nt.qq.com/download?appid=1407&fileid=${a.file_uuid.replace(/_/g, "%5F")}&rkey=CAQSKAB6JWENi5LMtWVWVxS2RfZbDwvOdlkneNX9iQFbjGK7q7lbRPyD1v0&spec=0`
   //   return url
   // } catch (e) {
-    if (ctx.get('server.temp')?.upload) {
-      const url = await ctx.get('server.temp').upload(img)
-      return url.replace(/_/g, "%5F")
-    }
-    const { url } = await ctx.get('server.temp').create(img)
-    return url
+  if (ctx.get('server.temp')?.upload) {
+    const url = await ctx.get('server.temp').upload(img)
+    return url.replace(/_/g, "%5F")
+  }
+  const { url } = await ctx.get('server.temp').create(img)
+  return url
   // }
 }
 export function typeEffect(a: string, b: string, skillType: string) {
@@ -391,21 +438,21 @@ export function typeEffect(a: string, b: string, skillType: string) {
 
 }
 
-export async function censorText(ctx,text: string) {
-  const a:Element[]=[Element('text',{content:text})]
-  const [b]=await ctx.censor.transform(a)
+export async function censorText(ctx, text: string) {
+  const a: Element[] = [Element('text', { content: text })]
+  const [b] = await ctx.censor.transform(a)
   return b.attrs.content
 }
 
-export function baseFusion(a:number,b:number,){
+export function baseFusion(a: number, b: number,) {
   let max = Math.max(a, b)
   let min = Math.min(a, b)
-  let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
-  if((max - min) / max >=0.25) c=0
-  if(max==min){c=0.2}
+  let c = Math.abs(max - min) / (max + min) <= 0.12 ? 0.3 : 0.1
+  if ((max - min) / max >= 0.25) c = 0
+  if (max == min) { c = 0.2 }
   max *= 0.8
   min *= 0.2
-  return Math.floor((max+min)*(1+c))
+  return Math.floor((max + min) * (1 + c))
 }
 // export function baseFusion(a:PokemonBase,b:PokemonBase,){
 //   return  [
@@ -418,14 +465,14 @@ export function baseFusion(a:number,b:number,){
 //   ]
 
 // }
-  // let max = Math.max(a, b)
-  // let min = Math.min(a, b)
-  // let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
-  // if((max - min) / max >=0.25) c=0
-  // if(max==min){c=0.2}
-  // max *= 0.8
-  // min *= 0.2
-  // return Math.floor((max+min)*(1+c))
+// let max = Math.max(a, b)
+// let min = Math.min(a, b)
+// let c=Math.abs(max - min) / (max+min)<=0.12?0.3:0.1
+// if((max - min) / max >=0.25) c=0
+// if(max==min){c=0.2}
+// max *= 0.8
+// min *= 0.2
+// return Math.floor((max+min)*(1+c))
 
 
 function arraysEqual(a: any[], b: any[]): boolean {
@@ -436,15 +483,15 @@ function arraysEqual(a: any[], b: any[]): boolean {
   return true;
 }
 
-export async function getChance(player:Pokebattle,ctx:Context){
+export async function getChance(player: Pokebattle, ctx: Context) {
   const banID = ['150.150', '151.151', '144.144', '145.145', '146.146', '249.249', '250.250', '251.251', '243.243', '244.244', '245.245']
-  const keys=Object.keys(player?.ultra)
-  const [battle]= await ctx.database.get('pokemon.resourceLimit', { id: player.id })
-  if(player.lap!==3&&!player.advanceChance&&player.level>99&&arraysEqual(banID, keys)&&battle?.rank>0&&battle?.rank<=10) return true
-  if(player.lap==3||player.advanceChance||!player?.pokedex?.dex) return false
+  const keys = Object.keys(player?.ultra)
+  const [battle] = await ctx.database.get('pokemon.resourceLimit', { id: player.id })
+  if (player.lap !== 3 && !player.advanceChance && player.level > 99 && arraysEqual(banID, keys) && battle?.rank > 0 && battle?.rank <= 10) return true
+  if (player.lap == 3 || player.advanceChance || !player?.pokedex?.dex) return false
   const flatArrayA = [].concat(...player.pokedex.dex)
   const flatArray = [...new Set(flatArrayA)]
-  return flatArray.length==251
+  return flatArray.length == 251
 }
 
 export function isVip(a: Pokebattle): boolean {
@@ -600,9 +647,9 @@ export function urlbutton(pt: number, a: string, b: string, d: string, c: string
     },
   }
 }
-export function actionbutton(a: string, 数据: string, 权限: string,消息Id: string, 时间戳: number,按钮权限=0) {
+export function actionbutton(a: string, 数据: string, 权限: string, 消息Id: string, 时间戳: number, 按钮权限 = 0) {
   return {
-    "id":消息Id,
+    "id": 消息Id,
     "render_data": {
       "label": a,
       "visited_label": a
@@ -614,7 +661,7 @@ export function actionbutton(a: string, 数据: string, 权限: string,消息Id:
         "specify_user_ids": [权限]
       },
       "unsupport_tips": "请输入@Bot",
-      "data":`${时间戳}=${数据}`,
+      "data": `${时间戳}=${数据}`,
     },
   }
 }

@@ -2,7 +2,7 @@ import { $, Context, h } from "koishi";
 import {Pokebattle, config} from '../index'
 import { trainer_list } from "../utils/data";
 import { Trainer } from "./type";
-import { button, censorText, sendMarkdown, toUrl, urlbutton } from "../utils/mothed";
+import { button, censorText, sendMarkdown, toUrl, urlbutton } from "../utils/method";
 export async function apply(ctx:Context) {
     ctx.command('宝可梦').subcommand('盲盒','开启盲盒抽取训练师').action(async ({session})=>{
         const [player]:Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
@@ -130,7 +130,7 @@ ${isTrainer.name}➣${newName}`
     .option('page', '-p [pages]', { fallback: 1 })
     .option('tid', '-t [tid]')
     .shortcut(/更换训练师\+(.*)$/,{args:['$1']})
-    .action(async ({session,options},trainer:string,test)=>{
+    .action(async ({session,options},trainer:string)=>{
         trainer=trainer?trainer.split('+')[0]:trainer
         const [player]:Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
         if (!player) {

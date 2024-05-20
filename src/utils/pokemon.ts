@@ -3,7 +3,7 @@ import { expToLv, skillMachine, pokemonBase, battleType, skills } from './data'
 import {config,Config} from '../index';
 
 import { h } from "koishi"
-import { baseFusion } from './mothed';
+import { baseFusion } from './method';
 import { PokemonList } from '../model';
 
 const exptolv = expToLv

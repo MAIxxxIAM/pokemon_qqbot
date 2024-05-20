@@ -4,9 +4,10 @@ import { PokemonPower, Skill, Skills } from "../battle"
 import pokemonCal from "../utils/pokemon"
 import { config,Config  } from ".."
 import { natures } from "../utils/data"
-import { DigItem, DigMine } from "../digGame/type"
+import { DigItem, DigMine } from "../dig_game/type"
 import { unknowns } from "../pokedle/src/type/type"
 import { Trainer } from "../trainer/type"
+import { CardPlayer } from "../card_battle/type"
 
 
 //智能体兼容
@@ -91,6 +92,7 @@ declare module 'koishi' {
         'intellegentBody': IntellegentBody
         'pokemon.digChannel': DigChannel
         'pokemon.isPokemon': IsPokemon
+        'card_battle': CardPlayer
     }
 }
 //邀请表
@@ -205,6 +207,8 @@ export interface Pokebattle {
     date?: number
     checkInDays?: number
     fossil_bag?: DigItem[]
+    total_battle?: number
+    win_count?: number
     unknowns_bag?: unknowns[]
     captureTimes?: number
     battleTimes: number
@@ -322,6 +326,16 @@ export async function model(ctx: Context) {
         fossil_bag: {
             type: 'json',
             initial: [],
+            nullable: false,
+        },
+        total_battle:{
+            type: 'unsigned',
+            initial: 1,
+            nullable: false,
+        },
+        win_count:{
+            type: 'unsigned',
+            initial: 1,
             nullable: false,
         },
         unknowns_bag: {

@@ -1,6 +1,6 @@
 import { $, h } from "koishi"
 import { config } from ".."
-import { button, isResourceLimit, isVip, toUrl } from "../utils/mothed"
+import { button, isResourceLimit, isVip, toUrl } from "../utils/method"
 import { PokeGuess } from "./pokeguess"
 import { Pokebattle, PrivateResource } from "../model"
 import { Pokedex } from "../pokedex/pokedex"
