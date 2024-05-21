@@ -350,18 +350,22 @@ ${h.image(d, 'image/png')}
         .replace(/\n\n+/g, '\n')
         .replace(/\n+/g, '\n')
         .replace(/(.)(>)/g, '$1\\$2')
+      const urlText = outUrlMarkdown.split('\n')[0]
+      const Markdown = outUrlMarkdown.split('\n')
+      Markdown.shift()
+      outUrlMarkdown = Markdown.filter(a => a.replace(/\s/g, '') != '').join('\n')
       let buttons = button ? button.keyboard.content.rows.map(row => row.buttons) : []
       buttons = buttons.flat()
-      const buttonName:Telegram.InlineKeyboardButton[][] = [];
+      const buttonName: Telegram.InlineKeyboardButton[][] = [];
       let temp = [];
 
       buttons.forEach((button, index) => {
         if (button.action.type == 2) {
           const buttonElement = (<button id={button.id} type='input' text={button.action.data} theme='primary'>{button.render_data.label}</button>);
-          temp.push(decodeButton(buttonElement.attrs,button.render_data.label))
+          temp.push(decodeButton(buttonElement.attrs, button.render_data.label))
 
           // 当 temp 数组中有两个元素时，将它们作为一个子数组推入结果数组中，并清空 temp 数组
-          if (temp.length ===3) {
+          if (temp.length === 3) {
             buttonName.push(temp)
             temp = []
           }
@@ -373,12 +377,13 @@ ${h.image(d, 'image/png')}
         buttonName.push(temp);
       }
       try {
+
         c = await session['telegram'].sendMessage({
           chat_id: session.channelId,
-          text: outUrlMarkdown + (url ? ('\n\n' + url[0]).replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1') : ''),
+          text: (url ? `[${urlText}](${(url[0]).replace(/\)/g, '')})\n\n` : '') + outUrlMarkdown,
           parse_mode: 'MarkdownV2',
-          reply_markup:{
-            inline_keyboard:buttonName
+          reply_markup: {
+            inline_keyboard: buttonName
           }
         })
       } catch (e) {
