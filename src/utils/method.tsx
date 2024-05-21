@@ -306,7 +306,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]) {
 export async function sendMarkdown(ctx: Context, a: string, session: Session, button = null, eventId = null) {
   const b = getMarkdownParams(a)
   const { platform } = session
-  const md = a.replace(`<@${session.userId}>`, '你的')
+  const md = a.replace(`<@${session.userId}>`, '你')
   let c: any
   switch (platform) {
     case 'qq':
