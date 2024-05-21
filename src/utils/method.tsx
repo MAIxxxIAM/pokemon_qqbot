@@ -1,13 +1,14 @@
 import { parse, resolve } from 'path'
 import { Pokebattle, logger, config, shop, testcanvas, Config } from '..'
 import { type, battleType } from './data'
-import { Context, Session, Element, h } from 'koishi'
+import { Context, Session, Element, h, Dict } from 'koishi'
 import { WildPokemon } from '../battle'
 import { } from 'koishi-plugin-cron'
 import { FusionPokemon, Natures, PokemonList } from '../model'
 import { DigMine, StoneType } from '../dig_game/type'
 import imageSize from 'image-size'
 import { } from 'koishi-plugin-text-censor'
+import { Telegram } from '@koishijs/plugin-adapter-telegram'
 
 export function mudPath(a: string) {
   return `${testcanvas}${resolve(__dirname, `../assets/img/digGame/${StoneType[a]}.png`)}`
@@ -335,47 +336,79 @@ ${h.image(d, 'image/png')}
 
     //telegram兼容
     case 'telegram':
-      const url=a.match(/https?:\/\/[^\s]+/g)
+      const url = a.match(/https?:\/\/[^\s]+/g)
       let outUrlMarkdown = a
-      .replace(`<@${session.userId}>`, '你的')
-      .replace(/\[([^\]]+)\]\([^\)]+\)/g, '')
-      .replace(/\!/g, '')
-      .replace(/\|\|/g, '')
-      .replace(/\#/g, '')
-      .replace(/\> /g, '>')
-      .replace(/\-\-\-/g, '')
-      .replace(/\-/g, '>')
-      .replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1')
-      .replace(/\n\n+/g, '\n')
-      .replace(/\n+/g, '\n')
-      .replace(/(.)(>)/g, '$1\\$2')
+        .replace(`<@${session.userId}>`, '你的')
+        .replace(/\[([^\]]+)\]\([^\)]+\)/g, '')
+        .replace(/\!/g, '')
+        .replace(/\|\|/g, '')
+        .replace(/\#/g, '')
+        .replace(/\> /g, '>')
+        .replace(/\-\-\-/g, '')
+        .replace(/\-/g, '>')
+        .replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1')
+        .replace(/\n\n+/g, '\n')
+        .replace(/\n+/g, '\n')
+        .replace(/(.)(>)/g, '$1\\$2')
       let buttons = button ? button.keyboard.content.rows.map(row => row.buttons) : []
       buttons = buttons.flat()
-      const buttonName = buttons.flatMap((button, index) => {
+      const buttonName:Telegram.InlineKeyboardButton[][] = [];
+      let temp = [];
+
+      buttons.forEach((button, index) => {
         if (button.action.type == 2) {
-          const buttonElement =  (<button id={button.id} type='input' text={button.action.data} theme='primary'>{button.render_data.label}</button>)
-          return index % 2 === 1 ? [buttonElement, <br/>] : [buttonElement]
+          const buttonElement = (<button id={button.id} type='input' text={button.action.data} theme='primary'>{button.render_data.label}</button>);
+          temp.push(decodeButton(buttonElement.children[0],button.render_data.label))
+
+          // 当 temp 数组中有两个元素时，将它们作为一个子数组推入结果数组中，并清空 temp 数组
+          if (temp.length === 2) {
+            buttonName.push(temp)
+            temp = []
+          }
         }
-        return []
       })
-      console.log(outUrlMarkdown,url)
-     try{ c=await session['telegram'].sendMessage({
-        chat_id:session.channelId,
-        text:outUrlMarkdown+(url?('\n\n'+url[0]).replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1'):''),
-        parse_mode:'MarkdownV2'
-    })
-      await session.send(<message>可用指令：
-        {buttonName}
-        </message>)
-  }catch(e){
-      console.log(e)
-    }
-  //     c=await session.send(<message>
-  //       {transform(outUrlMarkdown)}
-  //       {buttonName}
-  //     </message>)
+
+      // 如果在循环结束后 temp 数组中还有元素，将它们作为一个子数组推入结果数组中
+      if (temp.length > 0) {
+        buttonName.push(temp);
+      }
+      try {
+        c = await session['telegram'].sendMessage({
+          chat_id: session.channelId,
+          text: outUrlMarkdown + (url ? ('\n\n' + url[0]).replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1') : ''),
+          parse_mode: 'MarkdownV2',
+          reply_markup:{
+            inline_keyboard:buttonName
+          }
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    //     c=await session.send(<message>
+    //       {transform(outUrlMarkdown)}
+    //       {buttonName}
+    //     </message>)
   }
   return c
+}
+
+function decodeButton(attrs: Dict, label: string): Telegram.InlineKeyboardButton {
+  if (attrs.type === 'link') {
+    return {
+      text: label,
+      url: attrs.href,
+    }
+  } else if (attrs.type === 'input') {
+    return {
+      text: label,
+      switch_inline_query_current_chat: attrs.text,
+    }
+  } else {
+    return {
+      text: label,
+      callback_data: attrs.id,
+    }
+  }
 }
 
 function splitArray(input, parts) {
@@ -438,7 +471,7 @@ export function typeEffect(a: string, b: string, skillType: string) {
 
 }
 
-export async function censorText(ctx:Context, text: string) {
+export async function censorText(ctx: Context, text: string) {
   const a: Element[] = [Element('text', { content: text })]
   const b = <censor>{a}</censor>
   return b.children[0].attrs.content

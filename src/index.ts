@@ -804,14 +804,17 @@ const kb={
             }
           }
           const noHasRandomPokemon=Math.random()*100
-        const noHasPoke=noHasRandomPokemon>(99-userArr[0].cyberMerit*0.5)
+        let noHasPoke=false
+        let no=3
           if(noHasRandomPokemon>(99-userArr[0].cyberMerit*0.5)){
             for(let i = 1 ; i<catchPokemonNumber[userArr[0].area][1];i++){
               if(!pokeDex.check(`${i}.${i}`)&&!lapThree.includes(`${i}.${i}`)){
                 const randomNo=Math.floor(Math.random()*3)
+                no=randomNo
                 grassMonster[randomNo]=i
                 pokeM[randomNo]=i+'.'+i
                 black[randomNo]=`✨${pokemonCal.pokemonlist(i+'.'+i)}✨`
+                noHasPoke=true
                 break
               }
             }
@@ -894,6 +897,7 @@ ${(h('at', { id: (session.userId) }))}
   `)
           }
           const chooseMonster = await session.prompt(config.捕捉等待时间)
+          noHasPoke=noHasPoke&&no==(Number(chooseMonster)-1)
           let poke
           let reply: string
           if (!chooseMonster) {
@@ -1661,7 +1665,7 @@ ${chance ? `你当前可以领取三周目资格
         getGold = await rLimit.getGold(ctx, getGold, session.userId)
         const legendaryPokemonRandom = Math.random() * 100
         const events =`将宝可梦放生后，身心受到了净化赛博功德+1
-`+pokemon ? `捕捉途中放生宝可梦，好像什么都无法发生` : (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : ``)
+`+(pokemon ? `捕捉途中放生宝可梦，好像什么都无法发生` : (legendaryPokemonRandom > (99.5 - userArr[0].cyberMerit * 0.04) ? `放生过程中，你好像看到了一个身影` : ``))
         const addMerits = userArr[0].cyberMerit > 99 ? 0 : 1
         const isEvent = userArr[0].lap < 3 || userArr[0].level < 90
         await ctx.database.set('pokebattle', { id: session.userId }, row => ({
