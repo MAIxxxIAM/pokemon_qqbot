@@ -358,10 +358,10 @@ ${h.image(d, 'image/png')}
       buttons.forEach((button, index) => {
         if (button.action.type == 2) {
           const buttonElement = (<button id={button.id} type='input' text={button.action.data} theme='primary'>{button.render_data.label}</button>);
-          temp.push(decodeButton(buttonElement.children[0],button.render_data.label))
+          temp.push(decodeButton(buttonElement.attrs,button.render_data.label))
 
           // 当 temp 数组中有两个元素时，将它们作为一个子数组推入结果数组中，并清空 temp 数组
-          if (temp.length === 2) {
+          if (temp.length ===3) {
             buttonName.push(temp)
             temp = []
           }
