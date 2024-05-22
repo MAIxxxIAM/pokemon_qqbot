@@ -1,0 +1,29 @@
+markdown: # markdown默认模板(含图片)
+  id: '102072441_1715877647' # 模板id
+  title: name # 标题插值
+  img:
+    size: img_size # 图片尺寸插值
+    url: url # 图片链接插值
+  text:
+    - type # 文本插值1
+    - power # 文本插值2
+    - xinge # 文本插值3
+    - skill1 # 文本插值4
+    - skill2 # 文本插值5
+    - skill3 # 文本插值6
+    - skill4 # 文本插值7
+textMarkdown: # markdown默认模板(不含图片)
+  id: '111111' # 模板id
+  title: name # 标题插值
+  text:
+    - text1 # 文本插值1
+    - text2 # 文本插值2
+    - text3 # 文本插值3
+    - text4 # 文本插值4
+    - text5 # 文本插值5
+    - text6 # 文本插值6
+    - text7 # 文本插值7
+
+## 以下为自定义模板
+宝可梦签到: 
+对战:

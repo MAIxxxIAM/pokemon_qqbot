@@ -416,7 +416,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
           }
         }
         const url = a.match(/https?:\/\/[^\s]+/g)
-        const img_size = a.match(/\!\[img#(\d+)px #(\d+)px\]/)
+        const img_size = a.match(/\!\[(.*?) #(\d+)px #(\d+)px\]/)
         let onepic=true
         if(a.match(/```([^`]+)```/s)){
           if(a.match(/```([^`]+)```/s)[0]?.split('\n')?.filter(part => part.replace(/```/g, '') !== '')?.length>5)
@@ -432,8 +432,8 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
             title: tittle,
             content: outUrlMarkdown,
             image: {
-              width: Number(img_size[1]),
-              height: Number(img_size[2]),
+              width: Number(img_size[2]),
+              height: Number(img_size[3]),
               url: url[0].replace(/\)/g, '')
             }
           }

@@ -15,7 +15,9 @@ import { DigItem } from '../dig_game/type'
 import { PokemonBase } from './method'
 import trainerList from '../assets/json/trainerList.json'
 import { Trainer } from '../trainer/type'
-import * as markdown from '../markdown.yaml'
+import yaml from 'js-yaml'
+import fs from 'fs'
+import { resolve } from 'path'
 
 export const expToLv= exptolv
 export const expBase = expbase
@@ -29,4 +31,5 @@ export const natures:Natures[] = nature
 export const fishing:FishItem[] =Fishing
 export const digItems:DigItem[] = DigItems
 export const trainer_list:Trainer[]=trainerList
-export const md_ky = markdown.default
+export const md_ky = yaml.load(fs.readFileSync(resolve(__dirname,'../../markdown.yaml'), 'utf8'))
+console.log(md_ky)
