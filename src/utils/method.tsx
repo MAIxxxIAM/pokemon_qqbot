@@ -306,6 +306,7 @@ export function normalKb(session: Session, userArr: Pokebattle[]) {
 function splitText(text: string, textLength: number, md = true): string[] {
   text = text.replace(/\*\*/g, '')
   text = text.replace(/^# /g, '\n')
+  text = text.replace(/# /g, '\n')
   text = text.replace(/^> /g, '\n')
   text = text.replace(/> /g, '\n')
   text = text.replace(/^- /g, '\n')
@@ -333,7 +334,7 @@ function splitText(text: string, textLength: number, md = true): string[] {
     }
   }
 
-  if (currentPart.length > 0) {
+  if (currentPart?.length > 0) {
     result.push(currentPart)
   }
   return result
@@ -352,10 +353,10 @@ export function toKeyMarkdown(markdownMessage: markdownMessage, command?: string
   }).filter(item => item.values[0] !== undefined && item.values[0] !== "")
 
   if (mdModel?.title) {
-    data = data.concat({
+    if(markdownMessage?.title){data = data.concat({
       key: mdModel.title,
-      values: [markdownMessage.title]
-    })
+      values:splitText(markdownMessage.title,1)
+    })}
   }
   if (markdownMessage?.image) {
     if (mdModel?.img) {
@@ -407,7 +408,12 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
         const buttonName = buttons.map(button => { if (button.action.type == 2) { return `${button.action.data}➣${button.render_data.label}` } })
         const url = a.match(/https?:\/\/[^\s]+/g)
         const img_size = a.match(/\!\[img#(\d+)px #(\d+)px\]/)
-        if ((url.length == 1) && !(a.match(/```([^`]+)```/s)[0].split('\n').length > 5)) {
+        let onepic=true
+        if(a.match(/```([^`]+)```/s)){
+          if(a.match(/```([^`]+)```/s)[0]?.split('\n')?.filter(part => part.replace(/```/g, '') !== '')?.length>5)
+          {onepic=false}
+        }
+        if ((url.length == 1)&&onepic) {
           a.replace(`<@${session.userId}>`, '你的')
           const tittle = outUrlMarkdown.split('\n')[0]
           const Markdown = outUrlMarkdown.split('\n')
@@ -442,16 +448,13 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
             </message>)
           }
         } else {
-          a.replace(`<@${session.userId}>`, '你的')
+          const tittle = outUrlMarkdown.split('\n')[0]
           const d = await ctx.markdownToImage.convertToImage(md)
           const size = imageSize(d)
-          const Markdown = outUrlMarkdown.split('\n')
-          Markdown.shift()
-          outUrlMarkdown = Markdown.join('\n')
           const imgSrc = await toUrl(ctx, session, d)
           const kvMarkdown: markdownMessage = {
-            title: outUrlMarkdown.split('\n')[0],
-            content: outUrlMarkdown,
+            title:tittle,
+            content: '',
             image: {
               width: size.width,
               height: size.height,
@@ -459,6 +462,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
             }
           }
           const data = toKeyMarkdown(kvMarkdown)
+          console.log(data)
           try {
             c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
               content: "111",
@@ -470,11 +474,11 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
               timestamp: session.timestamp,
               msg_seq: Math.floor(Math.random() * 1000000),
             }, platform == 'qq' ? button : null, eventId ? { event_id: eventId } : { msg_id: session.messageId, }))
-          } catch {
+          } catch(e) {
+            console.log(e)
             c = await session.send(<message>
               <img src={imgSrc} />
             </message>)
-
           }
         }
       }
