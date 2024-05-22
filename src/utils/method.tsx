@@ -391,6 +391,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
   switch (platform) {
     case 'qq':
     case 'qqguild':
+    case 'sandbox:c2g1pz24r8':
       try {
         c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
           content: "111",
@@ -405,7 +406,15 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
       } catch {
         let buttons = button ? button.keyboard.content.rows.map(row => row.buttons) : []
         buttons = buttons.flat()
-        const buttonName = buttons.map(button => { if (button.action.type == 2) { return `${button.action.data}➣${button.render_data.label}` } })
+        let canUse='»'
+        const buttonName = buttons.map(button => { if (button.action.type == 2) { return `${button.action.data}➣${button.render_data.label}` } }).filter(a => a!==undefined)
+          for(let i=0;i<buttonName.length;i++){
+            if((i+1)%3==0&&i!=buttonName.length-1){
+              canUse+=buttonName[i]+'\n»'
+          }else{
+            canUse+=buttonName[i]+(i==buttonName.length-1?'':'||')
+          }
+        }
         const url = a.match(/https?:\/\/[^\s]+/g)
         const img_size = a.match(/\!\[img#(\d+)px #(\d+)px\]/)
         let onepic=true
@@ -444,7 +453,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
             const content = splitText(outUrlMarkdown, mdModel.text.length, false)
             c = await session.send(<message>
               <img src={url[0].replace(/\)/g, '')} />
-              {content.join('\n')}
+              {content.join('\n')+'\n'+buttonName.join('\n')}
             </message>)
           }
         } else {
