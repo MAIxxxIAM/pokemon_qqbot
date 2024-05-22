@@ -1,6 +1,6 @@
 import { parse, resolve } from 'path'
 import { Pokebattle, logger, config, shop, testcanvas, Config } from '..'
-import { type, battleType } from './data'
+import { type, battleType, md_ky } from './data'
 import { Context, Session, Element, h, Dict } from 'koishi'
 import { WildPokemon } from '../battle'
 import { } from 'koishi-plugin-cron'
@@ -9,6 +9,7 @@ import { DigMine, StoneType } from '../dig_game/type'
 import imageSize from 'image-size'
 import { } from 'koishi-plugin-text-censor'
 import { Telegram } from '@koishijs/plugin-adapter-telegram'
+import { markdownMessage } from '../utils/message'
 
 export function mudPath(a: string) {
   return `${testcanvas}${resolve(__dirname, `../assets/img/digGame/${StoneType[a]}.png`)}`
@@ -302,6 +303,72 @@ export function normalKb(session: Session, userArr: Pokebattle[]) {
   }
 }
 
+function splitText(text: string, textLength: number): string[] {
+  text = text.replace(/\*\*/g, '')
+  text = text.replace(/^# /g, '\n')
+  text = text.replace(/^> /g, '\n')
+  text = text.replace(/> /g, '\n')
+  text = text.replace(/^- /g, '\n')
+  text = text.replace(/```/g, '\n')
+  text = text.replace(/---/g, '\n')
+  let parts = text.split(/[,，.。？！；~\n]/).filter(part => part !== '')
+
+  let idealLength = text.length / textLength
+
+  let result: string[] = []
+  let currentPart = parts[0]
+
+  for (let i = 1; i < parts.length; i++) {
+    if (currentPart.length + parts[i].length < idealLength) {
+      currentPart += parts[i]
+    } else {
+      result.push(currentPart)
+      currentPart = parts[i]
+    }
+  }
+
+  if (currentPart.length > 0) {
+    result.push(currentPart)
+  }
+
+  return result
+}
+
+export function toKeyMarkdown(markdownMessage: markdownMessage, command?: string) {
+  const mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
+  //config配置对象转为数组
+  const mdText = splitText(markdownMessage.content, md_ky.markdown.text.length)
+  const keys = md_ky.markdown.text
+  let data = keys.map((key, index) => {
+    return {
+      key: key,
+      values: [mdText[index]]
+    }
+  }).filter(item => item.values[0] !== undefined && item.values[0] !== "")
+
+  if (md_ky?.markdown?.title) {
+    data = data.concat({
+      key: md_ky.markdown.title,
+      values: [markdownMessage.title]
+    })
+  }
+  if (markdownMessage?.image) {
+    if (md_ky?.markdown?.img) {
+
+      data = data.concat([
+        {
+          key: md_ky.markdown.img.size,
+          values: [`img #${markdownMessage.image.width}px #${markdownMessage.image.height}px`]
+        },
+        {
+          key: md_ky.markdown.img.url,
+          values: [markdownMessage.image.url]
+        },
+      ])
+    }
+  }
+  return data
+}
 
 export async function sendMarkdown(ctx: Context, a: string, session: Session, button = null, eventId = null) {
   const b = getMarkdownParams(a)

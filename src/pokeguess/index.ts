@@ -196,10 +196,10 @@ ${end}
         if (player.lap < 3 || player.level < 90) return
         const pokedex = new Pokedex(player);
         if (pokedex.check(legendaryPokemon)) return
-        (legendaryPokemonRandom > (90 - player.cyberMerit * 0.04)) ?
+        (legendaryPokemonRandom > (99 - player.cyberMerit * 0.04)) ?
           await session.send(`接下来你将和${pokemonCal.pokemonlist(legendaryPokemon)}对战...`)
           : null
-        if (legendaryPokemonRandom > (90 - player.cyberMerit * 0.04)) {
+        if (legendaryPokemonRandom > (99 - player.cyberMerit * 0.04)) {
           const key = crypto.createHash('md5').update(session.userId + new Date().getTime()).digest('hex').toUpperCase()
           legendaryPokemonId[key] = legendaryPokemon
           await session.execute(`捕捉宝可梦 ${key}`)

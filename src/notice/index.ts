@@ -90,7 +90,7 @@ ${notice}`
 
     })
 
-    ctx.command('宝可梦').subcommand('发送公告 <msg:text>', {authority:0}).action(async ({ session },msg) => {
+    ctx.command('宝可梦').subcommand('发送公告 <msg:text>', {authority:4}).action(async ({ session },msg) => {
         const groups=await ctx.database.get('channel', { platform:session.platform })
         const notices:PNotice[]=await ctx.database.get('pokemon.notice',{})
         let notice:PNotice

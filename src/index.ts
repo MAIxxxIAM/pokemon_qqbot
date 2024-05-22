@@ -2,7 +2,7 @@ import { Schema, h, $, is, Context, Session, App } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
-import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion, actionbutton } from './utils/method'
+import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion, actionbutton, toKeyMarkdown } from './utils/method'
 import { pathToFileURL } from 'url'
 import { resolve } from 'path'
 import * as fs from 'fs'
@@ -23,12 +23,13 @@ import { } from 'koishi-plugin-markdown-to-image-service'
 
 import { Robot } from './utils/robot'
 
-import { expToLv, expBase, skillMachine } from './utils/data'
+import { expToLv, expBase, skillMachine, md_ky } from './utils/data'
 import { Pokedex } from './pokedex/pokedex'
 import { pokebattle } from './battle/pvp'
 import { AddGroup, FusionPokemon, Pokebattle, PokemonList, PrivateResource, Resource, model, IntellegentBody } from './model'
 import { catchPokemon } from './battle/pve'
 import { Skill } from './battle'
+import { markdownMessage } from './utils/message'
 
 
 
@@ -207,6 +208,19 @@ export let config: Config
 export let legendaryPokemonId = {}
 
 export async function apply(ctx, conf: Config) {
+  console.log(toKeyMarkdown({
+    title:'欢迎使用宝可梦功能',
+    content:`本群已关闭宝可梦功能，如要开启请联系管理员点击下面按钮
+---
+> 宝可梦功能十分刷屏，如介意请勿开启
+**关闭时，仅可使用签到功能**
+可使用 **关闭/开启宝可梦** 来开启或关闭宝可梦功能`,
+    image:{
+      width:408,
+      height:456,
+      url:'https://gitee.com/maikama/pokemon-fusion-image/raw/master/friendlink.png'
+    }
+  }))
   config = conf
   ctx.on('before-send', async (session: Session, msg_id) => {
     const { message } = session.event
@@ -328,6 +342,19 @@ export async function apply(ctx, conf: Config) {
       const b = await isResourceLimit(op_member_openid, ctx)
       const resource = new PrivateResource(b.resource.goldLimit)
       await resource.addGold(ctx, a, op_member_openid)
+    }
+    const keyMarkdown:markdownMessage={
+      title:'欢迎使用宝可梦功能',
+      content:`我是麦麦！(*/ω＼*)。
+是博士做出来帮助训练师们的机器人少女噢~
+✨我有好多好玩的功能！✨
+可以点我头像看 **使用文档**
+或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`,
+      image:{
+        width:408,
+        height:456,
+        url:await toUrl(ctx,session,fs.readFileSync('./friendlink.png'))
+      }
     }
     const md = `![img #408px #456px](${await toUrl(ctx, session, fs.readFileSync('./friendlink.png'))})
 我是麦麦！(*/ω＼*)。
