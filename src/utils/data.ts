@@ -32,4 +32,3 @@ export const fishing:FishItem[] =Fishing
 export const digItems:DigItem[] = DigItems
 export const trainer_list:Trainer[]=trainerList
 export const md_ky = yaml.load(fs.readFileSync(resolve(__dirname,'../../markdown.yaml'), 'utf8'))
-console.log(md_ky)
