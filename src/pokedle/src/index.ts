@@ -1168,7 +1168,7 @@ ${gameDuration}${answerInfo}${processedResult}`
 
   async function getSessionUserName(session: any): Promise<string> {
     const [player]: Pokebattle[] = await ctx.database.get('pokebattle', session.userId)
-    let sessionUserName = player.name;
+    let sessionUserName = player?.name?player.name:'玩家';
 
     if (isQQOfficialRobotMarkdownTemplateEnabled && session.platform === 'qq') {
       let userRecord = await ctx.database.get('p_wordle_player_records', { userId: session.userId });

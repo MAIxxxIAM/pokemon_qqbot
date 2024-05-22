@@ -1,4 +1,5 @@
 markdown: # markdown默认模板(含图片)
+  id: '102072441_1715877647' # 模板id
   title: name # 标题插值
   img:
     size: img_size # 图片尺寸插值
@@ -12,6 +13,7 @@ markdown: # markdown默认模板(含图片)
     - skill3 # 文本插值6
     - skill4 # 文本插值7
 textMarkdown: # markdown默认模板(不含图片)
+  id: '111111' # 模板id
   title: name # 标题插值
   text:
     - text1 # 文本插值1

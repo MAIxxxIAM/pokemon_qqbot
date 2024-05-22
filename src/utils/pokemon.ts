@@ -179,7 +179,7 @@ const pokemonCal = {
   skillinfo(a: string[],c:string, b: boolean=false) {
     let skill = []
     let m=0
-    for (let i = 0; i < a.length; i++) {
+    for (let i = 0; i < a?.length; i++) {
       if(b){
         if(skillMachine.skill[a[i]]?.type===c){
           skill[m] = a[i]

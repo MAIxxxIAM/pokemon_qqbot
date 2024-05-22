@@ -208,19 +208,6 @@ export let config: Config
 export let legendaryPokemonId = {}
 
 export async function apply(ctx, conf: Config) {
-  console.log(toKeyMarkdown({
-    title:'欢迎使用宝可梦功能',
-    content:`本群已关闭宝可梦功能，如要开启请联系管理员点击下面按钮
----
-> 宝可梦功能十分刷屏，如介意请勿开启
-**关闭时，仅可使用签到功能**
-可使用 **关闭/开启宝可梦** 来开启或关闭宝可梦功能`,
-    image:{
-      width:408,
-      height:456,
-      url:'https://gitee.com/maikama/pokemon-fusion-image/raw/master/friendlink.png'
-    }
-  }))
   config = conf
   ctx.on('before-send', async (session: Session, msg_id) => {
     const { message } = session.event
@@ -528,6 +515,7 @@ export async function apply(ctx, conf: Config) {
     })
 
   ctx.command('宝可梦').subcommand('宝可梦签到', '每日的宝可梦签到')
+    .alias('签到')
     .action(async ({ session }) => {
       if (session.userId == '') return
       const userArr: Pokebattle[] = await ctx.database.get('pokebattle', { id: session.userId })
@@ -2278,7 +2266,7 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
     .action(async ({ session }, skill) => {
       const userArr = await ctx.database.get('pokebattle', { id: session.userId })
       try {
-        let type = skill ? pokemonCal.skillinfo(userArr[0].skillbag, skill, true) : '请选择查询属性,或者查询具体技能'
+        let type = skill ? pokemonCal.skillinfo(userArr[0]?.skillbag, skill, true) : '请选择查询属性,或者查询具体技能'
         if (pokemonCal.findskillId(skill) == 0) {
           const kb = {
             keyboard: {
