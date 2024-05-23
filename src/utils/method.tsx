@@ -342,7 +342,6 @@ function splitText(text: string, textLength: number, md = true): string[] {
 
 export function toKeyMarkdown(markdownMessage: markdownMessage, command?: string) {
   const mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
-  //config配置对象转为数组
   const mdText = splitText(markdownMessage.content, mdModel.text.length)
   const keys = mdModel.text
   let data = keys.map((key, index) => {
@@ -353,10 +352,12 @@ export function toKeyMarkdown(markdownMessage: markdownMessage, command?: string
   }).filter(item => item.values[0] !== undefined && item.values[0] !== "")
 
   if (mdModel?.title) {
-    if(markdownMessage?.title){data = data.concat({
-      key: mdModel.title,
-      values:splitText(markdownMessage.title,1)
-    })}
+    if (markdownMessage?.title) {
+      data = data.concat({
+        key: mdModel.title,
+        values: splitText(markdownMessage.title, 1)
+      })
+    }
   }
   if (markdownMessage?.image) {
     if (mdModel?.img) {
@@ -380,18 +381,60 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
   const mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
   const b = getMarkdownParams(a)
   let outUrlMarkdown = a
-    .replace(`<@${session.userId}>`, '你的')
+    .replace(`<@${session.userId}>`, '你')
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, '')
     .replace(/\|\|/g, '')
     .replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1')
     .replace(/(.)(>)/g, '$1\\$2')
   const { platform } = session
-  const md = a.replace(`<@${session.userId}>`, '你')
+
+  //去除@用户,用作markdown转图片
+  const mdToImg = a.replace(`<@${session.userId}>`, '你')
+
+
+  //转换为key-value格式数组，发送通用markdown消息
+  //提取图片url
+  const url = a.match(/https?:\/\/[^\s]+/g)
+  //提取图片大小
+  const img_size = a.match(/\!\[(.*?)\s*#(\d+)px #(\d+)px\]/)
+  //判断是否为短文本且单图片
+  let onepic = true
+  let kvMarkdown: markdownMessage = {
+    title: '',
+    content: '',
+    image: {
+      width: 0,
+      height: 0,
+      url: ''
+    }
+  }
+
+  //判断是否存在代码块
+  if (a.match(/```([^`]+)```/s)) {
+    if (a.match(/```([^`]+)```/s)[0]?.split('\n')?.filter(part => part.replace(/```/g, '') !== '')?.length > 5) { onepic = false }
+  }
+  kvMarkdown.title = outUrlMarkdown.split('\n')[0]
+  if ((url.length == 1) && onepic) {
+    const Markdown = outUrlMarkdown.split('\n')
+    Markdown.shift()
+    outUrlMarkdown = Markdown.join('\n')
+    kvMarkdown.content = outUrlMarkdown
+    kvMarkdown.image.width = Number(img_size[2])
+    kvMarkdown.image.height = Number(img_size[3])
+    kvMarkdown.image.url = url[0].replace(/\)/g, '')
+  } else {
+    const d = await ctx.markdownToImage.convertToImage(mdToImg)
+    const size = imageSize(d)
+    const imgSrc = await toUrl(ctx, session, d)
+    kvMarkdown.image.width = size.width
+    kvMarkdown.image.height = size.height
+    kvMarkdown.image.url = imgSrc
+  }
+
   let c: any
   switch (platform) {
     case 'qq':
     case 'qqguild':
-    case 'sandbox:c2g1pz24r8':
       try {
         c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
           content: "111",
@@ -404,98 +447,44 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
           msg_seq: Math.floor(Math.random() * 1000000),
         }, platform == 'qq' ? button : null, eventId ? { event_id: eventId } : { msg_id: session.messageId, }))
       } catch {
+
+        //markdown百插值失效
+        //按钮转换为文本
         let buttons = button ? button.keyboard.content.rows.map(row => row.buttons) : []
         buttons = buttons.flat()
-        let canUse='»'
-        const buttonName = buttons.map(button => { if (button.action.type == 2) { return `${button.action.data}➣${button.render_data.label}` } }).filter(a => a!==undefined)
-          for(let i=0;i<buttonName.length;i++){
-            if((i+1)%3==0&&i!=buttonName.length-1){
-              canUse+=buttonName[i]+'\n»'
-          }else{
-            canUse+=buttonName[i]+(i==buttonName.length-1?'':'||')
+        let canUse = '»'
+        const buttonName = buttons.map(button => { if (button.action.type == 2) { return `${button.action.data}➣${button.render_data.label}` } }).filter(a => a !== undefined)
+        for (let i = 0; i < buttonName.length; i++) {
+          if ((i + 1) % 3 == 0 && i != buttonName.length - 1) {
+            canUse += buttonName[i] + '\n»'
+          } else {
+            canUse += buttonName[i] + (i == buttonName.length - 1 ? '' : '||')
           }
         }
-        const url = a.match(/https?:\/\/[^\s]+/g)
-        const img_size = a.match(/\!\[(.*?) #(\d+)px #(\d+)px\]/)
-        let onepic=true
-        if(a.match(/```([^`]+)```/s)){
-          if(a.match(/```([^`]+)```/s)[0]?.split('\n')?.filter(part => part.replace(/```/g, '') !== '')?.length>5)
-          {onepic=false}
-        }
-        if ((url.length == 1)&&onepic) {
-          a.replace(`<@${session.userId}>`, '你的')
-          const tittle = outUrlMarkdown.split('\n')[0]
-          const Markdown = outUrlMarkdown.split('\n')
-          Markdown.shift()
-          outUrlMarkdown = Markdown.join('\n')
-          const kvMarkdown: markdownMessage = {
-            title: tittle,
-            content: outUrlMarkdown,
-            image: {
-              width: Number(img_size[2]),
-              height: Number(img_size[3]),
-              url: url[0].replace(/\)/g, '')
-            }
-          }
-          const data = toKeyMarkdown(kvMarkdown)
-          try {
-            c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
-              content: "111",
-              msg_type: 2,
-              markdown: {
-                custom_template_id: mdModel.id,
-                params: data
-              },
-              timestamp: session.timestamp,
-              msg_seq: Math.floor(Math.random() * 1000000),
-            }, platform == 'qq' ? button : null, eventId ? { event_id: eventId } : { msg_id: session.messageId, }))
-          } catch {
-            const content = splitText(outUrlMarkdown, mdModel.text.length, false)
-            c = await session.send(<message>
-              <img src={url[0].replace(/\)/g, '')} />
-              {content.join('\n')+'\n'+buttonName.join('\n')}
-            </message>)
-          }
-        } else {
-          const tittle = outUrlMarkdown.split('\n')[0]
-          const d = await ctx.markdownToImage.convertToImage(md)
-          const size = imageSize(d)
-          const imgSrc = await toUrl(ctx, session, d)
-          const kvMarkdown: markdownMessage = {
-            title:tittle,
-            content: '',
-            image: {
-              width: size.width,
-              height: size.height,
-              url: imgSrc
-            }
-          }
-          const data = toKeyMarkdown(kvMarkdown)
-          console.log(data)
-          try {
-            c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
-              content: "111",
-              msg_type: 2,
-              markdown: {
-                custom_template_id: mdModel.id,
-                params: data
-              },
-              timestamp: session.timestamp,
-              msg_seq: Math.floor(Math.random() * 1000000),
-            }, platform == 'qq' ? button : null, eventId ? { event_id: eventId } : { msg_id: session.messageId, }))
-          } catch(e) {
-            console.log(e)
-            c = await session.send(<message>
-              <img src={imgSrc} />
-            </message>)
-          }
+        const data = toKeyMarkdown(kvMarkdown)
+        try {
+          c = await session.bot.internal.sendMessage(session.channelId, Object.assign({
+            content: "111",
+            msg_type: 2,
+            markdown: {
+              custom_template_id: mdModel.id,
+              params: data
+            },
+            timestamp: session.timestamp,
+            msg_seq: Math.floor(Math.random() * 1000000),
+          }, platform == 'qq' ? button : null, eventId ? { event_id: eventId } : { msg_id: session.messageId, }))
+        } catch (e) {
+          //发送失败则发送标准图片消息
+          const content = splitText(outUrlMarkdown, mdModel.text.length, false)
+          c = await session.send(<message>
+            <img src={url[0].replace(/\)/g, '')} />
+            {content.join('\n')+'\n'+buttonName.join('\n')}
+          </message>)
         }
       }
       break
-
     //telegram兼容
     case 'telegram':
-      const url = a.match(/https?:\/\/[^\s]+/g)
       const urlText = outUrlMarkdown.split('\n')[0]
       const Markdown = outUrlMarkdown.split('\n')
       Markdown.shift()
@@ -535,10 +524,13 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
       } catch (e) {
         console.log(e)
       }
-    //     c=await session.send(<message>
-    //       {transform(outUrlMarkdown)}
-    //       {buttonName}
-    //     </message>)
+      break
+    default:
+      const content = splitText(outUrlMarkdown, mdModel.text.length, false)
+      c = await session.send(<message>
+        <img src={url[0].replace(/\)/g, '')}/>
+        {content.join('\n')}
+      </message>)
   }
   return c
 }

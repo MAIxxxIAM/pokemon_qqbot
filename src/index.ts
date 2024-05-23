@@ -299,15 +299,6 @@ export async function apply(ctx, conf: Config) {
   ctx.on('guild-added', async (session) => {
     const { id } = session.event._data
     const { group_openid, op_member_openid } = session.event._data.d
-    let [channel] = await ctx.database.get('pokemon.isPokemon', { id: group_openid })
-    if (!channel) {
-      channel = await ctx.database.create('pokemon.isPokemon', { id: group_openid }, {
-        pokemon_cmd: false
-      })
-    }
-    await ctx.database.set('pokemon.isPokemon', { id: group_openid }, row => ({
-      pokemon_cmd: false
-    }))
     const addGroup: AddGroup[] = await ctx.database.get('pokemon.addGroup', { id: op_member_openid })
     let a: number
     if (addGroup.length == 0) {
@@ -330,19 +321,6 @@ export async function apply(ctx, conf: Config) {
       const resource = new PrivateResource(b.resource.goldLimit)
       await resource.addGold(ctx, a, op_member_openid)
     }
-    const keyMarkdown:markdownMessage={
-      title:'欢迎使用宝可梦功能',
-      content:`我是麦麦！(*/ω＼*)。
-是博士做出来帮助训练师们的机器人少女噢~
-✨我有好多好玩的功能！✨
-可以点我头像看 **使用文档**
-或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`,
-      image:{
-        width:408,
-        height:456,
-        url:await toUrl(ctx,session,fs.readFileSync('./friendlink.png'))
-      }
-    }
     const md = `![img #408px #456px](${await toUrl(ctx, session, fs.readFileSync('./friendlink.png'))})
 我是麦麦！(*/ω＼*)。
 是博士做出来帮助训练师们的机器人少女噢~
@@ -350,6 +328,15 @@ export async function apply(ctx, conf: Config) {
 可以点我头像看 **使用文档**
 或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`
     sendMarkdown(ctx, md, session, null, id)
+    let [channel] = await ctx.database.get('pokemon.isPokemon', { id: group_openid })
+    if (!channel) {
+      channel = await ctx.database.create('pokemon.isPokemon', { id: group_openid }, {
+        pokemon_cmd: false
+      })
+    }
+    await ctx.database.set('pokemon.isPokemon', { id: group_openid }, row => ({
+      pokemon_cmd: false
+    }))
   })
 
 
@@ -1544,6 +1531,7 @@ ${chance ? `你当前可以领取三周目资格
 > *邀请麦麦子到其他群做客可以增加3w获取上限哦~o\(\*\/\/\/\/\▽\/\/\/\/\*\)q`
           await sendMarkdown(ctx, md, session, normalKb(session, userArr as Pokebattle[]))
         } catch (e) {
+          console.log(e)
           md = `# ${userArr[0].name}的训练师卡片
 ![img#485px #703px](${await toUrl(ctx, session, src)})
 [📃 宝可问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可问答`)}&reply=false&enter=true) || [⚔️ 对战](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战`)}&reply=false&enter=true) || [📕 属性](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/属性`)}&reply=false&enter=true)
