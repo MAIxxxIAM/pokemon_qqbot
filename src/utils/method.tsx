@@ -315,7 +315,6 @@ function splitText(text: string, textLength: number, md = true): string[] {
   text = text.replace(/\\/g, '')
   text = text.replace(/\*/g, '')
   text = text.replace(/---/g, '\n')
-
   let parts = text.split(/[,，.。？！!；~\n]/).filter(part => part.replace(/\s/g, '') !== '')
   if (!md) {
     return parts
@@ -341,7 +340,10 @@ function splitText(text: string, textLength: number, md = true): string[] {
 }
 
 export function toKeyMarkdown(markdownMessage: markdownMessage, command?: string) {
-  const mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
+  let mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
+  if (markdownMessage?.image) {
+    mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.textMarkdown) : md_ky.textMarkdown
+  }
   const mdText = splitText(markdownMessage.content, mdModel.text.length)
   const keys = mdModel.text
   let data = keys.map((key, index) => {
@@ -359,32 +361,30 @@ export function toKeyMarkdown(markdownMessage: markdownMessage, command?: string
       })
     }
   }
-  if (markdownMessage?.image) {
-    if (mdModel?.img) {
+  if (mdModel?.img) {
 
-      data = data.concat([
-        {
-          key: mdModel.img.size,
-          values: [`img #${markdownMessage.image.width}px #${markdownMessage.image.height}px`]
-        },
-        {
-          key: mdModel.img.url,
-          values: [markdownMessage.image.url]
-        },
-      ])
-    }
+    data = data.concat([
+      {
+        key: mdModel.img.size,
+        values: [`img #${markdownMessage.image.width}px #${markdownMessage.image.height}px`]
+      },
+      {
+        key: mdModel.img.url,
+        values: [markdownMessage.image.url]
+      },
+    ])
   }
+
   return data
 }
 
 export async function sendMarkdown(ctx: Context, a: string, session: Session, button = null, eventId = null, command?: string) {
-  const mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
+  let mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
   const b = getMarkdownParams(a)
   let outUrlMarkdown = a
     .replace(`<@${session.userId}>`, '你')
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, '')
     .replace(/\|\|/g, '')
-    .replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1')
     .replace(/(.)(>)/g, '$1\\$2')
   const { platform } = session
 
@@ -394,7 +394,9 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
 
   //转换为key-value格式数组，发送通用markdown消息
   //提取图片url
-  const url = a.match(/https?:\/\/[^\s]+/g)
+  const url = a.match(/https?:\/\/[^\s)]+/g)
+  //判断是否纯在图片
+
   //提取图片大小
   const img_size = a.match(/\!\[(.*?)\s*#(\d+)px #(\d+)px\]/)
   //判断是否为短文本且单图片
@@ -402,35 +404,39 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
   let kvMarkdown: markdownMessage = {
     title: '',
     content: '',
-    image: {
-      width: 0,
-      height: 0,
-      url: ''
-    }
   }
 
   //判断是否存在代码块
   if (a.match(/```([^`]+)```/s)) {
-    if (a.match(/```([^`]+)```/s)[0]?.split('\n')?.filter(part => part.replace(/```/g, '') !== '')?.length > 5) { onepic = false }
+    if (a.match(/```([^`]+)```/s)[0]?.split('\n')?.filter(part => part.replace(/```/g, '') !== '')?.length > 6) { onepic = false }
   }
   kvMarkdown.title = outUrlMarkdown.split('\n')[0]
-  if ((url.length == 1) && onepic) {
+  if(url===null){
+    mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.textMarkdown) : md_ky.textMarkdown
     const Markdown = outUrlMarkdown.split('\n')
     Markdown.shift()
     outUrlMarkdown = Markdown.join('\n')
     kvMarkdown.content = outUrlMarkdown
-    kvMarkdown.image.width = Number(img_size[2])
-    kvMarkdown.image.height = Number(img_size[3])
-    kvMarkdown.image.url = url[0].replace(/\)/g, '')
+  }else if (((url.length == 1) && onepic)) {
+    const Markdown = outUrlMarkdown.split('\n')
+    Markdown.shift()
+    outUrlMarkdown = Markdown.join('\n')
+    kvMarkdown.content = outUrlMarkdown
+    kvMarkdown.image = {
+      width: Number(img_size[2]),
+      height:Number(img_size[3]),
+      url: url[0]
+    }
   } else {
     const d = await ctx.markdownToImage.convertToImage(mdToImg)
     const size = imageSize(d)
     const imgSrc = await toUrl(ctx, session, d)
-    kvMarkdown.image.width = size.width
-    kvMarkdown.image.height = size.height
-    kvMarkdown.image.url = imgSrc
+    kvMarkdown.image = {
+      width: size.width,
+      height:size.height,
+      url: imgSrc
+    }
   }
-
   let c: any
   switch (platform) {
     case 'qq':
@@ -477,7 +483,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
           //发送失败则发送标准图片消息
           const content = splitText(outUrlMarkdown, mdModel.text.length, false)
           c = await session.send(<message>
-            <img src={url[0].replace(/\)/g, '')} />
+            <img src={url[0]} />
             {content.join('\n')+'\n'+buttonName.join('\n')}
           </message>)
         }
@@ -485,6 +491,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
       break
     //telegram兼容
     case 'telegram':
+      outUrlMarkdown=outUrlMarkdown.replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1')
       const urlText = outUrlMarkdown.split('\n')[0]
       const Markdown = outUrlMarkdown.split('\n')
       Markdown.shift()
@@ -515,7 +522,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
 
         c = await session['telegram'].sendMessage({
           chat_id: session.channelId,
-          text: (url ? `[${urlText}](${(url[0]).replace(/\)/g, '')})\n\n` : '') + outUrlMarkdown,
+          text: (url ? `[${urlText}](${(url[0])})\n\n` : '') + outUrlMarkdown,
           parse_mode: 'MarkdownV2',
           reply_markup: {
             inline_keyboard: buttonName
@@ -525,11 +532,13 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
         console.log(e)
       }
       break
+
+    //其他平台
     default:
       const content = splitText(outUrlMarkdown, mdModel.text.length, false)
       c = await session.send(<message>
-        <img src={url[0].replace(/\)/g, '')}/>
-        {content.join('\n')}
+        {url?<img src={url[0]}/>
+        :''}{content.join('\n')}
       </message>)
   }
   return c

@@ -809,7 +809,7 @@ const kb={
         let noHasPoke=false
         let no=3
           if(noHasRandomPokemon>(99-userArr[0].cyberMerit*0.5)){
-            for(let i = 1 ; i<catchPokemonNumber[userArr[0].area][1];i++){
+            for(let i = catchPokemonNumber[userArr[0].area][0] ; i<=catchPokemonNumber[userArr[0].area][1];i++){
               if(!pokeDex.check(`${i}.${i}`)&&!lapThree.includes(`${i}.${i}`)){
                 const randomNo=Math.floor(Math.random()*3)
                 no=randomNo
@@ -1767,12 +1767,12 @@ ${(h('at', { id: (session.userId) }))}
       }))
       if (userArr[0]?.base[0]) {
         toDo = `能力值：
-生命：${playerPower[0]}
-攻击：${playerPower[1]}
-防御：${playerPower[2]}
-特攻：${playerPower[3]}
-特防：${playerPower[4]}
-速度：${playerPower[5]}`
+生命：${playerPower[0]}   努力值：${playerList.pokemon[index].power[0]}
+攻击：${playerPower[1]}   努力值：${playerList.pokemon[index].power[1]}
+防御：${playerPower[2]}   努力值：${playerList.pokemon[index].power[2]}
+特攻：${playerPower[3]}   努力值：${playerList.pokemon[index].power[3]}
+特防：${playerPower[4]}   努力值：${playerList.pokemon[index].power[4]}
+速度：${playerPower[5]}   努力值：${playerList.pokemon[index].power[5]}`
       }
       try {
         const point = '```'
@@ -2700,47 +2700,6 @@ ${!isEvent ? events : ''}
     })
 
 
-
-
-
-
-  // ctx.command('宝可梦').subcommand('训练师改名', '改动训练师名字').action(async ({ session }) => {
-  //   const userArr = await ctx.database.get('pokebattle', { id: session.userId })
-  //   if (userArr.length == 0) {
-  //     try {
-  //       await session.execute(`签到`)
-  //       return
-  //     } catch (e) { return `${h('at', { id: (session.userId) })}请先输入 签到 领取属于你的宝可梦和精灵球` }
-  //   }
-  //   const vip = isVip(userArr[0])
-  //   if (!vip) return `你不是VIP，无法使用此功能`
-  //   await session.send(`输入当前训练师的新名字`)
-  //   try {
-  //     await session.bot.internal.sendMessage(session.channelId, {
-  //       content: "111",
-  //       msg_type: 2,
-  //       keyboard: {
-  //         content: {
-  //           "rows": [
-  //             { "buttons": [button(0, '点击输入新名字', "", session.userId, "1", false)] },
-  //           ]
-  //         },
-  //       },
-  //       msg_id: session.messageId,
-  //       timestamp: session.timestamp,
-  //       msg_seq: Math.floor(Math.random() * 1000000),
-  //     })
-  //   } catch {
-  //     await session.send(`请向机器人回复你想要的训练师名字`)
-  //   }
-  //   const newName = await session.prompt(60000)
-  //   if (!newName) return `你好像没有输入名字`
-  //   userArr[0].trainerName[0] = await censorText(ctx, newName)
-  //   await ctx.database.set('pokebattle', { id: session.userId }, {
-  //     trainerName: userArr[0].trainerName
-  //   })
-  //   return `你的训练师名字已经改为${newName}`
-  // })
 }
 export { Pokebattle }
 
