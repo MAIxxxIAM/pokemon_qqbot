@@ -304,17 +304,19 @@ export function normalKb(session: Session, userArr: Pokebattle[]) {
 }
 
 function splitText(text: string, textLength: number, md = true): string[] {
-  text = text.replace(/\*\*/g, '')
-  text = text.replace(/^# /g, '\n')
-  text = text.replace(/# /g, '\n')
-  text = text.replace(/^> /g, '\n')
-  text = text.replace(/> /g, '\n')
-  text = text.replace(/^- /g, '\n')
-  text = text.replace(/- /g, '\n')
-  text = text.replace(/\`\`\`/g, '\n')
-  text = text.replace(/\\/g, '')
-  text = text.replace(/\*/g, '')
-  text = text.replace(/---/g, '\n')
+  text = text.replace(/(?<!\\)\*\*/g, '')
+  text = text.replace(/(?<!\\)^# /g, '\n')
+  text = text.replace(/(?<!\\)# /g, '\n')
+  text = text.replace(/(?<!\\)#/g, '\n')
+  text = text.replace(/(?<!\\)> /g, '\n')
+  text = text.replace(/(?<!\\)>/g, '\n')
+  text = text.replace(/(?<!\\)^- /g, '\n')
+  text = text.replace(/(?<!\\)- /g, '\n')
+  text = text.replace(/(?<!\\)-/g, '\n')
+  text = text.replace(/(?<!\\)\`\`\`/g, '\n')
+  text = text.replace(/(?<!\\)\\/g, '')
+  text = text.replace(/(?<!\\)\*/g, '')
+  text = text.replace(/(?<!\\)---/g, '\n')
   let parts = text.split(/[,，.。？！!；~\n]/).filter(part => part.replace(/\s/g, '') !== '')
   if (!md) {
     return parts
@@ -341,7 +343,7 @@ function splitText(text: string, textLength: number, md = true): string[] {
 
 export function toKeyMarkdown(markdownMessage: markdownMessage, command?: string) {
   let mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
-  if (markdownMessage?.image) {
+  if (!markdownMessage?.image) {
     mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.textMarkdown) : md_ky.textMarkdown
   }
   const mdText = splitText(markdownMessage.content, mdModel.text.length)
@@ -383,9 +385,10 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
   const b = getMarkdownParams(a)
   let outUrlMarkdown = a
     .replace(`<@${session.userId}>`, '你')
+    .replace(/(?<!\\)^# /g, '')
+    .replace(/(?<!\\)# /g, '')
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, '')
     .replace(/\|\|/g, '')
-    .replace(/(.)(>)/g, '$1\\$2')
   const { platform } = session
 
   //去除@用户,用作markdown转图片
@@ -410,33 +413,8 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
   if (a.match(/```([^`]+)```/s)) {
     if (a.match(/```([^`]+)```/s)[0]?.split('\n')?.filter(part => part.replace(/```/g, '') !== '')?.length > 6) { onepic = false }
   }
-  kvMarkdown.title = outUrlMarkdown.split('\n')[0]
-  if(url===null){
-    mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.textMarkdown) : md_ky.textMarkdown
-    const Markdown = outUrlMarkdown.split('\n')
-    Markdown.shift()
-    outUrlMarkdown = Markdown.join('\n')
-    kvMarkdown.content = outUrlMarkdown
-  }else if (((url.length == 1) && onepic)) {
-    const Markdown = outUrlMarkdown.split('\n')
-    Markdown.shift()
-    outUrlMarkdown = Markdown.join('\n')
-    kvMarkdown.content = outUrlMarkdown
-    kvMarkdown.image = {
-      width: Number(img_size[2]),
-      height:Number(img_size[3]),
-      url: url[0]
-    }
-  } else {
-    const d = await ctx.markdownToImage.convertToImage(mdToImg)
-    const size = imageSize(d)
-    const imgSrc = await toUrl(ctx, session, d)
-    kvMarkdown.image = {
-      width: size.width,
-      height:size.height,
-      url: imgSrc
-    }
-  }
+  kvMarkdown.title = splitText(outUrlMarkdown, mdModel.title.length, false)[0]
+  
   let c: any
   switch (platform) {
     case 'qq':
@@ -453,7 +431,32 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
           msg_seq: Math.floor(Math.random() * 1000000),
         }, platform == 'qq' ? button : null, eventId ? { event_id: eventId } : { msg_id: session.messageId, }))
       } catch {
-
+        if(url===null){
+          mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.textMarkdown) : md_ky.textMarkdown
+          const Markdown = splitText(outUrlMarkdown, mdModel.title.length)
+          Markdown.shift()
+          outUrlMarkdown = Markdown.join('\n')
+          kvMarkdown.content = outUrlMarkdown
+        }else if (((url.length == 1) && onepic)) {
+          const Markdown = outUrlMarkdown.split('\n')
+          Markdown.shift()
+          outUrlMarkdown = Markdown.join('\n')
+          kvMarkdown.content = outUrlMarkdown
+          kvMarkdown.image = {
+            width: Number(img_size[2]),
+            height:Number(img_size[3]),
+            url: url[0]
+          }
+        } else {
+          const d = await ctx.markdownToImage.convertToImage(mdToImg)
+          const size = imageSize(d)
+          const imgSrc = await toUrl(ctx, session, d)
+          kvMarkdown.image = {
+            width: size.width,
+            height:size.height,
+            url: imgSrc
+          }
+        }
         //markdown百插值失效
         //按钮转换为文本
         let buttons = button ? button.keyboard.content.rows.map(row => row.buttons) : []
@@ -483,15 +486,15 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
           //发送失败则发送标准图片消息
           const content = splitText(outUrlMarkdown, mdModel.text.length, false)
           c = await session.send(<message>
-            <img src={url[0]} />
-            {content.join('\n')+'\n'+buttonName.join('\n')}
+            {url?<img src={url[0]}/>
+        :''}{content.join('\n')+'\n'+buttonName.join('\n')}
           </message>)
         }
       }
       break
     //telegram兼容
     case 'telegram':
-      outUrlMarkdown=outUrlMarkdown.replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1')
+      outUrlMarkdown=outUrlMarkdown.replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, '\\$1').replace(/(.)(>)/g, '$1\\$2')
       const urlText = outUrlMarkdown.split('\n')[0]
       const Markdown = outUrlMarkdown.split('\n')
       Markdown.shift()
