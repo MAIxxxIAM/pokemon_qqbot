@@ -121,41 +121,25 @@ export async function apply(ctx) {
         })
         try {
             const { src } = pokeDexImage.attrs
-            await session.bot.internal.sendMessage(session.channelId, {
-                content: "111",
-                msg_type: 2,
-                markdown: {
-                    custom_template_id: config.MDid,
-                    params: [
-                        {
-                            key: config.key1,
-                            values: [`<@${session.userId}>的图鉴`]
-                        },
-                        {
-                            key: config.key2,
-                            values: ["[img#324px #296px]"]
-                        },
-                        {
-                            key: config.key3,
-                            values: [await toUrl(ctx,session, src)]
-                        }
-                    ]
-                },
-                keyboard: {
-                    content: {
-                        "rows": [
-                            { "buttons": [button(2, '📖 我的图鉴', '/查看图鉴', session.userId, 'cmd'),button(2, '💻 接收宝可梦', '/接收', session.userId, 'cmd',false), ] },
-                            { "buttons": [button(2, "🖊 签到", "/签到", session.userId, "1"), button(2, "💳 信息", "/查看信息", session.userId, "1")] },
-                            { "buttons": [button(2, "🔍 图鉴检查", "/图鉴检查", session.userId, "1")] },
 
-                            page < 2 ? { "buttons": [button(0, "下一页", `/查看图鉴 ${page + 1}`, session.userId, "cmd2")] } : { "buttons": [button(0, "上一页", `/查看图鉴 ${page - 1}`, session.userId, "cmd1"), button(0, "下一页", `/查看图鉴 ${page + 1}`, session.userId, "cmd2")] }
-                        ]
-                    },
-                },
-                msg_id: session.messageId,
-                timestamp: session.timestamp,
-                msg_seq: Math.floor(Math.random() * 10000)
-            })
+            const md=`<@${session.userId}>的图鉴
+---
+![img#324px #296px](${await toUrl(ctx,session, src)})`
+const kb={
+    keyboard: {
+        content: {
+            "rows": [
+                { "buttons": [button(2, '📖 我的图鉴', '/查看图鉴', session.userId, 'cmd'),button(2, '💻 接收宝可梦', '/接收', session.userId, 'cmd',false), ] },
+                { "buttons": [button(2, "🖊 签到", "/签到", session.userId, "1"), button(2, "💳 信息", "/查看信息", session.userId, "1")] },
+                { "buttons": [button(2, "🔍 图鉴检查", "/图鉴检查", session.userId, "1")] },
+
+                page < 2 ? { "buttons": [button(0, "下一页", `/查看图鉴 ${page + 1}`, session.userId, "cmd2")] } : { "buttons": [button(0, "上一页", `/查看图鉴 ${page - 1}`, session.userId, "cmd1"), button(0, "下一页", `/查看图鉴 ${page + 1}`, session.userId, "cmd2")] }
+            ]
+        },
+    },
+}
+    await sendMarkdown(ctx,md, session,kb)
+
         } catch (e) {
             return pokeDexImage
         }
@@ -183,43 +167,15 @@ export async function apply(ctx) {
             if(!pokedex.check(Pid.toString())) return `你还没有捕捉到这个宝可梦`
             let poke = `${Pid}.${Pid}`
             Number(Pid)?poke = `${Number(Pid)}.${Number(Pid)}`:poke = `${Number(expBase.exp.find((id)=>id.name===Pid).id)}.${Number(expBase.exp.find((id)=>id.name===Pid).id)}`
-            if (platform == 'qq' && config.QQ官方使用MD) {
-                try {
-                    await session.bot.internal.sendMessage(session.channelId, {
-                        content: "111",
-                        msg_type: 2,
-                        markdown: {
-                            custom_template_id: config.MDid,
-                            params: [
-                                {
-                                    key: config.key1,
-                                    values: [`<@${session.userId}>成功接收宝可梦${pokemonCal.pokemonlist(poke)}`]
-                                },
-                                {
-                                    key: config.key2,
-                                    values: ["[img#512px #512px]"]
-                                },
-                                {
-                                    key: config.key3,
-                                    values: [await toUrl(ctx,session, `${(pokemonCal.pokemomPic(poke, false)).toString().match(/src="([^"]*)"/)[1]}`)]
-                                },
-                                {
-                                    key: config.key4,
-                                    values: [`花费1200金币接收到了${pokemonCal.pokemonlist(poke)}`]
-                                },
-                            ]
-                        },
-                        msg_id: session.messageId,
-                        timestamp: session.timestamp,
-                        msg_seq: Math.floor(Math.random() * 1000000),
-                    })
-                } catch (e) {
-                    return `网络繁忙，再试一次`
-                }
-            } else {
-                await session.send(`${pokemonCal.pokemomPic(poke, false)}\n成功将${pokemonCal.pokemonlist(poke)}接收`
-                )
-            }
+                const md=`<@${session.userId}>成功接收宝可梦${pokemonCal.pokemonlist(poke)}
+---
+![img#512px #512px](${await toUrl(ctx,session, `${(pokemonCal.pokemomPic(poke, false)).toString().match(/src="([^"]*)"/)[1]}`)})
+        
+---
+花费1200金币接收到了${pokemonCal.pokemonlist(poke)}`
+            
+                await sendMarkdown(ctx,md, session)
+
             if (player.AllMonster.length < 6) {//背包空间
                 let five: string = ''
                 if (player.AllMonster.length === 5) five = `\n你的背包已经满了,你可以通过 放生 指令，放生宝可梦`//背包即满
@@ -252,49 +208,26 @@ export async function apply(ctx) {
             })
             const { src } = img.attrs
             //图片服务
-            if (platform == 'qq' && config.QQ官方使用MD) {
-                try {
-                    await session.bot.internal.sendMessage(session.guildId, {
-                        content: "111",
-                        msg_type: 2,
-                        markdown: {
-                            custom_template_id: config.MDid,
-                            params: [
-                                {
-                                    key: config.key1,
-                                    values: [`<@${session.userId}>的宝可梦背包已经满了`]
-                                },
-                                {
-                                    key: config.key2,
-                                    values: ["[img#512px #381px]"]
-                                },
-                                {
-                                    key: config.key3,
-                                    values: [await toUrl(ctx,session, src)]
-                                },
-                                {
-                                    key: config.key4,
-                                    values: [`<@${session.userId}>请你选择需要替换的宝可梦`]
-                                },
-                            ]
-                        },
-                        keyboard: {
-                            content: {
-                                "rows": [
-                                    { "buttons": [button(0, pokemonCal.pokemonlist(player.AllMonster[0]), "1", session.userId, "1"), button(0, pokemonCal.pokemonlist(player.AllMonster[1]), "2", session.userId, "2")] },
-                                    { "buttons": [button(0, pokemonCal.pokemonlist(player.AllMonster[2]), "3", session.userId, "3"), button(0, pokemonCal.pokemonlist(player.AllMonster[3]), "4", session.userId, "4")] },
-                                    { "buttons": [button(0, pokemonCal.pokemonlist(player.AllMonster[4]), "5", session.userId, "5"), button(0, pokemonCal.pokemonlist(player.AllMonster[5]), "6", session.userId, "6")] },
-                                    { "buttons": [button(0, '放生', "/放生", session.userId, "7")] },
-                                ]
-                            },
-                        },
-                        msg_id: session.messageId,
-                        timestamp: session.timestamp,
-                        msg_seq: Math.floor(Math.random() * 1000000),
-                    })
-                } catch (e) {
-                    return `网络繁忙，再试一次`
-                }
+            const kb={
+                keyboard: {
+                    content: {
+                        "rows": [
+                            { "buttons": [button(0, pokemonCal.pokemonlist(player.AllMonster[0]), "1", session.userId, "1"), button(0, pokemonCal.pokemonlist(player.AllMonster[1]), "2", session.userId, "2")] },
+                            { "buttons": [button(0, pokemonCal.pokemonlist(player.AllMonster[2]), "3", session.userId, "3"), button(0, pokemonCal.pokemonlist(player.AllMonster[3]), "4", session.userId, "4")] },
+                            { "buttons": [button(0, pokemonCal.pokemonlist(player.AllMonster[4]), "5", session.userId, "5"), button(0, pokemonCal.pokemonlist(player.AllMonster[5]), "6", session.userId, "6")] },
+                            { "buttons": [button(0, '放生', "/放生", session.userId, "7")] },
+                        ]
+                    },
+                },
+            }
+            const md2=`<@${session.userId}>的宝可梦背包已经满了
+---
+![img#512px #381px](${await toUrl(ctx,session, src)})
+
+---
+请你选择需要替换的宝可梦`
+            if (platform == 'qq' ) {
+                await sendMarkdown(ctx,md2, session,kb)
             } else {
                 await session.send(`\n
 你的背包中已经有6只原生宝可梦啦
