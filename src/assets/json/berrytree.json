@@ -1,0 +1,340 @@
+[
+  {
+    "id": 0,
+    "berrytree": "乐芭果",
+    "imglink": "https://media.52poke.com/wiki/b/b7/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%B9%90%E8%8A%AD%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722091846"
+  },
+  {
+    "id": 1,
+    "berrytree": "亚开果",
+    "imglink": "https://media.52poke.com/wiki/f/f3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%BA%9A%E5%BC%80%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810062049"
+  },
+  {
+    "id": 2,
+    "berrytree": "佛柑果",
+    "imglink": "https://media.52poke.com/wiki/9/94/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%BD%9B%E6%9F%91%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810052753"
+  },
+  {
+    "id": 3,
+    "berrytree": "兰萨果",
+    "imglink": "https://media.52poke.com/wiki/1/1f/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%85%B0%E8%90%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727114632"
+  },
+  {
+    "id": 4,
+    "berrytree": "凰梨果",
+    "imglink": "https://media.52poke.com/wiki/1/1d/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%87%B0%E6%A2%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230723143131"
+  },
+  {
+    "id": 5,
+    "berrytree": "利木果",
+    "imglink": "https://media.52poke.com/wiki/f/f9/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%88%A9%E6%9C%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230721144756"
+  },
+  {
+    "id": 6,
+    "berrytree": "刺耳果",
+    "imglink": "https://media.52poke.com/wiki/2/23/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%88%BA%E8%80%B3%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810054151"
+  },
+  {
+    "id": 7,
+    "berrytree": "刺角果",
+    "imglink": "https://media.52poke.com/wiki/1/19/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%88%BA%E8%A7%92%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726133807"
+  },
+  {
+    "id": 8,
+    "berrytree": "勿花果",
+    "imglink": "https://media.52poke.com/wiki/7/73/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%8B%BF%E8%8A%B1%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722090242"
+  },
+  {
+    "id": 9,
+    "berrytree": "千香果",
+    "imglink": "https://media.52poke.com/wiki/a/a3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%8D%83%E9%A6%99%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803132150"
+  },
+  {
+    "id": 10,
+    "berrytree": "哈密果",
+    "imglink": "https://media.52poke.com/wiki/0/02/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%93%88%E5%AF%86%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230724141918"
+  },
+  {
+    "id": 11,
+    "berrytree": "嘉珍果",
+    "imglink": "https://media.52poke.com/wiki/c/cd/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%98%89%E7%8F%8D%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810060749"
+  },
+  {
+    "id": 12,
+    "berrytree": "墨莓果",
+    "imglink": "https://media.52poke.com/wiki/3/37/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%A2%A8%E8%8E%93%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230723141901"
+  },
+  {
+    "id": 13,
+    "berrytree": "奇秘果",
+    "imglink": "https://media.52poke.com/wiki/7/73/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%A5%87%E7%A7%98%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810055753"
+  },
+  {
+    "id": 14,
+    "berrytree": "岳竹果",
+    "imglink": "https://media.52poke.com/wiki/d/dd/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%B2%B3%E7%AB%B9%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726131932"
+  },
+  {
+    "id": 15,
+    "berrytree": "巧可果",
+    "imglink": "https://media.52poke.com/wiki/1/1f/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%B7%A7%E5%8F%AF%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803050626"
+  },
+  {
+    "id": 16,
+    "berrytree": "异奇果",
+    "imglink": "https://media.52poke.com/wiki/b/bf/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%BC%82%E5%A5%87%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722090547"
+  },
+  {
+    "id": 17,
+    "berrytree": "扁樱果",
+    "imglink": "https://media.52poke.com/wiki/8/89/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%89%81%E6%A8%B1%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810041318"
+  },
+  {
+    "id": 18,
+    "berrytree": "文柚果",
+    "imglink": "https://media.52poke.com/wiki/9/9c/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%96%87%E6%9F%9A%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722084308"
+  },
+  {
+    "id": 19,
+    "berrytree": "星桃果",
+    "imglink": "https://media.52poke.com/wiki/7/76/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%98%9F%E6%A1%83%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803044949"
+  },
+  {
+    "id": 20,
+    "berrytree": "木子果",
+    "imglink": "https://media.52poke.com/wiki/4/41/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9C%A8%E5%AD%90%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722083950"
+  },
+  {
+    "id": 21,
+    "berrytree": "杏仔果",
+    "imglink": "https://media.52poke.com/wiki/9/96/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9D%8F%E4%BB%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727114244"
+  },
+  {
+    "id": 22,
+    "berrytree": "枝荔果",
+    "imglink": "https://media.52poke.com/wiki/4/49/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9E%9D%E8%8D%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727110710"
+  },
+  {
+    "id": 23,
+    "berrytree": "柿仔果",
+    "imglink": "https://media.52poke.com/wiki/3/37/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9F%BF%E4%BB%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722083623"
+  },
+  {
+    "id": 24,
+    "berrytree": "桃桃果",
+    "imglink": "https://media.52poke.com/wiki/9/97/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A1%83%E6%A1%83%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230721143648"
+  },
+  {
+    "id": 25,
+    "berrytree": "棱瓜果",
+    "imglink": "https://media.52poke.com/wiki/9/93/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A3%B1%E7%93%9C%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808122452"
+  },
+  {
+    "id": 26,
+    "berrytree": "椰木果",
+    "imglink": "https://media.52poke.com/wiki/f/f6/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A4%B0%E6%9C%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726134203"
+  },
+  {
+    "id": 27,
+    "berrytree": "榴石果",
+    "imglink": "https://media.52poke.com/wiki/d/de/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A6%B4%E7%9F%B3%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230724132955"
+  },
+  {
+    "id": 28,
+    "berrytree": "樱子果",
+    "imglink": "https://media.52poke.com/wiki/c/c7/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A8%B1%E5%AD%90%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230721135119"
+  },
+  {
+    "id": 29,
+    "berrytree": "橙橙果",
+    "imglink": "https://media.52poke.com/wiki/d/d6/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A9%99%E6%A9%99%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722045726"
+  },
+  {
+    "id": 30,
+    "berrytree": "檬柠果",
+    "imglink": "https://media.52poke.com/wiki/f/f9/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%AA%AC%E6%9F%A0%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726133512"
+  },
+  {
+    "id": 31,
+    "berrytree": "比巴果",
+    "imglink": "https://media.52poke.com/wiki/b/b0/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%AF%94%E5%B7%B4%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230724135722"
+  },
+  {
+    "id": 32,
+    "berrytree": "沙鳞果",
+    "imglink": "https://media.52poke.com/wiki/9/92/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%B2%99%E9%B3%9E%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727111431"
+  },
+  {
+    "id": 33,
+    "berrytree": "洛玫果",
+    "imglink": "https://media.52poke.com/wiki/f/f7/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%B4%9B%E7%8E%AB%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810061652"
+  },
+  {
+    "id": 34,
+    "berrytree": "灯浆果",
+    "imglink": "https://media.52poke.com/wiki/4/41/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%81%AF%E6%B5%86%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810055227"
+  },
+  {
+    "id": 35,
+    "berrytree": "烛木果",
+    "imglink": "https://media.52poke.com/wiki/3/34/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%83%9B%E6%9C%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230807112206"
+  },
+  {
+    "id": 36,
+    "berrytree": "玉黍果",
+    "imglink": "https://media.52poke.com/wiki/7/79/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%8E%89%E9%BB%8D%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726131542"
+  },
+  {
+    "id": 37,
+    "berrytree": "瓜西果",
+    "imglink": "https://media.52poke.com/wiki/f/f0/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%93%9C%E8%A5%BF%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726134600"
+  },
+  {
+    "id": 38,
+    "berrytree": "番荔果",
+    "imglink": "https://media.52poke.com/wiki/4/4e/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%95%AA%E8%8D%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808115236"
+  },
+  {
+    "id": 39,
+    "berrytree": "福禄果",
+    "imglink": "https://media.52poke.com/wiki/f/f5/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%A6%8F%E7%A6%84%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810035120"
+  },
+  {
+    "id": 40,
+    "berrytree": "罗子果",
+    "imglink": "https://media.52poke.com/wiki/4/4e/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%BD%97%E5%AD%90%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230807112629"
+  },
+  {
+    "id": 41,
+    "berrytree": "腰木果",
+    "imglink": "https://media.52poke.com/wiki/1/1c/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%85%B0%E6%9C%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808121843"
+  },
+  {
+    "id": 42,
+    "berrytree": "芒芒果",
+    "imglink": "https://media.52poke.com/wiki/8/88/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8A%92%E8%8A%92%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722091543"
+  },
+  {
+    "id": 43,
+    "berrytree": "芭亚果",
+    "imglink": "https://media.52poke.com/wiki/e/e6/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8A%AD%E4%BA%9A%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722093223"
+  },
+  {
+    "id": 44,
+    "berrytree": "苹野果",
+    "imglink": "https://media.52poke.com/wiki/2/2c/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8B%B9%E9%87%8E%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722042413"
+  },
+  {
+    "id": 45,
+    "berrytree": "茄番果",
+    "imglink": "https://media.52poke.com/wiki/a/ad/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8C%84%E7%95%AA%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726131235"
+  },
+  {
+    "id": 46,
+    "berrytree": "茸丹果",
+    "imglink": "https://media.52poke.com/wiki/b/b5/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8C%B8%E4%B8%B9%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726133010"
+  },
+  {
+    "id": 47,
+    "berrytree": "草蚕果",
+    "imglink": "https://media.52poke.com/wiki/4/40/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8D%89%E8%9A%95%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810042047"
+  },
+  {
+    "id": 48,
+    "berrytree": "莓榴果",
+    "imglink": "https://media.52poke.com/wiki/b/b5/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8E%93%E6%A6%B4%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810053553"
+  },
+  {
+    "id": 49,
+    "berrytree": "莓莓果",
+    "imglink": "https://media.52poke.com/wiki/c/c7/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8E%93%E8%8E%93%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230721144301"
+  },
+  {
+    "id": 50,
+    "berrytree": "莲蒲果",
+    "imglink": "https://media.52poke.com/wiki/4/45/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%8E%B2%E8%92%B2%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808115846"
+  },
+  {
+    "id": 51,
+    "berrytree": "萄葡果",
+    "imglink": "https://media.52poke.com/wiki/e/e1/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%90%84%E8%91%A1%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230724142504"
+  },
+  {
+    "id": 52,
+    "berrytree": "蔓莓果",
+    "imglink": "https://media.52poke.com/wiki/1/1d/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%94%93%E8%8E%93%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230723141349"
+  },
+  {
+    "id": 53,
+    "berrytree": "蕉香果",
+    "imglink": "https://media.52poke.com/wiki/8/82/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%95%89%E9%A6%99%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230723142334"
+  },
+  {
+    "id": 54,
+    "berrytree": "藻根果",
+    "imglink": "https://media.52poke.com/wiki/9/93/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%97%BB%E6%A0%B9%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230724135220"
+  },
+  {
+    "id": 55,
+    "berrytree": "西梨果",
+    "imglink": "https://media.52poke.com/wiki/b/b8/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%A5%BF%E6%A2%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230723142717"
+  },
+  {
+    "id": 56,
+    "berrytree": "谜芝果",
+    "imglink": "https://media.52poke.com/wiki/2/2d/%E6%A0%91%E6%9E%9C%E6%A0%91_%E8%B0%9C%E8%8A%9D%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803045325"
+  },
+  {
+    "id": 57,
+    "berrytree": "通通果",
+    "imglink": "https://media.52poke.com/wiki/1/19/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%80%9A%E9%80%9A%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808121530"
+  },
+  {
+    "id": 58,
+    "berrytree": "释陀果",
+    "imglink": "https://media.52poke.com/wiki/d/d2/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%87%8A%E9%99%80%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810060203"
+  },
+  {
+    "id": 59,
+    "berrytree": "金枕果",
+    "imglink": "https://media.52poke.com/wiki/e/e1/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%87%91%E6%9E%95%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726134922"
+  },
+  {
+    "id": 60,
+    "berrytree": "零余果",
+    "imglink": "https://media.52poke.com/wiki/c/ce/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%9B%B6%E4%BD%99%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230721135654"
+  },
+  {
+    "id": 61,
+    "berrytree": "雾莲果",
+    "imglink": "https://media.52poke.com/wiki/5/55/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%9B%BE%E8%8E%B2%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810061158"
+  },
+  {
+    "id": 62,
+    "berrytree": "霹霹果",
+    "imglink": "https://media.52poke.com/wiki/b/bd/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%9C%B9%E9%9C%B9%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810054818"
+  },
+  {
+    "id": 63,
+    "berrytree": "靛莓果",
+    "imglink": "https://media.52poke.com/wiki/7/79/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%9D%9B%E8%8E%93%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230726135301"
+  },
+  {
+    "id": 64,
+    "berrytree": "香罗果",
+    "imglink": "https://media.52poke.com/wiki/b/b2/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%A6%99%E7%BD%97%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810062622"
+  },
+  {
+    "id": 65,
+    "berrytree": "龙火果",
+    "imglink": "https://media.52poke.com/wiki/c/c1/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%BE%99%E7%81%AB%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727113857"
+  },
+  {
+    "id": 66,
+    "berrytree": "龙睛果",
+    "imglink": "https://media.52poke.com/wiki/e/e3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%BE%99%E7%9D%9B%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727111102"
+  },{
+    "id": 67,
+    "berrytree": "枯树"
+  }
+]

@@ -1,9 +1,8 @@
-import { Schema, h, $, is, Context, Session, App } from 'koishi'
+import { Schema, h, $,  Session } from 'koishi'
 import pokemonCal from './utils/pokemon'
 import * as pokeGuess from './pokeguess'
 import { } from 'koishi-plugin-cron'
-import { button, catchbutton, findItem, getPic, getRandomName, moveToFirst, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion, actionbutton, toKeyMarkdown } from './utils/method'
-import { pathToFileURL } from 'url'
+import { button, catchbutton, findItem, getPic, toUrl, urlbutton, getType, isVip, isResourceLimit, getWildPic, sendMsg, getMarkdownParams, sendMarkdown, normalKb, getChance, censorText, getList, findFusion, actionbutton} from './utils/method'
 import { resolve } from 'path'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -23,13 +22,12 @@ import { } from 'koishi-plugin-markdown-to-image-service'
 
 import { Robot } from './utils/robot'
 
-import { expToLv, expBase, skillMachine, md_ky } from './utils/data'
+import { expToLv, expBase, skillMachine,} from './utils/data'
 import { Pokedex } from './pokedex/pokedex'
 import { pokebattle } from './battle/pvp'
 import { AddGroup, FusionPokemon, Pokebattle, PokemonList, PrivateResource, Resource, model, IntellegentBody } from './model'
 import { catchPokemon } from './battle/pve'
 import { Skill } from './battle'
-import { markdownMessage } from './utils/message'
 
 
 
@@ -325,17 +323,21 @@ export async function apply(ctx, conf: Config) {
 我是麦麦！(*/ω＼*)。
 是博士做出来帮助训练师们的机器人少女噢~
 ✨我有好多好玩的功能！✨
+
+---
+> @麦麦后回复关闭宝可梦 可以关闭宝可梦功能
 可以点我头像看 **使用文档**
 或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)`
+    session.channelId=group_openid
     sendMarkdown(ctx, md, session, null, id)
     let [channel] = await ctx.database.get('pokemon.isPokemon', { id: group_openid })
     if (!channel) {
       channel = await ctx.database.create('pokemon.isPokemon', { id: group_openid }, {
-        pokemon_cmd: false
+        pokemon_cmd: true
       })
     }
     await ctx.database.set('pokemon.isPokemon', { id: group_openid }, row => ({
-      pokemon_cmd: false
+      pokemon_cmd: true
     }))
   })
 
@@ -632,8 +634,8 @@ export async function apply(ctx, conf: Config) {
             }
           })
           const { src } = dataUrl.attrs
+          const pokeDex = new Pokedex(userArr[0])
           try {
-            const pokeDex = new Pokedex(userArr[0])
             const md = `<@${session.userId}>签到成功
 连续签到天数${checkDays == dateNow ? userArr[0].checkInDays + 1 : 1}天
 ![img#512px #763px](${await toUrl(ctx, session, src)})
@@ -641,7 +643,7 @@ export async function apply(ctx, conf: Config) {
 > [📃 问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可问答`)}&reply=false&enter=true) || [⚔️ 对战](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战`)}&reply=false&enter=true) || [📕 属性](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/属性`)}&reply=false&enter=true)
 [🛒 商店](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/购买`)}&reply=false&enter=true) || [🔈 公告](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/notice`)}&reply=false&enter=true) || [🔖 帮助](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/宝可梦`)}&reply=false&enter=true)
 [🏆 兑换](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/使用 `)}&reply=false&enter=false) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/放生`)}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/杂交宝可梦`)}&reply=false&enter=true)
-${userArr[0].lap == 3 && !pokeDex.check('381.381') ? `三周目玩家连续签到7天可获得**基拉祈**
+${(userArr[0].lap == 3 && (!pokeDex.check('381.381')|| !pokeDex.check('378.378')|| !pokeDex.check('379.379'))) ? `三周目玩家连续签到7,15,30天可获得**基拉祈、拉帝亚斯、拉帝欧斯**
 `: ''}
 [**➣ ⚔️和他对战** ](mqqapi://aio/inlinecmd?command=${encodeURIComponent(`/对战 ${session.userId} `)}&reply=false&enter=true)
 
@@ -672,38 +674,54 @@ const kb={
 }
             sendMarkdown(ctx, md, session, kb)
 
+          } catch (e) {
+            console.log(e)
+            return h.image(src)
+          }
+          
             //连续签到
+            const checkInDays = userArr[0].checkInDays>=29?29:(userArr[0].checkInDays>=14)?14:(userArr[0].checkInDays>=6)?6:1
+            if(checkInDays==1) return
+            const pokemonObj={
+              6:381,
+              14:378,
+              29:379
+            }
+            let pokeId=pokemonObj[checkInDays]
+            let pokeName=`${pokeId}.${pokeId}`
             if (userArr[0].lap < 3 || checkDays !== dateNow) return
-            if (userArr[0].checkInDays < 6) return
 
-            if (pokeDex.check('381.381')) {
-              return
+            if (pokeDex.check(pokeName)) {
+              if (checkInDays > 14 && !pokeDex.check('381.381')) {
+                pokeId = pokemonObj[6];
+                pokeName = `${pokeId}.${pokeId}`;
+              } else if (checkInDays >= 29 && !pokeDex.check('378.378')) {
+                pokeId = pokemonObj[14];
+                pokeName = `${pokeId}.${pokeId}`;
+              } else {
+                return;
+              }
             }
-            pokeDex.pull('381.381', userArr[0])
-            if (userArr[0]?.ultra['381.381'] === undefined) {
-              userArr[0].ultra['381.381'] = 10
+            pokeDex.pull(pokeName, userArr[0])
+            if (userArr[0]?.ultra[pokeName] === undefined) {
+              userArr[0].ultra[pokeName] = 10
             }
-            userArr[0].ultra['381.381'] = 10
+            userArr[0].ultra[pokeName] = 10
             await ctx.database.set('pokebattle', { id: session.userId }, {
               ultra: userArr[0].ultra,
               pokedex: userArr[0].pokedex,
             })
             const getMd = `<@${session.userId}>成功获得
-![img#512px #512px](${await toUrl(ctx, session, `${(pokemonCal.pokemomPic('381.381', false)).toString().match(/src="([^"]*)"/)[1]}`)})
+![img#512px #512px](${await toUrl(ctx, session, `${(pokemonCal.pokemomPic(pokeName, false)).toString().match(/src="([^"]*)"/)[1]}`)})
 ---
-![img#20px #20px](${await toUrl(ctx, session, `${config.图片源}/sr/381.png`)}) : ${userArr[0].ultra['381.381'] * 10}% ${'🟩'.repeat(Math.floor(userArr[0].ultra['381.381'] / 2)) + '🟨'.repeat(userArr[0].ultra['381.381'] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(userArr[0].ultra['381.381'] / 2))}
+![img#20px #20px](${await toUrl(ctx, session, `${config.图片源}/sr/${pokeId}.png`)}) : ${userArr[0].ultra[pokeName] * 10}% ${'🟩'.repeat(Math.floor(userArr[0].ultra[pokeName] / 2)) + '🟨'.repeat(userArr[0].ultra[pokeName] % 2) + '⬜⬜⬜⬜⬜'.substring(Math.round(userArr[0].ultra[pokeName] / 2))}
                   
 ---
-**传说宝可梦——${pokemonCal.pokemonlist('381.381')}**
+**传说宝可梦——${pokemonCal.pokemonlist(pokeName)}**
             
 已经放入图鉴`
 
             await sendMarkdown(ctx, getMd, session)
-
-          } catch (e) {
-            console.log(e)
-            return h.image(src)
-          }
           //图片服务
         }
       } else {
@@ -810,7 +828,7 @@ const kb={
         let no=3
           if(noHasRandomPokemon>(99-userArr[0].cyberMerit*0.5)){
             for(let i = catchPokemonNumber[userArr[0].area][0] ; i<=catchPokemonNumber[userArr[0].area][1];i++){
-              if(!pokeDex.check(`${i}.${i}`)&&!lapThree.includes(`${i}.${i}`)){
+              if(!pokeDex.check(`${i}.${i}`)&&!((userArr[0].lap>1?lapThree:banID).includes(`${i}.${i}`))){
                 const randomNo=Math.floor(Math.random()*3)
                 no=randomNo
                 grassMonster[randomNo]=i

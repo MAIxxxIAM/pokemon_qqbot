@@ -15,9 +15,11 @@ import { DigItem } from '../dig_game/type'
 import { PokemonBase } from './method'
 import trainerList from '../assets/json/trainerList.json'
 import { Trainer } from '../trainer/type'
+import BerryTrees from '../assets/json/berrytree.json'
 import yaml from 'js-yaml'
 import fs from 'fs'
 import { resolve } from 'path'
+import { treesData } from '../farm/berryTreeFarm'
 
 export const expToLv= exptolv
 export const expBase = expbase
@@ -32,3 +34,4 @@ export const fishing:FishItem[] =Fishing
 export const digItems:DigItem[] = DigItems
 export const trainer_list:Trainer[]=trainerList
 export const md_ky = yaml.load(fs.readFileSync(resolve(__dirname,'../../markdown.yaml'), 'utf8'))
+export const berry_trees:treesData[] = BerryTrees
