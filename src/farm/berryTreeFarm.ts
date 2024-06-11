@@ -220,6 +220,7 @@ export class PlantTree implements Farm {
         Math.floor(time) * (10 + Math.floor(Math.random() * 5 + 5));
       tree.water = tree.water - spendWater;
       tree.water = tree.water > 0 ? tree.water : 0;
+      tree.plantTime=new Date()
       if (new Date(tree.eventTime).getTime() > new Date().getTime()) return;
       const startTime = new Date(tree.eventTime).getTime() / 1000 / 60 / 60;
       const endTime = new Date().getTime() / 1000 / 60 / 60;

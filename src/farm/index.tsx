@@ -471,7 +471,8 @@ ${
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
       const isWeed = farm.weeding();
-      if (!isWeed) {
+      console.log(isWeed);
+      if (isWeed===false) {
         return `当前没有杂草`;
       }
       await ctx.database.set(
@@ -481,7 +482,7 @@ ${
       );
       const md = `<@${player.id}> 除草成功
 ---
-> 获得肥料数：${isWeed}`;
+> 获得肥料数：${isWeed==0?'肥料已满':isWeed}`;
       const kb = {
         keyboard: {
           content: {
