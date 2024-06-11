@@ -384,7 +384,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
   let mdModel = command ? (md_ky?.[command] ? md_ky?.[command] : md_ky.markdown) : md_ky.markdown
   const b = getMarkdownParams(a)
   let outUrlMarkdown = a
-    .replace(`<@${session.userId}>`, '你')
+    .replace(`<@${session.userId}>`, '')
     .replace(/(?<!\\)^# /g, '')
     .replace(/(?<!\\)# /g, '')
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, '')
@@ -392,7 +392,7 @@ export async function sendMarkdown(ctx: Context, a: string, session: Session, bu
   const { platform } = session
 
   //去除@用户,用作markdown转图片
-  const mdToImg = a.replace(`<@${session.userId}>`, '你')
+  const mdToImg = a.replace(`<@${session.userId}>`, '')
 
 
   //转换为key-value格式数组，发送通用markdown消息
@@ -793,23 +793,23 @@ export function catchbutton(a: string, b: string, c: string, d: string) {
     ]
   }
 }
-export function button(pt: number, a: string, b: string, d: string, c: string, enter = true) {
+export function button(权限: number, 文本: string, 数据: string, 用户: string, id: string, enter = true) {
 
   return {
-    "id": c,
+    "id": id,
     "render_data": {
-      "label": a,
-      "visited_label": a
+      "label": 文本,
+      "visited_label": 文本
     },
     "action": {
       "type": 2,
       "permission": {
-        "type": pt,
-        "specify_user_ids": [d]
+        "type": 权限,
+        "specify_user_ids": [用户]
       },
       "click_limit": 10,
       "unsupport_tips": "请输入@Bot 1",
-      "data": b,
+      "data": 数据,
       "enter": enter
     },
   }
