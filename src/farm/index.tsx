@@ -26,7 +26,9 @@ export async function apply(ctx: Context) {
       farm.triggerEvent();
       const isplant = farm.plant(seed);
       if (!isplant) {
-        await session.send("种植失败,请检查土壤是否有空位或者背包是否有种子");
+        await session.send(
+          "种植失败,请检查土壤是否有空位或者背包是否有种子，种子在捕捉宝可梦时可能会获得"
+        );
         return;
       }
       farm.triggerEvent();
@@ -169,6 +171,7 @@ ${
       if (!isWater) {
         return `浇水失败，储水量不足，可以通过钓鱼补充`;
       }
+      if (farm.trees.length == 0) return `当前农场没有果树`;
       await ctx.database.set(
         "pokebattle",
         { id: session.userId },
@@ -230,7 +233,7 @@ ${
       farm.triggerEvent();
       const isFertilize = farm.fertilize(id);
       if (!isFertilize) {
-        return `当前肥料不足`;
+        return `当前肥料不足，挖掘化石或者铲除枯树可以获得`;
       }
       await ctx.database.set(
         "pokebattle",
@@ -472,7 +475,7 @@ ${
       farm.triggerEvent();
       const isWeed = farm.weeding();
       console.log(isWeed);
-      if (isWeed===false) {
+      if (isWeed === false) {
         return `当前没有杂草`;
       }
       await ctx.database.set(
@@ -482,7 +485,7 @@ ${
       );
       const md = `<@${player.id}> 除草成功
 ---
-> 获得肥料数：${isWeed==0?'肥料已满':isWeed}`;
+> 获得肥料数：${isWeed == 0 ? "肥料已满" : isWeed}`;
       const kb = {
         keyboard: {
           content: {

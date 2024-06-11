@@ -12,17 +12,22 @@ export async function drawFarm(ctx: any, farm: Farm) {
   };
   for (let i = 0; i < farm.trees.length; i++) {
     const tree = farm.trees[i];
-    let treeImage = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        __dirname,
-        `../assets/img/berrytree/${stages(tree)}.png`
-      )}`
-    );
+    let treeImage: any;
     if (tree.berry_id == 67) {
       treeImage = await ctx.canvas.loadImage(
-        `${testcanvas}${resolve(__dirname, `../assets/img/berrytree/枯树.png`)}`
+        `${testcanvas}${resolve(
+          __dirname,
+          `../assets/img/berrytree/overtrees.png`
+        )}`
       );
       tree.stage = 3;
+    } else {
+      treeImage = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          __dirname,
+          `../assets/img/berrytree/${stages(tree)}.png`
+        )}`
+      );
     }
     const inEvent = new Date().getTime() > new Date(tree.eventTime).getTime();
     const treeInfo = {

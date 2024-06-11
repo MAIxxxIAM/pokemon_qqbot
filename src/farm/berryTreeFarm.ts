@@ -220,7 +220,7 @@ export class PlantTree implements Farm {
         Math.floor(time) * (10 + Math.floor(Math.random() * 5 + 5));
       tree.water = tree.water - spendWater;
       tree.water = tree.water > 0 ? tree.water : 0;
-      tree.plantTime=new Date()
+      tree.plantTime = spendWater > 0 ? new Date() : tree.plantTime;
       if (new Date(tree.eventTime).getTime() > new Date().getTime()) return;
       const startTime = new Date(tree.eventTime).getTime() / 1000 / 60 / 60;
       const endTime = new Date().getTime() / 1000 / 60 / 60;
@@ -242,23 +242,23 @@ export class PlantTree implements Farm {
                 1000 * 60 * 60 * 6
             );
             tree.event = nextEvent;
-            tree.eventTime = eventTime;
+            tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           }
           break;
         case Event["干涸"]:
           subyield = Math.floor(subtime) * 2;
           tree.yield -= subyield;
-          tree.eventTime = new Date();
+          tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;
         case Event["缺肥"]:
           subyield = Math.floor(subtime) * 5;
           tree.yield -= subyield;
-          tree.eventTime = new Date();
+          tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;
         case Event["虫害"]:
           subyield = Math.floor(subtime) * 3;
           tree.yield -= subyield;
-          tree.eventTime = new Date();
+          tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;
         default:
           break;
