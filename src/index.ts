@@ -3629,6 +3629,7 @@ ${img}
           total_battle: $.add(row.total_battle, 1),
           win_count: $.add(row.win_count, winner == session.userId ? 1 : 0),
           power: userArr[0].power,
+          berry_food: userArr[0].berry_food,
           battle_log: battlelog + `??` + tarArr[0].id,
         }));
         if (!user) {

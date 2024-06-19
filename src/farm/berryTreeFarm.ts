@@ -1,3 +1,5 @@
+import { Skill } from "../battle";
+import { PVP } from "../battle/pvp";
 import { berry_trees } from "../utils/data";
 
 export enum Event {
@@ -11,6 +13,50 @@ export interface BerryFruit {
   id: number;
   name: string;
   number: number;
+}
+
+export interface Food {
+  id: number;
+  berrytree: string;
+  effectCategory?: string;
+  type?: string;
+  effect?: number;
+  effectMagnitude?: number;
+  target?: string;
+}
+
+export class BerryFood implements Food {
+  id: number;
+  berrytree: string;
+  effectCategory?: string;
+  type?: string;
+  effect?: number;
+  effectMagnitude?: number;
+  target?: string;
+  constructor(berry: Food) {
+    this.id = berry.id;
+    this.berrytree = berry.berrytree;
+    this.effectCategory = berry.effectCategory;
+    this.type = berry.type;
+    this.effect = berry.effect;
+    this.effectMagnitude = berry.effectMagnitude;
+    this.target = berry.target;
+  }
+  category(tar: PVP) {
+    if (this.type !== "category") return;
+    const value =
+      tar.power[this.effectCategory] * this.effectMagnitude + this.effect;
+    const categoryValue = this.target == "self" ? value : -value;
+    tar.power[this.effectCategory] =
+      tar.power[this.effectCategory] + categoryValue;
+    tar.food = null;
+  }
+  subPower(useSkill: Skill, tar: PVP) {
+    if (this.type !== "subPower") return;
+    if (useSkill.type !== this.effectCategory) return;
+    useSkill.dam = useSkill.dam * this.effectMagnitude;
+    tar.food = null;
+  }
 }
 
 export interface Farm {
@@ -80,10 +126,25 @@ export class PlantTree implements Farm {
       this.exp_farm = 0;
     }
   }
+  take(id: number) {
+    const tree = this.berry_bag.find(
+      (berry) => berry.id === id && berry.number > 0
+    );
+    if (!tree) return false;
+    this.berry_bag.forEach((berry) => {
+      if (berry.id == id) {
+        berry.number -= 1;
+      }
+    });
+    return true;
+  }
+
   weeding() {
     const weed = this.trees.filter((tree) => tree.berry_id == 67);
     if (weed.length == 0) return false;
-    this.trees = this.trees.filter((tree) => tree.berry_id != 67);
+    this.trees = this.trees
+      .filter((tree) => tree.berry_id != 67)
+      .map((tree, index) => ({ ...tree, id: index + 1 }));
     const getFertilize =
       this.fertilizes >= 100 ? 0 : Math.floor(5 * weed.length);
     this.fertilizes += getFertilize;
@@ -135,7 +196,10 @@ export class PlantTree implements Farm {
     if (bugs.length <= 0) return false;
     id.forEach((id) => {
       const tree = this.trees.find(
-        (tree) => tree.id === id && tree.event == Event["虫害"]
+        (tree) =>
+          new Date(tree.eventTime).getTime() < new Date().getTime() &&
+          tree.id === id &&
+          tree.event == Event["虫害"]
       );
       if (!tree) return;
       tree.growth += Math.floor(Math.random() * 10 + 5);
@@ -147,7 +211,9 @@ export class PlantTree implements Farm {
     const harvests = this.trees.filter((tree) => tree.stage == 3);
     if (harvests.length === 0) return false;
     harvests.forEach((harvest) => {
-      const fruit = this.berry_bag.find((fruit) => fruit.id === harvest.id);
+      const fruit = this.berry_bag.find(
+        (fruit) => fruit.id === harvest.berry_id
+      );
       if (fruit) {
         fruit.number += 1;
       } else {
@@ -158,6 +224,7 @@ export class PlantTree implements Farm {
         });
       }
       harvest.yield = 0;
+      harvest.event = Event["无事件"];
       this.exp_farm += 20;
       if (this.exp_farm >= 100) {
         this.exp_farm = 0;
@@ -180,10 +247,13 @@ export class PlantTree implements Farm {
     if (this.fertilizes <= 0) return false;
     id.forEach((id) => {
       const tree = this.trees.find(
-        (tree) => tree.id === id && tree.event == Event["缺肥"]
+        (tree) =>
+          new Date(tree.eventTime).getTime() < new Date().getTime() &&
+          tree.id === id &&
+          tree.event == Event["缺肥"]
       );
       if (!tree) return;
-      const needFertilize = Math.min(100 - tree.yield, this.fertilizes, 20);
+      const needFertilize = Math.min(120 - tree.yield, this.fertilizes, 20);
       tree.yield += needFertilize;
       this.fertilizes -= needFertilize;
       tree.growth += Math.floor(needFertilize / 3);
@@ -201,7 +271,7 @@ export class PlantTree implements Farm {
       tree.water += waterNeeded;
       this.water -= waterNeeded;
       tree.growth += waterNeeded / 2;
-      if (this.water >= 30 && tree.event == Event["干涸"]) {
+      if (tree.water >= 30 && tree.event == Event["干涸"]) {
         tree.event = Event["无事件"];
       }
     });
@@ -238,25 +308,25 @@ export class PlantTree implements Farm {
             const nextEvent = Math.floor(Math.random() * 2) + 2;
             const eventTime = new Date(
               new Date().getTime() +
-                Math.floor(Math.random() * 1000 * 60 * 60 * 6) +
-                1000 * 60 * 60 * 6
+                Math.floor(Math.random() * 1000 * 60 * 60 * 2) +
+                1000 * 60 * 60 * 0.5
             );
             tree.event = nextEvent;
-            tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
+            tree.eventTime = eventTime;
           }
           break;
         case Event["干涸"]:
-          subyield = Math.floor(subtime) * 2;
+          subyield = Math.floor(subtime);
           tree.yield -= subyield;
           tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;
         case Event["缺肥"]:
-          subyield = Math.floor(subtime) * 5;
+          subyield = Math.floor(subtime) * 1;
           tree.yield -= subyield;
           tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;
         case Event["虫害"]:
-          subyield = Math.floor(subtime) * 3;
+          subyield = Math.floor(subtime) * 2;
           tree.yield -= subyield;
           tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;

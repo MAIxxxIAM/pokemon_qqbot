@@ -47,7 +47,12 @@
   {
     "id": 9,
     "berrytree": "千香果",
-    "imglink": "https://media.52poke.com/wiki/a/a3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%8D%83%E9%A6%99%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803132150"
+    "imglink": "https://media.52poke.com/wiki/a/a3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%8D%83%E9%A6%99%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803132150",
+    "type": "subPower",
+    "effectCategory": "水",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 10,
@@ -77,7 +82,12 @@
   {
     "id": 15,
     "berrytree": "巧可果",
-    "imglink": "https://media.52poke.com/wiki/1/1f/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%B7%A7%E5%8F%AF%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803050626"
+    "imglink": "https://media.52poke.com/wiki/1/1f/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%B7%A7%E5%8F%AF%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230803050626",
+    "type": "subPower",
+    "effectCategory": "火",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 16,
@@ -92,7 +102,12 @@
   {
     "id": 18,
     "berrytree": "文柚果",
-    "imglink": "https://media.52poke.com/wiki/9/9c/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%96%87%E6%9F%9A%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722084308"
+    "imglink": "https://media.52poke.com/wiki/9/9c/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%96%87%E6%9F%9A%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722084308",
+    "type": "category",
+    "effectCategory": "hp",
+    "effect": 60,
+    "effectMagnitude": 0.25,
+    "target": "self"
   },
   {
     "id": 19,
@@ -177,7 +192,12 @@
   {
     "id": 35,
     "berrytree": "烛木果",
-    "imglink": "https://media.52poke.com/wiki/3/34/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%83%9B%E6%9C%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230807112206"
+    "imglink": "https://media.52poke.com/wiki/3/34/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%83%9B%E6%9C%A8%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230807112206",
+    "type": "subPower",
+    "effectCategory": "电",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 36,
@@ -192,7 +212,12 @@
   {
     "id": 38,
     "berrytree": "番荔果",
-    "imglink": "https://media.52poke.com/wiki/4/4e/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%95%AA%E8%8D%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808115236"
+    "imglink": "https://media.52poke.com/wiki/4/4e/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%95%AA%E8%8D%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808115236",
+    "type": "subPower",
+    "effectCategory": "冰",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 39,
@@ -202,7 +227,12 @@
   {
     "id": 40,
     "berrytree": "罗子果",
-    "imglink": "https://media.52poke.com/wiki/4/4e/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%BD%97%E5%AD%90%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230807112629"
+    "imglink": "https://media.52poke.com/wiki/4/4e/%E6%A0%91%E6%9E%9C%E6%A0%91_%E7%BD%97%E5%AD%90%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230807112629",
+    "type": "subPower",
+    "effectCategory": "草",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 41,
@@ -333,7 +363,8 @@
     "id": 66,
     "berrytree": "龙睛果",
     "imglink": "https://media.52poke.com/wiki/e/e3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E9%BE%99%E7%9D%9B%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727111102"
-  },{
+  },
+  {
     "id": 67,
     "berrytree": "枯树"
   }

@@ -18,7 +18,7 @@ import BerryTrees from "../assets/json/berrytree.json";
 import yaml from "js-yaml";
 import fs from "fs";
 import { resolve } from "path";
-import { treesData } from "../farm/berryTreeFarm";
+import { Food, treesData } from "../farm/berryTreeFarm";
 
 export const expToLv = exptolv;
 export const expBase = expbase;
@@ -36,3 +36,4 @@ export const md_ky = yaml.load(
   fs.readFileSync(resolve(__dirname, "../../markdown.yaml"), "utf8")
 );
 export const berry_trees: treesData[] = BerryTrees;
+export const berry_food: Food[] = BerryTrees;

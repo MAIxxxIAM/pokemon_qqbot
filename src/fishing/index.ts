@@ -172,43 +172,70 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
         return;
       }
       if (player.ultra[getFish.name[0]] >= 9) {
-        player.ultra[getFish.name[0]] = 10;
-        const getMd = `<@${session.userId}>成功获得
+        let getMd = "";
+        if (!pokeDex.check(getFish.name[0].split(".")[0])) {
+          player.ultra[getFish.name[0]] = 10;
+          getMd = `<@${session.userId}>成功获得
 ![img#512px #512px](${await toUrl(
-          ctx,
-          session,
-          `${
-            pokemonCal
-              .pokemomPic(getFish.name[0], false)
-              .toString()
-              .match(/src="([^"]*)"/)[1]
-          }`
-        )})
+            ctx,
+            session,
+            `${
+              pokemonCal
+                .pokemomPic(getFish.name[0], false)
+                .toString()
+                .match(/src="([^"]*)"/)[1]
+            }`
+          )})
 ---
 ![img#20px #20px](${await toUrl(
-          ctx,
-          session,
-          `${config.图片源}/sr/${getFish.name[0].split(".")[0]}.png`
-        )}) : ${player.ultra[getFish.name[0]] * 10}% ${
-          "🟩".repeat(Math.floor(player.ultra[getFish.name[0]] / 2)) +
-          "🟨".repeat(player.ultra[getFish.name[0]] % 2) +
-          "⬜⬜⬜⬜⬜".substring(Math.round(player.ultra[getFish.name[0]] / 2))
-        }
+            ctx,
+            session,
+            `${config.图片源}/sr/${getFish.name[0].split(".")[0]}.png`
+          )}) : ${player.ultra[getFish.name[0]] * 10}% ${
+            "🟩".repeat(Math.floor(player.ultra[getFish.name[0]] / 2)) +
+            "🟨".repeat(player.ultra[getFish.name[0]] % 2) +
+            "⬜⬜⬜⬜⬜".substring(
+              Math.round(player.ultra[getFish.name[0]] / 2)
+            )
+          }
       
 ---
 **传说宝可梦——${pokemonCal.pokemonlist(getFish.name[0])}**
 
 已经放入图鉴`;
-        pokeDex.pull(getFish.name[0], player);
-        await ctx.database.set(
-          "pokebattle",
-          { id: session.userId },
-          {
-            ultra: player.ultra,
-            pokedex: player.pokedex,
-            cyberMerit: 0,
-          }
-        );
+          pokeDex.pull(getFish.name[0], player);
+          await ctx.database.set(
+            "pokebattle",
+            { id: session.userId },
+            {
+              ultra: player.ultra,
+              pokedex: player.pokedex,
+              cyberMerit: 0,
+            }
+          );
+        } else {
+          getMd = `你已经获得了盖欧卡，奖励积分 + 200`;
+          await ctx.database.set(
+            "pokemon.resourceLimit",
+            { id: session.userId },
+            (row) => ({
+              rankScore: $.add(row.rankScore, getFish.points),
+            })
+          );
+        }
+        await sendMarkdown(ctx, getMd, session, {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1"),
+                  ],
+                },
+              ],
+            },
+          },
+        });
       }
       //copy
     } else {

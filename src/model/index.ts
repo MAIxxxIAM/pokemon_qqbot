@@ -8,7 +8,7 @@ import { DigItem, DigMine } from "../dig_game/type";
 import { unknowns } from "../pokedle/src/type/type";
 import { Trainer } from "../trainer/type";
 import { CardPlayer } from "../card_battle/type";
-import { Farm, PlantTree } from "../farm/berryTreeFarm";
+import { Farm, Food, PlantTree } from "../farm/berryTreeFarm";
 
 //智能体兼容
 
@@ -233,6 +233,7 @@ export interface Pokebattle {
   total_battle?: number;
   win_count?: number;
   farm?: Farm;
+  berry_food?: Food;
   unknowns_bag?: unknowns[];
   captureTimes?: number;
   battleTimes: number;
@@ -403,6 +404,7 @@ export async function model(ctx: Context) {
         initial: new PlantTree(),
         nullable: false,
       },
+      berry_food: "json",
       changeName: {
         type: "integer",
         initial: 1,

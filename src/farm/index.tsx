@@ -1,6 +1,13 @@
 import { Context } from "koishi";
-import { PlantTree, BerryTree, Event, Farm, BerrySend } from "./berryTreeFarm";
-import { berry_trees } from "../utils/data";
+import {
+  PlantTree,
+  BerryTree,
+  Event,
+  Farm,
+  BerrySend,
+  BerryFood,
+} from "./berryTreeFarm";
+import { berry_food, berry_trees } from "../utils/data";
 import { button, sendMarkdown, toUrl } from "../utils/method";
 import { drawFarm } from "./utils";
 import imageSize from "image-size";
@@ -168,6 +175,7 @@ ${
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
       const isWater = farm.watering(id);
+      farm.triggerEvent();
       if (!isWater) {
         return `浇水失败，储水量不足，可以通过钓鱼补充`;
       }
@@ -232,6 +240,7 @@ ${
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
       const isFertilize = farm.fertilize(id);
+      farm.triggerEvent();
       if (!isFertilize) {
         return `当前肥料不足，挖掘化石或者铲除枯树可以获得`;
       }
@@ -296,6 +305,7 @@ ${
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
       const isHarvest = farm.harvest();
+      farm.triggerEvent();
       if (!isHarvest) {
         return `当前没有可收获的果实`;
       }
@@ -393,6 +403,18 @@ ${
                   button(2, "种子背包", "种子背包", session.userId, "i"),
                 ],
               },
+              {
+                buttons: [
+                  button(
+                    2,
+                    "携带树果",
+                    "携带树果 ",
+                    session.userId,
+                    "t",
+                    false
+                  ),
+                ],
+              },
             ],
           },
         },
@@ -474,7 +496,7 @@ ${
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
       const isWeed = farm.weeding();
-      console.log(isWeed);
+      farm.triggerEvent();
       if (isWeed === false) {
         return `当前没有杂草`;
       }
@@ -534,6 +556,7 @@ ${
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
       const isBug = farm.bug(id);
+      farm.triggerEvent();
       if (!isBug) {
         return `当前没有虫害`;
       }
@@ -577,5 +600,43 @@ ${
         },
       };
       await sendMarkdown(ctx, md, session, kb);
+    });
+  ctx
+    .command("宝可梦")
+    .subcommand("树果农场")
+    .subcommand("携带树果 <id:string>")
+    .action(async ({ session }, id) => {
+      const [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!player) {
+        await session.send("自动注册中，请稍等");
+        await session.execute("签到");
+        return;
+      }
+      const farm = new PlantTree(player.farm);
+      farm.triggerEvent();
+      const test = ["文柚果", "巧可果", "千香果", "烛木果", "罗子果", "番荔果"];
+      if (!test.includes(id))
+        return `当前仅支持携带 [文柚果,巧可果,千香果,烛木果,罗子果,番荔果] 请检查输入`;
+      const _id = parseInt(id);
+      let _plantId = _id;
+      _plantId = _id
+        ? _id
+        : berry_trees.findIndex((tree) => tree.berrytree === id);
+      const isTake = farm.take(_plantId);
+      if (player.berry_food)
+        await session.send(`功能测试中，将直接覆盖已携带的树果`);
+      if (!isTake) {
+        return `没有该树果为空或者名字错误`;
+      }
+      const berry = berry_food.find((berry) => berry.id == _plantId);
+      await ctx.database.set(
+        "pokebattle",
+        { id: session.userId },
+        { farm: farm, berry_food: new BerryFood(berry) }
+      );
+      const md = `<@${player.id}> 携带树果${berry.berrytree}成功`;
+      await sendMarkdown(ctx, md, session);
     });
 }
