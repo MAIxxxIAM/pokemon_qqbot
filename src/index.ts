@@ -1007,7 +1007,7 @@ export async function apply(ctx, conf: Config) {
           const { src } = dataUrl.attrs;
           const pokeDex = new Pokedex(userArr[0]);
           try {
-            const md = `<@${session.userId}>签到成功
+            const md = `<qqbot-at-user id="${session.userId}" />签到成功
 连续签到天数${checkDays == dateNow ? userArr[0].checkInDays + 1 : 1}天
 ![img#512px #763px](${await toUrl(ctx, session, src)})
 
@@ -1163,7 +1163,7 @@ ${
               pokedex: userArr[0].pokedex,
             }
           );
-          const getMd = `<@${session.userId}>成功获得
+          const getMd = `<qqbot-at-user id="${session.userId}" />成功获得
 ![img#512px #512px](${await toUrl(
             ctx,
             session,
@@ -1254,7 +1254,9 @@ ${
         const { src } = replyImg.attrs;
         //图片服务
         try {
-          const md = `# <@${session.userId}>成功进入宝可梦的世界
+          const md = `# <qqbot-at-user id="${
+            session.userId
+          }" />成功进入宝可梦的世界
 
 ![img#512px #384px](${await toUrl(ctx, session, src)})
 ---
@@ -1445,7 +1447,7 @@ ${
           const { src } = catchpockmon_img.attrs;
           //创建图片
           try {
-            const md = `<@${session.userId}>正在捕捉宝可梦
+            const md = `<qqbot-at-user id="${session.userId}" />正在捕捉宝可梦
 
 ---
 当前${catchArea[userArr[0].area]}
@@ -1671,7 +1673,7 @@ ${h("at", { id: session.userId })}
 ![img#512px #512px](${await toUrl(ctx, session, img)})
 
 ---
-> <@${session.userId}>再接再厉`;
+> <qqbot-at-user id="${session.userId}" />再接再厉`;
                 await sendMarkdown(ctx, md, session, {
                   keyboard: {
                     content: {
@@ -1721,7 +1723,7 @@ ${h("at", { id: session.userId })}
                 })
               );
               try {
-                const md = `<@${session.userId}>收集度+10%
+                const md = `<qqbot-at-user id="${session.userId}" />收集度+10%
 ![img#512px #512px](${await toUrl(
                   ctx,
                   session,
@@ -1854,8 +1856,12 @@ ${h("at", { id: session.userId })}
             berry_bag.getSeed(getseed);
           }
           const title: string = result
-            ? `<@${session.userId}>成功捕捉了${pokemonCal.pokemonlist(poke)}`
-            : `<@${session.userId}>被${pokemonCal.pokemonlist(poke)}打败了`;
+            ? `<qqbot-at-user id="${
+                session.userId
+              }" />成功捕捉了${pokemonCal.pokemonlist(poke)}`
+            : `<qqbot-at-user id="${
+                session.userId
+              }" />被${pokemonCal.pokemonlist(poke)}打败了`;
           const picture =
             userArr[0].monster_1 == "0"
               ? pokemonCal
@@ -2031,7 +2037,9 @@ ${result ? "恭喜你捕捉到了宝可梦！" : "很遗憾，宝可梦逃走了
             const { src } = img.attrs;
             //图片服务
             try {
-              const md = `<@${session.userId}>的宝可梦背包已经满了
+              const md = `<qqbot-at-user id="${
+                session.userId
+              }" />的宝可梦背包已经满了
 ![img#512px #381px](${await toUrl(ctx, session, src)})
 ---
 > **请你选择需要替换的宝可梦**`;
@@ -2238,7 +2246,7 @@ ${h("at", { id: session.userId })}
         const { src } = image.attrs;
         //图片服务
         try {
-          const md = `# <@${session.userId}>选择两只宝可梦
+          const md = `# <qqbot-at-user id="${session.userId}" />选择两只宝可梦
 ![img#512px #381px](${await toUrl(ctx, session, src)})
 ---
 当前你也可以 [点击这里杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
@@ -2421,7 +2429,9 @@ ${h("at", { id: session.userId })}
               //有战斗宝可梦
               try {
                 const point = "```";
-                const md = `# <@${session.userId}>是否放入战斗栏
+                const md = `# <qqbot-at-user id="${
+                  session.userId
+                }" />是否放入战斗栏
 ![img #512px #768px](${await toUrl(ctx, session, src)})
 
 ---
@@ -2804,7 +2814,7 @@ ${h("at", { id: session.userId })}`;
         let md = "";
         const chance = await getChance(userArr[0], ctx);
         try {
-          md = `# <@${userId}>的训练师卡片
+          md = `# <qqbot-at-user id="${userId}" />的训练师卡片
 ![img#485px #703px](${await toUrl(ctx, session, src)})
 [📃 问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
             `/宝可问答`
@@ -2936,7 +2946,7 @@ ${
 
 > *邀请麦麦子到其他群做客可以增加3w获取上限哦~o\(\*\/\/\/\/\▽\/\/\/\/\*\)q`;
           const imgBuffer = await ctx.markdownToImage.convertToImage(
-            md.replace("<@${userId}>的", "")
+            md.replace(`<qqbot-at-user id="${userId}"/>的`, "")
           );
           return `${h.image(imgBuffer, "image/png")}`;
         }
@@ -3099,7 +3109,7 @@ ${
               },
             },
           };
-          const md = `# <@${session.userId}>选择放生宝可梦
+          const md = `# <qqbot-at-user id="${session.userId}" />选择放生宝可梦
 ![img#512px #381px](${await toUrl(ctx, session, src)})`;
           putMessage = await sendMarkdown(ctx, md, session, kb);
         } catch (e) {
@@ -3188,9 +3198,9 @@ ${
             .pokemomPic(discarded[0], false)
             .toString()
             .match(/src="([^"]*)"/)[1];
-          const md = `# <@${session.userId}>你将【${pokemonCal.pokemonlist(
-            discarded[0]
-          )}】放生了
+          const md = `# <qqbot-at-user id="${
+            session.userId
+          }" />你将【${pokemonCal.pokemonlist(discarded[0])}】放生了
 ![img#512px #512px](${await toUrl(ctx, session, src)})
 
 ---
@@ -3487,7 +3497,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
 ${img}
 
 ---
-<@${session.userId}>你还没有${commands}吧
+<qqbot-at-user id="${session.userId}" />你还没有${commands}吧
 点击👉 [${commands}](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
             `/${commands}`
           )}&reply=false&enter=fales)
@@ -3710,7 +3720,7 @@ ${img}
         ).replace(/\*/g, "口")}输了\r`;
         try {
           const legendaryPokemonRandom = Math.random() * 100;
-          const md = `<@${session.userId}>对战结束
+          const md = `<qqbot-at-user id="${session.userId}" />对战结束
 ![img#712px #750px](${await toUrl(
             ctx,
             session,
@@ -3742,7 +3752,7 @@ ${
 > ${loserlog} ${user ? "" : "对战积分-1"}`
     : `
 ---
-> ${loseName}<@${session.userId}>你输了已返还一半金币 ${
+> ${loseName}<qqbot-at-user id="${session.userId}" />你输了已返还一半金币 ${
         user ? "" : "对战积分-1"
       }`
 }`;
@@ -3884,7 +3894,7 @@ ${jli}`;
       const imgContent = img.replace(/^data:image\/\w+;base64,/, "");
       const imgBuffer = Buffer.from(imgContent, "base64");
       let dimensions = imageSize(imgBuffer);
-      const md = `# <@${session.userId}>战斗详情
+      const md = `# <qqbot-at-user id="${session.userId}" />战斗详情
 ![img#${dimensions.width}px #${dimensions.height}px](${await toUrl(
         ctx,
         session,
@@ -3961,7 +3971,7 @@ ${jli}`;
       let md = "";
       const point = "```";
       try {
-        md = `# <@${session.userId}> 扭蛋结果
+        md = `# <qqbot-at-user id="${session.userId}" /> 扭蛋结果
 你抽取了${count}个技能
 重复技能将被换成金币
 
@@ -4019,7 +4029,7 @@ ${point}
         return `你还没有技能哦\n签到领取代币到【技能扭蛋机】抽取技能吧`;
       const bag = `${pokemonCal.skillbag(userArr[0].skillbag)}`;
       const point = "```";
-      const md = `# ![img#50px #50px](https://q.qlogo.cn/qqapp/102072441/${session.userId}/640)<@${session.userId}>的技能背包
+      const md = `# ![img#50px #50px](https://q.qlogo.cn/qqapp/102072441/${session.userId}/640)<qqbot-at-user id="${session.userId}" />的技能背包
 
 ---
 ${point}
@@ -4062,7 +4072,9 @@ ${bag.replace(/\n/g, "||")}`;
         return `你已经装备了该技能`;
       if (userArr[0].skillSlot.length >= 4) {
         const getSkill = new Skill(pokemonCal.findskillId(skill));
-        const md = `<@${session.userId}>你的技能栏位已满，请选择替换技能
+        const md = `<qqbot-at-user id="${
+          session.userId
+        }" />你的技能栏位已满，请选择替换技能
 当前技能：
 
 > ${getSkill.name} 威力:${getSkill.dam} 属性:${getSkill.type} 类型:${
@@ -4345,7 +4357,7 @@ ${userArr[0].skillSlot[3].name} 威力：${userArr[0].skillSlot[3].dam} 属性�
           ctx,
           session,
           `${config.图片源}/trainers/${playerTrainer.source_name}.png`
-        )})<@${session.userId}>来到了商店
+        )})<qqbot-at-user id="${session.userId}" />来到了商店
 
 ---
 商店物品：
@@ -4474,8 +4486,8 @@ tips:${tips}`;
             row.fly_count
           ),
         }));
-
-        const md = `<@${session.userId}>购买了${item}
+        console.log(events);
+        const md = `<qqbot-at-user id="${session.userId}" />购买了${item}
 ---
 成功进入${place[areaId]}
 
@@ -4486,7 +4498,11 @@ ${!isEvent ? events : ""}
 
 当前赛博功德值:${userArr[0].cyberMerit + addMerits}`;
         await sendMarkdown(ctx, md, session);
-        if (userArr[0].fly_count < 1) return;
+        const qldn = ["343.343", "344.344"];
+        const isqldn = userArr[0].AllMonster.some((item) =>
+          qldn.includes(item)
+        );
+        if (userArr[0].fly_count < 1 && !isqldn) return;
         if (isEvent) return;
         if (legendaryPokemonRandom > 99 - userArr[0].cyberMerit * 0.04) {
           const key = crypto
@@ -4494,7 +4510,7 @@ ${!isEvent ? events : ""}
             .update(session.userId + new Date().getTime())
             .digest("hex")
             .toUpperCase();
-          legendaryPokemonId[key] = "342.342";
+          legendaryPokemonId[key] = isqldn ? "345.345" : "342.342";
           await ctx.setTimeout(() => {
             delete legendaryPokemonId[key];
           }, 2000);
