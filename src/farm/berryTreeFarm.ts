@@ -128,11 +128,11 @@ export class PlantTree implements Farm {
   }
   take(id: number) {
     const tree = this.berry_bag.find(
-      (berry) => berry.id === id && berry.number > 0
+      (berry) => berry.id === id + 1 && berry.number > 0
     );
     if (!tree) return false;
     this.berry_bag.forEach((berry) => {
-      if (berry.id == id) {
+      if (berry.id == id + 1) {
         berry.number -= 1;
       }
     });
@@ -225,7 +225,7 @@ export class PlantTree implements Farm {
       }
       harvest.yield = 0;
       harvest.event = Event["无事件"];
-      this.exp_farm += 20;
+      this.exp_farm += 34;
       if (this.exp_farm >= 100) {
         this.exp_farm = 0;
         this.farmLevel += 1;

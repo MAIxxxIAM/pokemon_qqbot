@@ -2,17 +2,32 @@
   {
     "id": 0,
     "berrytree": "乐芭果",
-    "imglink": "https://media.52poke.com/wiki/b/b7/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%B9%90%E8%8A%AD%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722091846"
+    "imglink": "https://media.52poke.com/wiki/b/b7/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%B9%90%E8%8A%AD%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722091846",
+    "type": "category",
+    "effectCategory": "hp",
+    "effect": 30,
+    "effectMagnitude": 0.15,
+    "target": "self"
   },
   {
     "id": 1,
     "berrytree": "亚开果",
-    "imglink": "https://media.52poke.com/wiki/f/f3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%BA%9A%E5%BC%80%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810062049"
+    "imglink": "https://media.52poke.com/wiki/f/f3/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%BA%9A%E5%BC%80%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810062049",
+    "type": "category",
+    "effectCategory": "defense",
+    "effect": 1,
+    "effectMagnitude": 0.1,
+    "target": "self"
   },
   {
     "id": 2,
     "berrytree": "佛柑果",
-    "imglink": "https://media.52poke.com/wiki/9/94/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%BD%9B%E6%9F%91%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810052753"
+    "imglink": "https://media.52poke.com/wiki/9/94/%E6%A0%91%E6%9E%9C%E6%A0%91_%E4%BD%9B%E6%9F%91%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810052753",
+    "type": "subPower",
+    "effectCategory": "幽灵",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 3,
@@ -32,7 +47,12 @@
   {
     "id": 6,
     "berrytree": "刺耳果",
-    "imglink": "https://media.52poke.com/wiki/2/23/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%88%BA%E8%80%B3%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810054151"
+    "imglink": "https://media.52poke.com/wiki/2/23/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%88%BA%E8%80%B3%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810054151",
+    "type": "subPower",
+    "effectCategory": "恶",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 7,
@@ -42,7 +62,12 @@
   {
     "id": 8,
     "berrytree": "勿花果",
-    "imglink": "https://media.52poke.com/wiki/7/73/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%8B%BF%E8%8A%B1%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722090242"
+    "imglink": "https://media.52poke.com/wiki/7/73/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%8B%BF%E8%8A%B1%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722090242",
+    "type": "category",
+    "effectCategory": "hp",
+    "effect": 20,
+    "effectMagnitude": 0.15,
+    "target": "self"
   },
   {
     "id": 9,
@@ -92,12 +117,22 @@
   {
     "id": 16,
     "berrytree": "异奇果",
-    "imglink": "https://media.52poke.com/wiki/b/bf/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%BC%82%E5%A5%87%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722090547"
+    "imglink": "https://media.52poke.com/wiki/b/bf/%E6%A0%91%E6%9E%9C%E6%A0%91_%E5%BC%82%E5%A5%87%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230722090547",
+    "type": "category",
+    "effectCategory": "hp",
+    "effect": 40,
+    "effectMagnitude": 0.15,
+    "target": "self"
   },
   {
     "id": 17,
     "berrytree": "扁樱果",
-    "imglink": "https://media.52poke.com/wiki/8/89/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%89%81%E6%A8%B1%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810041318"
+    "imglink": "https://media.52poke.com/wiki/8/89/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%89%81%E6%A8%B1%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230810041318",
+    "type": "subPower",
+    "effectCategory": "虫",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 18,
@@ -122,12 +157,22 @@
   {
     "id": 21,
     "berrytree": "杏仔果",
-    "imglink": "https://media.52poke.com/wiki/9/96/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9D%8F%E4%BB%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727114244"
+    "imglink": "https://media.52poke.com/wiki/9/96/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9D%8F%E4%BB%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727114244",
+    "type": "category",
+    "effectCategory": "specialDefense",
+    "effect": 1,
+    "effectMagnitude": 0.1,
+    "target": "self"
   },
   {
     "id": 22,
     "berrytree": "枝荔果",
-    "imglink": "https://media.52poke.com/wiki/4/49/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9E%9D%E8%8D%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727110710"
+    "imglink": "https://media.52poke.com/wiki/4/49/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%9E%9D%E8%8D%94%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230727110710",
+    "type": "category",
+    "effectCategory": "attack",
+    "effect": 1,
+    "effectMagnitude": 0.1,
+    "target": "self"
   },
   {
     "id": 23,
@@ -142,7 +187,12 @@
   {
     "id": 25,
     "berrytree": "棱瓜果",
-    "imglink": "https://media.52poke.com/wiki/9/93/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A3%B1%E7%93%9C%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808122452"
+    "imglink": "https://media.52poke.com/wiki/9/93/%E6%A0%91%E6%9E%9C%E6%A0%91_%E6%A3%B1%E7%93%9C%E6%9E%9C_%E7%BB%93%E6%9E%9C_ORAS.png?20230808122452",
+    "type": "subPower",
+    "effectCategory": "飞行",
+    "effect": 0,
+    "effectMagnitude": 0.5,
+    "target": "enemy"
   },
   {
     "id": 26,

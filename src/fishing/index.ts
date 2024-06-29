@@ -20,8 +20,10 @@ export async function apply(ctx: Context) {
       return;
     }
     const berryBag = new PlantTree(player.farm);
-    berryBag.water += berryBag.water > 100 ? 0 : 30;
-    berryBag.water = berryBag.water > 100 ? 100 : berryBag.water;
+    berryBag.water = Math.min(
+      berryBag.water + (player.vip > 0 ? 90 : 30),
+      player.vip > 0 ? 500 : 200
+    );
     const addMerits = player.cyberMerit > 99 ? 0 : 1;
     const pokeDex = new Pokedex(player);
     await ctx.database.set(

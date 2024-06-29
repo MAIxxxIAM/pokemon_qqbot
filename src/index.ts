@@ -1101,13 +1101,7 @@ ${
                       buttons: [
                         button(2, "签到", "签到", session.userId, "qd"),
                         button(2, "面板", "查看信息", session.userId, "xx"),
-                        button(
-                          2,
-                          "测试功能：树果农场",
-                          "树果农场",
-                          session.userId,
-                          "bt"
-                        ),
+                        button(2, "树果农场", "树果农场", session.userId, "bt"),
                       ],
                     },
                   ],
@@ -3628,7 +3622,9 @@ ${img}
             : "" + (tarArr[0].name || tarArr[0].battlename);
           jli = `${noTrainer}已经筋疲力尽,每一小时恢复一次可对战次数`;
         }
+        let useFood = !!userArr[0].berry_food;
         let battle = pokebattle(userArr[0], tarArr[0]);
+        useFood = useFood && !userArr[0].berry_food;
         let battlelog = battle[0];
         let winner = battle[1];
         let loser = battle[2];
@@ -3720,7 +3716,9 @@ ${img}
         ).replace(/\*/g, "口")}输了\r`;
         try {
           const legendaryPokemonRandom = Math.random() * 100;
-          const md = `<qqbot-at-user id="${session.userId}" />对战结束
+          const md = `<qqbot-at-user id="${session.userId}" />对战结束${
+            useFood ? " 已使用树果" : ""
+          }
 ![img#712px #750px](${await toUrl(
             ctx,
             session,
@@ -3929,6 +3927,7 @@ ${jli}`;
       if (userArr[0].coin < 1) {
         return `你的代币不足，要积极参与对战哦~`;
       }
+      if (count > 50) return `一次最多抽取50个技能,防止消息无法发送`;
       await ctx.database.set(
         "pokebattle",
         { id: session.userId },
@@ -4011,9 +4010,9 @@ ${point}
 
   ctx
     .command("宝可梦")
-    .subcommand("技能背包", "查看所有获得的技能")
+    .subcommand("技能背包 [page:number]", "查看所有获得的技能")
     .usage(`/技能背包`)
-    .action(async ({ session }) => {
+    .action(async ({ session }, page: number) => {
       const userArr = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
@@ -4025,18 +4024,57 @@ ${point}
           return `请先输入 签到 领取属于你的宝可梦和精灵球`;
         }
       }
+      if (!page) page = 1;
+      const basePage = (page - 1) * 50;
       if (userArr[0]?.skillbag.length == 0)
         return `你还没有技能哦\n签到领取代币到【技能扭蛋机】抽取技能吧`;
+      const skillPage = pokemonCal
+        .skillbag(userArr[0].skillbag)
+        .split("\n\n")
+        .slice(basePage / 5, (basePage + 50) / 5)
+        .join("\n\n");
       const bag = `${pokemonCal.skillbag(userArr[0].skillbag)}`;
       const point = "```";
+      const kb = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [
+                  button(
+                    2,
+                    "← 上一页",
+                    `/技能背包 ${page - 1 > 0 ? page - 1 : 1}`,
+                    session.userId,
+                    "1"
+                  ),
+                  button(
+                    2,
+                    "下一页 →",
+                    `/技能背包 ${page + 1}`,
+                    session.userId,
+                    "2"
+                  ),
+                ],
+              },
+              {
+                buttons: [
+                  button(2, "查询技能", `/查询技能`, session.userId, "1"),
+                ],
+              },
+            ],
+          },
+        },
+      };
+
       const md = `# ![img#50px #50px](https://q.qlogo.cn/qqapp/102072441/${session.userId}/640)<qqbot-at-user id="${session.userId}" />的技能背包
 
 ---
 ${point}
-${bag}
+${skillPage}
 ${point}`;
       try {
-        await sendMarkdown(ctx, md, session);
+        await sendMarkdown(ctx, md, session, kb);
       } catch {
         return `\u200b
 你当前的技能：
@@ -4469,8 +4507,7 @@ tips:${tips}`;
         const isEvent = userArr[0].lap < 3 || userArr[0].level < 90;
         const areaId = area.indexOf(item);
         const events =
-          legendaryPokemonRandom > 99 - userArr[0].cyberMerit * 0.04 &&
-          userArr[0].fly_count > 0
+          legendaryPokemonRandom > 99 - userArr[0].cyberMerit * 0.04
             ? `飞机航行中似乎出现了意外，请注意`
             : `飞机安全抵达目的地：${place[areaId]} 赛博功德+1`;
         if (userArr[0].lap <= areaId) return `你还没有获得更强的认证，无法购买`;
@@ -4486,7 +4523,6 @@ tips:${tips}`;
             row.fly_count
           ),
         }));
-        console.log(events);
         const md = `<qqbot-at-user id="${session.userId}" />购买了${item}
 ---
 成功进入${place[areaId]}

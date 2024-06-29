@@ -115,8 +115,6 @@ export async function apply(ctx: Context) {
       const md = `<@${player.id}> 农场信息
 
 ---
-> 当前为测试功能，树果无实际用途
-
 ${
   farm.trees.length == 0
     ? ""
@@ -376,8 +374,8 @@ ${
       const md = `<@${player.id}> 树果背包
 ---
 > ${farm.berry_bag
-        .map((fruit) => `${fruit.name} x${fruit.number}`)
-        .join("\n")}`;
+        .map((fruit) => `[${fruit.name} x${fruit.number}]`)
+        .join("||")}`;
       const kb = {
         keyboard: {
           content: {
@@ -444,11 +442,11 @@ ${
       );
       const seed_bag = farm.sends
         .filter((seed) => seed.number > 0)
-        .map((seed) => `${seed.name} x${seed.number}`);
+        .map((seed) => `[${seed.name} x${seed.number}]`);
       const md = `<@${player.id}> 种子背包
 
 ---
-> ${seed_bag.length == 0 ? "背包空无一物" : seed_bag.join("\n")}`;
+> ${seed_bag.length == 0 ? "背包空无一物" : seed_bag.join("||")}`;
       const kb = {
         keyboard: {
           content: {
@@ -616,17 +614,36 @@ ${
       }
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
-      const test = ["文柚果", "巧可果", "千香果", "烛木果", "罗子果", "番荔果"];
-      if (!test.includes(id))
-        return `当前仅支持携带 [文柚果,巧可果,千香果,烛木果,罗子果,番荔果] 请检查输入`;
+      const openBerrys = berry_food.filter((berry) => !!berry.type);
+      const openBerrysName = openBerrys.map((berry) => berry.berrytree);
+      const openBerrysdes = openBerrys.map((berry) => {
+        const sx = {
+          hp: "生命",
+          attack: "攻击",
+          defense: "防御",
+          specialAttack: "特攻",
+          specialDefense: "特防",
+          speed: "速度",
+        };
+        return `${berry.berrytree}：${
+          berry.type == "category"
+            ? `${
+                berry.effectCategory == "hp" ? `生命值剩余50%时` : `对战时`
+              } 增加一定量的${sx[berry.effectCategory]}`
+            : `当对方${berry.effectCategory}属性招式命中要害时，伤害降低${berry.effectMagnitude}倍`
+        }`;
+      });
+      if (!openBerrysName.includes(id))
+        return `当前第一批开放树果为: \n${openBerrysdes.join(
+          "\n\n"
+        )} \n请检查输入`;
       const _id = parseInt(id);
       let _plantId = _id;
       _plantId = _id
         ? _id
         : berry_trees.findIndex((tree) => tree.berrytree === id);
       const isTake = farm.take(_plantId);
-      if (player.berry_food)
-        await session.send(`功能测试中，将直接覆盖已携带的树果`);
+      if (player.berry_food) await session.send(`将直接覆盖已携带的树果`);
       if (!isTake) {
         return `没有该树果为空或者名字错误`;
       }
