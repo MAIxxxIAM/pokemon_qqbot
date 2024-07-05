@@ -578,7 +578,7 @@ export async function sendMarkdown(
     : md_ky.markdown;
   const b = getMarkdownParams(a);
   let outUrlMarkdown = a
-    .replace(`<@${session.userId}>`, "")
+    .replace(`<qqbot-at-user id="${session.userId}" />`, "你")
     .replace(/(?<!\\)^# /g, "")
     .replace(/(?<!\\)# /g, "")
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, "")
@@ -586,7 +586,7 @@ export async function sendMarkdown(
   const { platform } = session;
 
   //去除@用户,用作markdown转图片
-  const mdToImg = a.replace(`<@${session.userId}>`, "");
+  const mdToImg = a.replace(`<qqbot-at-user id="${session.userId}" />`, "你");
 
   //转换为key-value格式数组，发送通用markdown消息
   //提取图片url

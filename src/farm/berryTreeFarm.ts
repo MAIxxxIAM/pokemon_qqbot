@@ -170,7 +170,8 @@ export class PlantTree implements Farm {
     const berry = this.sends.find(
       (send) => send.id === _plantId && send.number > 0
     );
-    if (!berry || this.trees.length >= this.farmLevel) return false;
+    if (!berry || this.trees.length >= Math.min(this.farmLevel, 24))
+      return false;
     this.sends.forEach((send) => {
       if (send.id == _plantId) {
         send.number -= 1;
@@ -268,6 +269,20 @@ export class PlantTree implements Farm {
       const tree = this.trees.find((tree) => tree.id === id);
       if (!tree || this.water <= 0 || tree.water >= 100) return;
       const waterNeeded = Math.min(100 - tree.water, this.water, 10);
+      tree.water += waterNeeded;
+      this.water -= waterNeeded;
+      tree.growth += waterNeeded / 2;
+      if (tree.water >= 30 && tree.event == Event["干涸"]) {
+        tree.event = Event["无事件"];
+      }
+    });
+    return true;
+  }
+  VIPwatering() {
+    if (this.water <= 0) return false;
+    this.trees.forEach((tree) => {
+      if (tree.water >= 100) return;
+      const waterNeeded = Math.min(100 - tree.water, this.water);
       tree.water += waterNeeded;
       this.water -= waterNeeded;
       tree.growth += waterNeeded / 2;

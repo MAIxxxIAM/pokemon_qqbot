@@ -34,7 +34,7 @@ export async function apply(ctx: Context) {
       const isplant = farm.plant(seed);
       if (!isplant) {
         await session.send(
-          "种植失败,请检查土壤是否有空位或者背包是否有种子，种子在捕捉宝可梦时可能会获得"
+          "种植失败,请检查土壤是否有空位或者背包是否有种子，种子在捕捉宝可梦时可能会获得,土壤上限为24块"
         );
         return;
       }
@@ -169,10 +169,15 @@ ${
         await session.execute("签到");
         return;
       }
-      if (id.length == 0) return `请输入要浇水的树果id,多个id请用空格隔开`;
+      if (id.length == 0) {
+        if (player.vip < 1)
+          return `非vip用户无法使用一键浇水。请输入要浇水的树果id,多个id请用空格隔开`;
+        await session.send("一键浇水中，请稍等");
+      }
+
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
-      const isWater = farm.watering(id);
+      const isWater = player.vip < 1 ? farm.watering(id) : farm.VIPwatering();
       farm.triggerEvent();
       if (!isWater) {
         return `浇水失败，储水量不足，可以通过钓鱼补充`;

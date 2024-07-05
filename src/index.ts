@@ -1,4 +1,4 @@
-import { Schema, h, $, Session } from "koishi";
+import { Schema, h, $, Session, is } from "koishi";
 import pokemonCal from "./utils/pokemon";
 import * as pokeGuess from "./pokeguess";
 import {} from "koishi-plugin-cron";
@@ -4523,35 +4523,40 @@ tips:${tips}`;
             row.fly_count
           ),
         }));
+        const qldn = ["343.343", "344.344"];
+        const isqldn = userArr[0].AllMonster.some((item) =>
+          qldn.includes(item)
+        );
+        const isLegendaryPokemon =
+          (userArr[0].fly_count < 1 && !isqldn) ||
+          isEvent ||
+          legendaryPokemonRandom <= 99 - userArr[0].cyberMerit * 0.04;
+        if (!isLegendaryPokemon) {
+          await session.send(`飞机航行中似乎出现了意外，请注意`);
+        }
         const md = `<qqbot-at-user id="${session.userId}" />购买了${item}
 ---
 成功进入${place[areaId]}
 
 ---
-${!isEvent ? events : ""}
+${isLegendaryPokemon ? `飞机安全抵达目的地：${place[areaId]} 赛博功德+1` : ""}
 
 当前飞机航行事件 ${userArr[0].fly_count - addFlyCount} / 20
 
 当前赛博功德值:${userArr[0].cyberMerit + addMerits}`;
         await sendMarkdown(ctx, md, session);
-        const qldn = ["343.343", "344.344"];
-        const isqldn = userArr[0].AllMonster.some((item) =>
-          qldn.includes(item)
-        );
-        if (userArr[0].fly_count < 1 && !isqldn) return;
-        if (isEvent) return;
-        if (legendaryPokemonRandom > 99 - userArr[0].cyberMerit * 0.04) {
-          const key = crypto
-            .createHash("md5")
-            .update(session.userId + new Date().getTime())
-            .digest("hex")
-            .toUpperCase();
-          legendaryPokemonId[key] = isqldn ? "345.345" : "342.342";
-          await ctx.setTimeout(() => {
-            delete legendaryPokemonId[key];
-          }, 2000);
-          await session.execute(`捕捉宝可梦 ${key}`);
-        }
+
+        if (isLegendaryPokemon) return;
+        const key = crypto
+          .createHash("md5")
+          .update(session.userId + new Date().getTime())
+          .digest("hex")
+          .toUpperCase();
+        legendaryPokemonId[key] = isqldn ? "345.345" : "342.342";
+        await ctx.setTimeout(() => {
+          delete legendaryPokemonId[key];
+        }, 2000);
+        await session.execute(`捕捉宝可梦 ${key}`);
       }
     });
 
