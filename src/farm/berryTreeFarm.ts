@@ -165,7 +165,7 @@ export class PlantTree implements Farm {
     let _plantId = id;
     _plantId = id
       ? id
-      : berry_trees.findIndex((tree) => tree.berrytree === plantId) + 1;
+      : berry_trees.findIndex((tree) => tree.berrytree === plantId);
 
     const berry = this.sends.find(
       (send) => send.id === _plantId && send.number > 0
@@ -216,7 +216,7 @@ export class PlantTree implements Farm {
         (fruit) => fruit.id === harvest.berry_id
       );
       if (fruit) {
-        fruit.number += 1;
+        fruit.number += Math.floor(harvest.yield / 30);
       } else {
         this.berry_bag.push({
           id: harvest.berry_id,
@@ -224,6 +224,7 @@ export class PlantTree implements Farm {
           number: Math.floor(harvest.yield / 30),
         });
       }
+      [];
       harvest.yield = 0;
       harvest.event = Event["无事件"];
       this.exp_farm += 34;
