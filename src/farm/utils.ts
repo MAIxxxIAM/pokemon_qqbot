@@ -13,7 +13,7 @@ export async function drawFarm(ctx: any, farm: Farm) {
   for (let i = 0; i < farm.trees.length; i++) {
     const tree = farm.trees[i];
     let treeImage: any;
-    if (tree.berry_id == 67) {
+    if (tree.berry_id == 68) {
       treeImage = await ctx.canvas.loadImage(
         `${testcanvas}${resolve(
           __dirname,

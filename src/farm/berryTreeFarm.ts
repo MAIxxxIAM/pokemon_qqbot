@@ -232,7 +232,7 @@ export class PlantTree implements Farm {
         this.exp_farm = 0;
         this.farmLevel += 1;
       }
-      (harvest.berry_id = 67),
+      (harvest.berry_id = 68),
         (harvest.berry = "枯树"),
         (harvest.plantTime = new Date()),
         (harvest.stage = 0),
