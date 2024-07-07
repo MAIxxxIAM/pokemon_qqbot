@@ -168,7 +168,7 @@ export class PlantTree implements Farm {
       : berry_trees.findIndex((tree) => tree.berrytree === plantId);
 
     const berry = this.sends.find(
-      (send) => send.id === _plantId && send.number > 0
+      (send) => send.id === (1+_plantId) && send.number > 0
     );
     if (!berry || this.trees.length >= Math.min(this.farmLevel, 24))
       return false;
