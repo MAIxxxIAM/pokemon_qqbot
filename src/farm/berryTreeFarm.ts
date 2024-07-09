@@ -128,7 +128,7 @@ export class PlantTree implements Farm {
   }
   take(id: number) {
     const tree = this.berry_bag.find(
-      (berry) => berry.id === id + 1 && berry.number > 0
+      (berry) => berry.id === (id + 1) && berry.number > 0
     );
     if (!tree) return false;
     this.berry_bag.forEach((berry) => {
@@ -140,10 +140,10 @@ export class PlantTree implements Farm {
   }
 
   weeding() {
-    const weed = this.trees.filter((tree) => tree.berry_id == 67);
+    const weed = this.trees.filter((tree) => tree.berry_id == 68);
     if (weed.length == 0) return false;
     this.trees = this.trees
-      .filter((tree) => tree.berry_id != 67)
+      .filter((tree) => tree.berry_id != 68)
       .map((tree, index) => ({ ...tree, id: index + 1 }));
     const getFertilize =
       this.fertilizes >= 100 ? 0 : Math.floor(5 * weed.length);
@@ -154,6 +154,9 @@ export class PlantTree implements Farm {
   getSeed(seed: BerrySend) {
     const _seed = this.sends.find((send) => send.id === seed.id);
     if (_seed) {
+      if (_seed.number <= 0) {
+        _seed.number = 0;
+      };
       _seed.number += seed.number;
     } else {
       this.sends.push(seed);
@@ -162,19 +165,18 @@ export class PlantTree implements Farm {
   plant(plantId?: string) {
     if (!plantId) return;
     const id = parseInt(plantId);
-    let _plantId = id;
-    _plantId = id
+    let _plantId = id
       ? id
       : berry_trees.findIndex((tree) => tree.berrytree === plantId);
 
     const berry = this.sends.find(
-      (send) => send.id === (1+_plantId) && send.number > 0
+      (send) => (send.id === (1+_plantId)) && send.number > 0
     );
-    if (!berry || this.trees.length >= Math.min(this.farmLevel, 24))
+    if (!berry|| this.trees.length >= Math.min(this.farmLevel, 24))
       return false;
     this.sends.forEach((send) => {
-      if (send.id == _plantId) {
-        send.number -= 1;
+      if (send.id == (1+_plantId)) {
+        send.number = send.number-1;
       }
     });
     this.trees.push({
@@ -219,7 +221,7 @@ export class PlantTree implements Farm {
         fruit.number += Math.floor(harvest.yield / 30);
       } else {
         this.berry_bag.push({
-          id: harvest.berry_id,
+          id: (harvest.berry_id),
           name: harvest.berry,
           number: Math.floor(harvest.yield / 30),
         });
@@ -351,7 +353,7 @@ export class PlantTree implements Farm {
       }
       if (tree.yield <= 0) {
         tree.yield = 0;
-        (tree.berry_id = 67),
+        (tree.berry_id = 68),
           (tree.berry = "枯树"),
           (tree.plantTime = new Date()),
           (tree.stage = 0),

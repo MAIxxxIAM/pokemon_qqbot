@@ -643,8 +643,7 @@ ${
           "\n\n"
         )} \n请检查输入`;
       const _id = parseInt(id);
-      let _plantId = _id;
-      _plantId = _id
+      let _plantId = _id
         ? _id
         : berry_trees.findIndex((tree) => tree.berrytree === id);
       const isTake = farm.take(_plantId);
