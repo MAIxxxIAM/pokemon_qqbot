@@ -10,6 +10,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "moduleResolution":"bundler",
+    "resolveJsonModule":true,
     "emitDeclarationOnly": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@satorijs/element",
