@@ -128,11 +128,11 @@ export class PlantTree implements Farm {
   }
   take(id: number) {
     const tree = this.berry_bag.find(
-      (berry) => berry.id === (id + 1) && berry.number > 0
+      (berry) => berry.id === id  && berry.number > 0
     );
     if (!tree) return false;
     this.berry_bag.forEach((berry) => {
-      if (berry.id == id + 1) {
+      if (berry.id == id) {
         berry.number -= 1;
       }
     });
@@ -218,15 +218,15 @@ export class PlantTree implements Farm {
         (fruit) => fruit.id === harvest.berry_id
       );
       if (fruit) {
-        fruit.number += Math.floor(harvest.yield / 30);
+        fruit.name=harvest.berry;
+        fruit.number += Math.ceil(harvest.yield / 30);
       } else {
         this.berry_bag.push({
           id: (harvest.berry_id),
           name: harvest.berry,
-          number: Math.floor(harvest.yield / 30),
+          number: Math.ceil(harvest.yield / 30),
         });
       }
-      [];
       harvest.yield = 0;
       harvest.event = Event["无事件"];
       this.exp_farm += 34;
@@ -296,6 +296,9 @@ export class PlantTree implements Farm {
     return true;
   }
   triggerEvent() {
+    this.berry_bag.forEach((berry) => {
+      berry.name=berry_trees[berry.id].berrytree;
+    })
     this.trees.forEach((tree) => {
       if (tree.growth >= 100 && tree.stage < 3) {
         tree.stage += 1;

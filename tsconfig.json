@@ -9,7 +9,12 @@
     "incremental": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
+<<<<<<< HEAD
     "moduleResolution":"bundler",
+=======
+    "resolveJsonModule":true,
+    "moduleResolution": "bundler",
+>>>>>>> 29267afed21f2da9054d6f4e13d3583375c96219
     "emitDeclarationOnly": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@satorijs/element",
