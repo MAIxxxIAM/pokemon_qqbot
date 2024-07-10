@@ -36,6 +36,7 @@ import * as formGame from "./farm/index";
 import crypto from "crypto";
 import * as digGame from "./dig_game/index";
 import * as handleAndCiying from "./pokedle/src";
+import * as cry_guess from "./guess_cry/index";
 import imageSize from "image-size";
 import * as trainercmd from "./trainer/index";
 import {} from "koishi-plugin-markdown-to-image-service";
@@ -461,6 +462,7 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(digGame);
   ctx.plugin(handleAndCiying);
   ctx.plugin(trainercmd);
+  ctx.plugin(cry_guess);
 
   if (config.指令使用日志) {
     ctx.on("command/before-execute", ({ session, command }) => {

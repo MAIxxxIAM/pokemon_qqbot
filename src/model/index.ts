@@ -9,6 +9,7 @@ import { unknowns } from "../pokedle/src/type/type";
 import { Trainer } from "../trainer/type";
 import { CardPlayer } from "../card_battle/type";
 import { Farm, Food, PlantTree } from "../farm/berryTreeFarm";
+import { Cry_info } from "../guess_cry/type";
 
 //智能体兼容
 
@@ -104,6 +105,7 @@ declare module "koishi" {
     "pokemon.digChannel": DigChannel;
     "pokemon.isPokemon": IsPokemon;
     card_battle: CardPlayer;
+    "pokemon.cry": Cry_info;
   }
 }
 //邀请表
@@ -167,44 +169,6 @@ export interface Resource {
   resource: PrivateResource;
 }
 
-//宝可梦（待定
-// export class Pokemon {
-//     id: number
-//     monster_1: string
-//     battlename: string
-//     level: number
-//     hitSpeed: number
-//     power: PokemonPower
-//     skill: [Skill?, Skill?, Skill?, Skill?]
-//     constructor(mId: string) {
-//         this.monster_1 = mId
-//         this.id = Number(mId.split('.')[0])
-//         this.battlename = pokemonCal.pokemonlist(mId)
-//         this.level = 5
-//         const allBase = pokemonCal.pokeBase(mId)
-//         this.hitSpeed = Number(allBase[5])
-//         const allPower = pokemonCal.power(allBase, this.level)
-//         this.power = {
-//             hp: Number(allPower[0]),
-//             attack: Number(allPower[1]),
-//             defense: Number(allPower[2]),
-//             specialAttack: Number(allPower[3]),
-//             specialDefense: Number(allPower[4]),
-//             speed: Number(allPower[5])
-//         }
-//         this.skill = [new Skill(0)]
-//     }
-
-// }
-
-// interface PokeBag {
-//     pokemon: [Pokemon?, Pokemon?, Pokemon?, Pokemon?, Pokemon?, Pokemon?]
-// }
-
-// export interface BattleSlot {
-//     id: string
-//     pokemonBag: PokeBag
-// }
 export interface IsPokemon {
   id: string;
   pokemon_cmd: boolean;
@@ -530,6 +494,18 @@ export async function model(ctx: Context) {
     },
     {
       primary: "id",
+    }
+  );
+  ctx.model.extend(
+    "pokemon.cry",
+    {
+      name: "string",
+      file_info: "string",
+      file_uuid: "string",
+      ttl: "timestamp",
+    },
+    {
+      primary: "name",
     }
   );
 }

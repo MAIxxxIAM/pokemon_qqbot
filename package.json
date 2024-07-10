@@ -32,7 +32,8 @@
   "dependencies": {
     "@koishijs/censor": "*",
     "koishi-plugin-markdown": "*",
-    "pidusage": "*"
+    "pidusage": "*",
+    "koishi-plugin-silk": "*"
   },
   "repository": {
     "type": "git",
