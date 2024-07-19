@@ -19,6 +19,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 import { resolve } from "path";
 import { Food, treesData } from "../farm/berryTreeFarm";
+import { dirname } from "../dirname";
 
 export const expToLv = exptolv;
 export const expBase = expbase;
@@ -32,8 +33,9 @@ export const natures: Natures[] = nature;
 export const fishing: FishItem[] = Fishing;
 export const digItems: DigItem[] = DigItems;
 export const trainer_list: Trainer[] = trainerList;
-export const md_ky = yaml.load(
-  fs.readFileSync(resolve(__dirname, "../../markdown.yaml"), "utf8")
+
+export const md_ky: any = yaml.load(
+  fs.readFileSync(resolve(dirname, "../markdown.yaml"), "utf8")
 );
 export const berry_trees: treesData[] = BerryTrees;
 export const berry_food: Food[] = BerryTrees;

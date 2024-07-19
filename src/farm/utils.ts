@@ -2,6 +2,7 @@ import { resolve } from "path";
 import { testcanvas } from "..";
 import { BerryTree, Farm } from "./berryTreeFarm";
 import { Event } from "./berryTreeFarm";
+import { dirname } from "../dirname";
 
 export async function drawFarm(ctx: any, farm: Farm) {
   // const backImage=await ctx.canvas.loadImage(`${testcanvas}${resolve(__dirname, `../assets/img/`)}`)
@@ -16,16 +17,16 @@ export async function drawFarm(ctx: any, farm: Farm) {
     if (tree.berry_id == 68) {
       treeImage = await ctx.canvas.loadImage(
         `${testcanvas}${resolve(
-          __dirname,
-          `../assets/img/berrytree/overtrees.png`
+          dirname,
+          `./assets/img/berrytree/overtrees.png`
         )}`
       );
       tree.stage = 3;
     } else {
       treeImage = await ctx.canvas.loadImage(
         `${testcanvas}${resolve(
-          __dirname,
-          `../assets/img/berrytree/${stages(tree)}.png`
+          dirname,
+          `./assets/img/berrytree/${stages(tree)}.png`
         )}`
       );
     }

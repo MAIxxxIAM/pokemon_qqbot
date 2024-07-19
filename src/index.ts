@@ -1,6 +1,7 @@
 import { Schema, h, $, Session, is } from "koishi";
 import pokemonCal from "./utils/pokemon";
 import * as pokeGuess from "./pokeguess";
+import { fishing } from "./utils/data";
 import {} from "koishi-plugin-cron";
 import {
   button,
@@ -31,7 +32,7 @@ import pidusage from "pidusage";
 import * as lapTwo from "./lap/index";
 import * as pokedex from "./pokedex/pokedex";
 import * as notice from "./notice/index";
-import * as fishing from "./fishing/index";
+import * as fishings from "./fishing/index";
 import * as formGame from "./farm/index";
 import crypto from "crypto";
 import * as digGame from "./dig_game/index";
@@ -59,6 +60,7 @@ import {
 import { catchPokemon } from "./battle/pve";
 import { Skill } from "./battle";
 import { BerrySend, PlantTree } from "./farm/berryTreeFarm";
+import { FishingGame, FishItem, Lucky } from "./fishing/type";
 
 export const name = "pokemon";
 
@@ -318,6 +320,7 @@ export async function apply(ctx, conf: Config) {
   model(ctx);
   await ctx.database.set("pokebattle", {}, (row) => ({
     isfish: false,
+    isMix: false,
     isPut: false,
   }));
 
@@ -458,7 +461,7 @@ export async function apply(ctx, conf: Config) {
 
   ctx.plugin(pokeGuess);
   ctx.plugin(notice);
-  ctx.plugin(fishing);
+  ctx.plugin(fishings);
   ctx.plugin(digGame);
   ctx.plugin(handleAndCiying);
   ctx.plugin(trainercmd);
@@ -478,27 +481,488 @@ export async function apply(ctx, conf: Config) {
     });
   }
   ctx.on("interaction/button", async (session) => {
+    const { isDirect } = session;
     const { id, d } = session.event._data;
     const state = d.data.resolved.button_id;
-    if (state !== "ispokemon") return;
+    // if (state !== "ispokemon") return;
     const { group_openid, op_member_openid } = session.event._data.d;
-    let [channel] = await ctx.database.get("pokemon.isPokemon", {
-      id: group_openid,
-    });
-    if (!channel) {
-      channel = await ctx.database.create("pokemon.isPokemon", {
-        id: group_openid,
-      });
-    }
-    await ctx.database.set(
-      "pokemon.isPokemon",
-      { id: group_openid },
-      (row) => ({
-        pokemon_cmd: $.if(row.pokemon_cmd, false, true),
-      })
+    const [player] = await ctx.database.get(
+      "pokebattle",
+      isDirect ? d.user_openid : d.group_member_openid
     );
-    const md = `已${channel.pokemon_cmd ? "关闭" : "开启"}宝可梦功能`;
-    await sendMarkdown(ctx, md, session, null, id);
+    if (!player) return;
+    const pokeDex = new Pokedex(player);
+    switch (state) {
+      //ispokemon
+      case "ispokemon":
+        let [channel] = await ctx.database.get("pokemon.isPokemon", {
+          id: group_openid,
+        });
+        if (!channel) {
+          channel = await ctx.database.create("pokemon.isPokemon", {
+            id: group_openid,
+          });
+        }
+        await ctx.database.set(
+          "pokemon.isPokemon",
+          { id: group_openid },
+          (row) => ({
+            pokemon_cmd: $.if(row.pokemon_cmd, false, true),
+          })
+        );
+        const md = `已${channel.pokemon_cmd ? "关闭" : "开启"}宝可梦功能`;
+        await sendMarkdown(ctx, md, session, null, id);
+        break;
+      //fishing
+      case "收杆":
+        const fishGame = new FishingGame(fishing);
+
+        if (!player.isfish) {
+          return;
+        }
+        const berryBag = new PlantTree(player.farm);
+        berryBag.water = Math.min(
+          berryBag.water + (player.vip > 0 ? 90 : 30),
+          player.vip > 0 ? 500 : 200
+        );
+        const addMerits = player.cyberMerit > 99 ? 0 : 1;
+
+        await ctx.database.set(
+          "pokebattle",
+          { id: d.group_member_openid },
+          (row) => ({
+            isfish: false,
+            cyberMerit: $.add(row.cyberMerit, addMerits),
+            farm: berryBag,
+          })
+        );
+        let regex = /^[\u4e00-\u9fa5]{2,6}$/;
+
+        const isEvent = player.lap < 3 || player.level < 90;
+        const noneMd = `${
+          regex.test(player.name) ? player.name : `<@${session.userId}>`
+        }的运气极佳，幸运女神都有点嫉妒
+    
+> 但是你什么都没钓到
+    
+---
+    ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""}
+    
+当前赛博功德值:${player.cyberMerit + 1}
+当前储水量:${berryBag.water}`;
+        const getMd = (item: FishItem) => `${
+          regex.test(player.name) ? player.name : `<@${session.userId}>`
+        }获得了${item.name[Math.floor(Math.random() * item.name.length)]}
+            
+> 价值${
+          item.points * (player.lap < 3 ? 50 : 1) +
+          (player.lap < 3 ? Fishspend : 0)
+        }${player.lap < 3 ? "金币" : "积分"}
+    
+---
+${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""}
+    
+当前赛博功德值:${player.cyberMerit + addMerits}
+当前储水量:${berryBag.water}`;
+        const fished: "普通鱼饵" | "高级鱼饵" =
+          d.data.resolved.button_data.split("=")[1];
+        const Fishspend = fished === "普通鱼饵" ? 2000 : 2300;
+        let getFish = fishGame.fish(Lucky[fished], player.cyberMerit);
+        if (!getFish) {
+          await sendMarkdown(
+            ctx,
+            noneMd,
+            session,
+            {
+              keyboard: {
+                content: {
+                  rows: [
+                    {
+                      buttons: [
+                        button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1"),
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            id
+          );
+          return;
+        }
+        if (getFish.legendaryPokemon) {
+          if (player?.level < 90 || player?.lap < 3) {
+            const weak = `<@${session.userId}>你太弱小了
+    
+---
+盖欧卡看了你一眼，并摇了摇头
+    
+> 你当前好像无法收复它`;
+            await sendMarkdown(
+              ctx,
+              weak,
+              session,
+              {
+                keyboard: {
+                  content: {
+                    rows: [
+                      {
+                        buttons: [
+                          button(
+                            2,
+                            `🎣 继续钓鱼`,
+                            "/钓鱼",
+                            session.userId,
+                            "1"
+                          ),
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+              id
+            );
+            return;
+          }
+          if (
+            player.ultra?.[getFish.name[0]] < 9 ||
+            !player.ultra?.[getFish.name[0]]
+          ) {
+            if (player?.ultra[getFish.name[0]] === undefined) {
+              player.ultra[getFish.name[0]] = 0;
+            }
+            player.ultra[getFish.name[0]] = player?.ultra[getFish.name[0]] + 1;
+            const md = `<@${session.userId}>收集度+10%
+![img#512px #512px](${await toUrl(
+              ctx,
+              session,
+              `${
+                pokemonCal
+                  .pokemomPic(getFish.name[0], false)
+                  .toString()
+                  .match(/src="([^"]*)"/)[1]
+              }`
+            )})
+---
+![img#20px #20px](${await toUrl(
+              ctx,
+              session,
+              `${config.图片源}/sr/${getFish.name[0].split(".")[0]}.png`
+            )}) : ${player.ultra[getFish.name[0]] * 10}% ${
+              "🟩".repeat(Math.floor(player.ultra[getFish.name[0]] / 2)) +
+              "🟨".repeat(player.ultra[getFish.name[0]] % 2) +
+              "⬜⬜⬜⬜⬜".substring(
+                Math.round(player.ultra[getFish.name[0]] / 2)
+              )
+            }
+
+---
+**传说宝可梦——${pokemonCal.pokemonlist(getFish.name[0])}**`;
+            await sendMarkdown(
+              ctx,
+              md,
+              session,
+              {
+                keyboard: {
+                  content: {
+                    rows: [
+                      {
+                        buttons: [
+                          button(
+                            2,
+                            `🎣 继续钓鱼`,
+                            "/钓鱼",
+                            session.userId,
+                            "1"
+                          ),
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+              id
+            );
+            await ctx.database.set(
+              "pokebattle",
+              { id: session.userId },
+              {
+                ultra: player.ultra,
+                cyberMerit: 0,
+              }
+            );
+            return;
+          }
+          if (player.ultra[getFish.name[0]] >= 9) {
+            let getMd = "";
+            if (!pokeDex.check(getFish.name[0].split(".")[0])) {
+              player.ultra[getFish.name[0]] = 10;
+              getMd = `<@${session.userId}>成功获得
+![img#512px #512px](${await toUrl(
+                ctx,
+                session,
+                `${
+                  pokemonCal
+                    .pokemomPic(getFish.name[0], false)
+                    .toString()
+                    .match(/src="([^"]*)"/)[1]
+                }`
+              )})
+---
+![img#20px #20px](${await toUrl(
+                ctx,
+                session,
+                `${config.图片源}/sr/${getFish.name[0].split(".")[0]}.png`
+              )}) : ${player.ultra[getFish.name[0]] * 10}% ${
+                "🟩".repeat(Math.floor(player.ultra[getFish.name[0]] / 2)) +
+                "🟨".repeat(player.ultra[getFish.name[0]] % 2) +
+                "⬜⬜⬜⬜⬜".substring(
+                  Math.round(player.ultra[getFish.name[0]] / 2)
+                )
+              }
+          
+---
+**传说宝可梦——${pokemonCal.pokemonlist(getFish.name[0])}**
+    
+已经放入图鉴`;
+              pokeDex.pull(getFish.name[0], player);
+              await ctx.database.set(
+                "pokebattle",
+                { id: session.userId },
+                {
+                  ultra: player.ultra,
+                  pokedex: player.pokedex,
+                  cyberMerit: 0,
+                }
+              );
+            } else {
+              getMd = `你已经获得了盖欧卡，奖励积分 + 200`;
+              await ctx.database.set(
+                "pokemon.resourceLimit",
+                { id: session.userId },
+                (row) => ({
+                  rankScore: $.add(row.rankScore, getFish.points),
+                })
+              );
+            }
+            await sendMarkdown(
+              ctx,
+              getMd,
+              session,
+              {
+                keyboard: {
+                  content: {
+                    rows: [
+                      {
+                        buttons: [
+                          button(
+                            2,
+                            `🎣 继续钓鱼`,
+                            "/钓鱼",
+                            session.userId,
+                            "1"
+                          ),
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+              id
+            );
+          }
+          //copy
+        } else {
+          await sendMarkdown(
+            ctx,
+            getMd(getFish),
+            session,
+            {
+              keyboard: {
+                content: {
+                  rows: [
+                    {
+                      buttons: [
+                        button(2, `🎣 继续钓鱼`, "/钓鱼", session.userId, "1"),
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            id
+          );
+          player.lap < 3
+            ? await ctx.database.set(
+                "pokebattle",
+                { id: session.userId },
+                (row) => ({
+                  gold: $.add(row.gold, getFish.points * 50 + Fishspend),
+                })
+              )
+            : await ctx.database.set(
+                "pokemon.resourceLimit",
+                { id: session.userId },
+                (row) => ({
+                  rankScore: $.add(row.rankScore, getFish.points),
+                })
+              );
+        }
+        break;
+      //mix
+      case "mix":
+        if (!player.isMix) {
+          return;
+        }
+        await ctx.database.set(
+          "pokebattle",
+          { id: op_member_openid },
+          {
+            isMix: false,
+          }
+        );
+        const kb = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      2,
+                      `继续混合`,
+                      "/树果混合",
+                      session.userId,
+                      "1",
+                      false
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        const mixData = JSON.parse(d.data.resolved.button_data.split("=")[1]);
+        const time = parseInt(d.data.resolved.button_data.split("=")[0]);
+        const isPoke =
+          time > session.timestamp + mixData.perfectClick - 500 &&
+          time < session.timestamp + mixData.perfectClick + 500;
+        const isEventMix =
+          player.lap >= 3 &&
+          player.level >= 90 &&
+          isPoke &&
+          !pokeDex.check("380");
+        if (isEventMix) {
+          if (player.ultra?.["380.380"] < 9 || !player.ultra?.["380.380"]) {
+            if (player?.ultra["380.380"] === undefined) {
+              player.ultra["380.380"] = 0;
+            }
+            player.ultra["380.380"] = player?.ultra["380.380"] + 1;
+            const md = `收集度+10%
+你混合树果的香气，吸引了一个奇怪的宝可梦
+![img#512px #512px](${await toUrl(
+              ctx,
+              session,
+              `${
+                pokemonCal
+                  .pokemomPic("380.380", false)
+                  .toString()
+                  .match(/src="([^"]*)"/)[1]
+              }`
+            )})
+---
+![img#20px #20px](${await toUrl(
+              ctx,
+              session,
+              `${config.图片源}/sr/${"380.380".split(".")[0]}.png`
+            )}) : ${player.ultra["380.380"] * 10}% ${
+              "🟩".repeat(Math.floor(player.ultra["380.380"] / 2)) +
+              "🟨".repeat(player.ultra["380.380"] % 2) +
+              "⬜⬜⬜⬜⬜".substring(Math.round(player.ultra["380.380"] / 2))
+            }
+          
+---
+**传说宝可梦——${pokemonCal.pokemonlist("380.380")}**`;
+            await sendMarkdown(ctx, md, session, kb, id);
+            await ctx.database.set(
+              "pokebattle",
+              { id: session.userId },
+              {
+                ultra: player.ultra,
+                cyberMerit: 0,
+              }
+            );
+            return;
+          }
+          if (player.ultra["380.380"] >= 9) {
+            let getMd = "";
+            if (!pokeDex.check("380.380".split(".")[0])) {
+              player.ultra["380.380"] = 10;
+              getMd = `<@${session.userId}>成功获得
+![img#512px #512px](${await toUrl(
+                ctx,
+                session,
+                `${
+                  pokemonCal
+                    .pokemomPic("380.380", false)
+                    .toString()
+                    .match(/src="([^"]*)"/)[1]
+                }`
+              )})
+---
+![img#20px #20px](${await toUrl(
+                ctx,
+                session,
+                `${config.图片源}/sr/${"380.380".split(".")[0]}.png`
+              )}) : ${player.ultra["380.380"] * 10}% ${
+                "🟩".repeat(Math.floor(player.ultra["380.380"] / 2)) +
+                "🟨".repeat(player.ultra["380.380"] % 2) +
+                "⬜⬜⬜⬜⬜".substring(Math.round(player.ultra["380.380"] / 2))
+              }
+            
+---
+**传说宝可梦——${pokemonCal.pokemonlist("380.380")}**
+      
+已经放入图鉴`;
+              pokeDex.pull("380.380", player);
+              await ctx.database.set(
+                "pokebattle",
+                { id: session.userId },
+                {
+                  ultra: player.ultra,
+                  pokedex: player.pokedex,
+                  cyberMerit: 0,
+                }
+              );
+
+              await sendMarkdown(ctx, getMd, session, kb, id);
+              return;
+            }
+          }
+        }
+        if (mixData.GorP) {
+          await ctx.database.set(
+            "pokemon.resourceLimit",
+            { id: session.userId },
+            (row) => ({
+              rankScore: $.add(row.rankScore, mixData.get),
+            })
+          );
+        } else {
+          await ctx.database.set(
+            "pokebattle",
+            { id: session.userId },
+            (row) => ({
+              gold: $.add(row.gold, mixData.get),
+            })
+          );
+        }
+        const mdMix = `<@${session.userId}> 混合成功
+---
+> 获得${mixData.get}${mixData.GorP ? "积分" : "金币"}`;
+        await sendMarkdown(ctx, mdMix, session, kb, id);
+        break;
+    }
   });
 
   ctx.on("command/before-execute", async (argv) => {

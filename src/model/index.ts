@@ -224,6 +224,7 @@ export interface Pokebattle {
   trainerIndex?: number;
   trainer_list?: Trainer[];
   isfish?: boolean;
+  isMix?: boolean;
   lapTwo?: boolean;
   advanceChance?: boolean;
   lap?: number;
@@ -359,6 +360,11 @@ export async function model(ctx: Context) {
       coin: "unsigned",
       gold: "unsigned",
       isfish: {
+        type: "boolean",
+        initial: false,
+        nullable: false,
+      },
+      isMix: {
         type: "boolean",
         initial: false,
         nullable: false,

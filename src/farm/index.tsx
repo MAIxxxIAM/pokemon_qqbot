@@ -1,18 +1,154 @@
-import { Context } from "koishi";
-import {
-  PlantTree,
-  BerryTree,
-  Event,
-  Farm,
-  BerrySend,
-  BerryFood,
-} from "./berryTreeFarm";
+import { $, Context } from "koishi";
+import { PlantTree, BerryFood } from "./berryTreeFarm";
 import { berry_food, berry_trees } from "../utils/data";
-import { button, sendMarkdown, toUrl } from "../utils/method";
+import { actionbutton, button, sendMarkdown, toUrl } from "../utils/method";
 import { drawFarm } from "./utils";
-import imageSize from "image-size";
+import { Pokedex } from "../pokedex/pokedex";
+import pokemonCal from "../utils/pokemon";
+import { config } from "..";
 
 export async function apply(ctx: Context) {
+  //   ctx.on("interaction/button", async (session) => {
+  //     const { id, d } = session.event._data;
+  //     const state = d.data.resolved.button_id;
+  //     const { group_openid, op_member_openid } = session.event._data.d;
+  //     const [player] = await ctx.database.get("pokebattle", op_member_openid);
+  //     if (state !== "mix") return;
+  //     await ctx.database.set(
+  //       "pokebattle",
+  //       { id: op_member_openid },
+  //       {
+  //         isfish: false,
+  //       }
+  //     );
+  //     const kb = {
+  //       keyboard: {
+  //         content: {
+  //           rows: [
+  //             {
+  //               buttons: [
+  //                 button(2, `继续混合`, "/树果混合", session.userId, "1", false),
+  //               ],
+  //             },
+  //           ],
+  //         },
+  //       },
+  //     };
+  //     const pokeDex = new Pokedex(player);
+  //     const mixData = JSON.parse(d.data.resolved.button_data.split("=")[1]);
+  //     const time = parseInt(d.data.resolved.button_data.split("=")[0]);
+  //     const isPoke =
+  //       time > session.timestamp + mixData.perfectClick - 500 &&
+  //       time < session.timestamp + mixData.perfectClick + 500;
+  //     const isEvent =
+  //       player.lap >= 3 && player.level >= 90 && isPoke && !pokeDex.check("380");
+  //     if (isEvent) {
+  //       if (player.ultra?.["380.380"] < 9 || !player.ultra?.["380.380"]) {
+  //         if (player?.ultra["380.380"] === undefined) {
+  //           player.ultra["380.380"] = 0;
+  //         }
+  //         player.ultra["380.380"] = player?.ultra["380.380"] + 1;
+  //         const md = `收集度+10%
+  // 你混合树果的香气，吸引了一个奇怪的宝可梦
+  // ![img#512px #512px](${await toUrl(
+  //           ctx,
+  //           session,
+  //           `${
+  //             pokemonCal
+  //               .pokemomPic("380.380", false)
+  //               .toString()
+  //               .match(/src="([^"]*)"/)[1]
+  //           }`
+  //         )})
+  // ---
+  // ![img#20px #20px](${await toUrl(
+  //           ctx,
+  //           session,
+  //           `${config.图片源}/sr/${"380.380".split(".")[0]}.png`
+  //         )}) : ${player.ultra["380.380"] * 10}% ${
+  //           "🟩".repeat(Math.floor(player.ultra["380.380"] / 2)) +
+  //           "🟨".repeat(player.ultra["380.380"] % 2) +
+  //           "⬜⬜⬜⬜⬜".substring(Math.round(player.ultra["380.380"] / 2))
+  //         }
+
+  // ---
+  // **传说宝可梦——${pokemonCal.pokemonlist("380.380")}**`;
+  //         await sendMarkdown(ctx, md, session, kb, id);
+  //         await ctx.database.set(
+  //           "pokebattle",
+  //           { id: session.userId },
+  //           {
+  //             ultra: player.ultra,
+  //             cyberMerit: 0,
+  //           }
+  //         );
+  //         return;
+  //       }
+  //       if (player.ultra["380.380"] >= 9) {
+  //         let getMd = "";
+  //         if (!pokeDex.check("380.380".split(".")[0])) {
+  //           player.ultra["380.380"] = 10;
+  //           getMd = `<@${session.userId}>成功获得
+  // ![img#512px #512px](${await toUrl(
+  //             ctx,
+  //             session,
+  //             `${
+  //               pokemonCal
+  //                 .pokemomPic("380.380", false)
+  //                 .toString()
+  //                 .match(/src="([^"]*)"/)[1]
+  //             }`
+  //           )})
+  // ---
+  // ![img#20px #20px](${await toUrl(
+  //             ctx,
+  //             session,
+  //             `${config.图片源}/sr/${"380.380".split(".")[0]}.png`
+  //           )}) : ${player.ultra["380.380"] * 10}% ${
+  //             "🟩".repeat(Math.floor(player.ultra["380.380"] / 2)) +
+  //             "🟨".repeat(player.ultra["380.380"] % 2) +
+  //             "⬜⬜⬜⬜⬜".substring(Math.round(player.ultra["380.380"] / 2))
+  //           }
+
+  // ---
+  // **传说宝可梦——${pokemonCal.pokemonlist("380.380")}**
+
+  // 已经放入图鉴`;
+  //           pokeDex.pull("380.380", player);
+  //           await ctx.database.set(
+  //             "pokebattle",
+  //             { id: session.userId },
+  //             {
+  //               ultra: player.ultra,
+  //               pokedex: player.pokedex,
+  //               cyberMerit: 0,
+  //             }
+  //           );
+
+  //           await sendMarkdown(ctx, getMd, session, kb, id);
+  //           return;
+  //         }
+  //       }
+  //     }
+  //     if (mixData.GorP) {
+  //       await ctx.database.set(
+  //         "pokemon.resourceLimit",
+  //         { id: session.userId },
+  //         (row) => ({
+  //           rankScore: $.add(row.rankScore, mixData.get),
+  //         })
+  //       );
+  //     } else {
+  //       await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
+  //         gold: $.add(row.gold, mixData.get),
+  //       }));
+  //     }
+  //     const md = `<@${session.userId}> 混合成功
+  // ---
+  // > 获得${mixData.get}${mixData.GorP ? "积分" : "金币"}`;
+  //     await sendMarkdown(ctx, md, session, kb, id);
+  //   });
+
   ctx
     .command("宝可梦")
     .subcommand("树果农场")
@@ -416,6 +552,14 @@ ${
                     "t",
                     false
                   ),
+                  button(
+                    2,
+                    "💻 树果混合器",
+                    "树果混合 ",
+                    session.userId,
+                    "t",
+                    false
+                  ),
                 ],
               },
             ],
@@ -659,5 +803,64 @@ ${
       );
       const md = `<@${player.id}> 携带树果${berry.berrytree}成功`;
       await sendMarkdown(ctx, md, session);
+    });
+
+  ctx
+    .command("宝可梦")
+    .subcommand("树果农场")
+    .subcommand("树果混合 [...id:string]")
+    .action(async ({ session }, ...id) => {
+      const [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!player) {
+        await session.send("自动注册中，请稍等");
+        await session.execute("签到");
+        return;
+      }
+      if (id.length < 2 || id.length > 4) return `请放入2-4个树果,用空格隔开`;
+      const farm = new PlantTree(player.farm);
+      const isMix = farm.mix(id);
+      if (!isMix) {
+        return `树果混合失败`;
+      }
+      await ctx.database.set(
+        "pokebattle",
+        { id: session.userId },
+        { farm: farm }
+      );
+      const mixData = JSON.stringify(isMix);
+      const md = `是否混合树果${id.join(" ")}?`;
+      const kb = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [
+                  actionbutton(
+                    "确认",
+                    mixData,
+                    session.userId,
+                    "mix",
+                    session.timestamp
+                  ),
+                  button(2, "取消 (不退回树果)", "取消", session.userId, "c"),
+                ],
+              },
+            ],
+          },
+        },
+      };
+      await ctx.database.set(
+        "pokebattle",
+        { id: session.userId },
+        { isMix: true }
+      );
+      await sendMarkdown(ctx, md, session, kb);
+      ctx.setTimeout(async () => {
+        await ctx.database.set("pokebattle", session.userId, (row) => ({
+          isMix: false,
+        }));
+      }, 5000);
     });
 }

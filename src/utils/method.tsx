@@ -10,11 +10,12 @@ import imageSize from "image-size";
 import {} from "koishi-plugin-text-censor";
 import { Telegram } from "@koishijs/plugin-adapter-telegram";
 import { markdownMessage } from "../utils/message";
+import { dirname } from "../dirname";
 
 export function mudPath(a: string) {
   return `${testcanvas}${resolve(
-    __dirname,
-    `../assets/img/digGame/${StoneType[a]}.png`
+    dirname,
+    `./assets/img/digGame/${StoneType[a]}.png`
   )}`;
 }
 
@@ -43,7 +44,7 @@ export async function minePic(
   const digGamePositionX = digGame.item.x;
   const digGamePositionY = digGame.item.y;
   const mineBack = await ctx.canvas.loadImage(
-    `${testcanvas}${resolve(__dirname, `../assets/img/digGame/miningbg.png`)}`
+    `${testcanvas}${resolve(dirname, `./assets/img/digGame/miningbg.png`)}`
   );
   const fissureMud = await ctx.canvas.loadImage(mudPath("fissureMud"));
   const mud = await ctx.canvas.loadImage(mudPath("mud"));
@@ -54,8 +55,8 @@ export async function minePic(
   const empty = await ctx.canvas.loadImage(mudPath("empty"));
   const hs = await ctx.canvas.loadImage(
     `${testcanvas}${resolve(
-      __dirname,
-      `../assets/img/digGame/${digGame.item.id}.png`
+      dirname,
+      `./assets/img/digGame/${digGame.item.id}.png`
     )}`
   );
   const stoneList = {
@@ -194,22 +195,13 @@ export async function getPic(ctx, log, user, tar, full = false) {
       }.png`
     );
     const backimage1 = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        __dirname,
-        `../assets/img/components/battle_1.png`
-      )}`
+      `${testcanvas}${resolve(dirname, `./assets/img/components/battle_1.png`)}`
     );
     const backimage2 = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        __dirname,
-        `../assets/img/components/battle_2.png`
-      )}`
+      `${testcanvas}${resolve(dirname, `./assets/img/components/battle_2.png`)}`
     );
     const backimage3 = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        __dirname,
-        `../assets/img/components/battle_3.png`
-      )}`
+      `${testcanvas}${resolve(dirname, `./assets/img/components/battle_3.png`)}`
     );
     let array = log.split("\n");
     let attCount: number;
@@ -319,10 +311,7 @@ export async function getWildPic(
       `${config.图片源}/fusion/${wild}/${wild}.png`
     );
     const backimage = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        __dirname,
-        `../assets/img/components/battle.png`
-      )}`
+      `${testcanvas}${resolve(dirname, `./assets/img/components/battle.png`)}`
     );
     let array = log.split("\n");
     let attCount: number;
@@ -571,6 +560,10 @@ export async function sendMarkdown(
   eventId = null,
   command?: string
 ) {
+  const isDirect = session.isDirect;
+  a = isDirect
+    ? a.replace(`<qqbot-at-user id="${session.userId}" />`, "你")
+    : a;
   let mdModel = command
     ? md_ky?.[command]
       ? md_ky?.[command]
@@ -620,7 +613,9 @@ export async function sendMarkdown(
     case "qq":
     case "qqguild":
       try {
-        c = await session.bot.internal.sendMessage(
+        c = await session.bot.internal[
+          isDirect ? "sendPrivateMessage" : "sendMessage"
+        ](
           session.channelId,
           Object.assign(
             {
@@ -637,7 +632,8 @@ export async function sendMarkdown(
             eventId ? { event_id: eventId } : { msg_id: session.messageId }
           )
         );
-      } catch {
+      } catch (e) {
+        console.log(e);
         if (url === null) {
           mdModel = command
             ? md_ky?.[command]

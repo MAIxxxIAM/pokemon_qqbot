@@ -31,12 +31,19 @@
   },
   "dependencies": {
     "@koishijs/censor": "*",
+    "@satorijs/element": "^3.1.7",
+    "cheerio": "^1.0.0-rc.12",
+    "image-size": "^1.1.1",
+    "js-yaml": "^4.1.0",
     "koishi-plugin-markdown": "*",
-    "pidusage": "*",
-    "koishi-plugin-silk": "*"
+    "koishi-plugin-silk": "*",
+    "pidusage": "*"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MAIxxxIAM/koishi-plugin-pokemon-battle.git"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4"
   }
 }
