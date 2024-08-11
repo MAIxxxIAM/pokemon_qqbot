@@ -560,7 +560,7 @@ export async function sendMarkdown(
   eventId = null,
   command?: string
 ) {
-  const isDirect = session.isDirect;
+  const isDirect = session?.isDirect;
   a = isDirect
     ? a.replace(`<qqbot-at-user id="${session.userId}" />`, "你")
     : a;
@@ -977,7 +977,14 @@ export function getType(a: string) {
   }
 }
 
-export function catchbutton(a: string, b: string, c: string, d: string) {
+export function catchbutton(
+  session: Session,
+  a: string,
+  b: string,
+  c: string,
+  d: string
+) {
+  const isD = session.isDirect;
   return {
     rows: [
       {
@@ -991,7 +998,7 @@ export function catchbutton(a: string, b: string, c: string, d: string) {
             action: {
               type: 2,
               permission: {
-                type: 0,
+                type: isD ? 2 : 0,
                 specify_user_ids: [d],
               },
               click_limit: 10,
@@ -1013,7 +1020,7 @@ export function catchbutton(a: string, b: string, c: string, d: string) {
             action: {
               type: 2,
               permission: {
-                type: 0,
+                type: isD ? 2 : 0,
                 specify_user_ids: [d],
               },
               click_limit: 10,
@@ -1035,7 +1042,7 @@ export function catchbutton(a: string, b: string, c: string, d: string) {
             action: {
               type: 2,
               permission: {
-                type: 0,
+                type: isD ? 2 : 0,
                 specify_user_ids: [d],
               },
               click_limit: 10,
@@ -1057,7 +1064,7 @@ export function catchbutton(a: string, b: string, c: string, d: string) {
             action: {
               type: 2,
               permission: {
-                type: 0,
+                type: isD ? 2 : 0,
                 specify_user_ids: [d],
               },
               click_limit: 10,

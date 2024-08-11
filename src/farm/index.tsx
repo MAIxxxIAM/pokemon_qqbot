@@ -842,7 +842,7 @@ ${
                     mixData,
                     session.userId,
                     "mix",
-                    session.timestamp
+                    new Date().getTime()
                   ),
                   button(2, "取消 (不退回树果)", "取消", session.userId, "c"),
                 ],
@@ -858,9 +858,15 @@ ${
       );
       await sendMarkdown(ctx, md, session, kb);
       ctx.setTimeout(async () => {
-        await ctx.database.set("pokebattle", session.userId, (row) => ({
-          isMix: false,
-        }));
-      }, 5000);
+        const [playerOut] = await ctx.database.get(
+          "pokebattle",
+          session.userId
+        );
+        playerOut.isMix
+          ? await ctx.database.set("pokebattle", session.userId, (row) => ({
+              isMix: false,
+            }))
+          : null;
+      }, 10000);
     });
 }

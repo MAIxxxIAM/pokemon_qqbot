@@ -421,23 +421,20 @@ export async function apply(ctx, conf: Config) {
       const resource = new PrivateResource(b.resource.goldLimit);
       await resource.addGold(ctx, a, op_member_openid);
     }
-    const md = `![img #408px #456px](${await toUrl(
-      ctx,
-      session,
-      fs.readFileSync("./friendlink.png")
-    )})
-我是麦麦！(*/ω＼*)。
-是博士做出来帮助训练师们的机器人少女噢~
-✨我有好多好玩的功能！✨
+    //     const md = `![img #408px #456px](${await toUrl(
+    //       ctx,
+    //       session,
+    //       fs.readFileSync("./friendlink.png")
+    //     )})
+    // 我是麦麦！(*/ω＼*)。
+    // 是博士做出来帮助训练师们的机器人少女噢~
+    // ✨我有好多好玩的功能！✨
 
----
-> @麦麦后回复关闭宝可梦 可以关闭宝可梦功能
-可以点我头像看 **使用文档**
-或者[@我查看帮助哦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
-      `/宝可梦`
-    )}&reply=false&enter=true)`;
-    session.channelId = group_openid;
-    sendMarkdown(ctx, md, session, null, id);
+    // ---
+    // > @麦麦后回复关闭宝可梦 可以关闭宝可梦功能
+    // 可以点我头像看 **使用文档**`;
+    //     session.isDirect = false;
+    //     await sendMarkdown(ctx, md, session, null, id);
     let [channel] = await ctx.database.get("pokemon.isPokemon", {
       id: group_openid,
     });
@@ -521,10 +518,7 @@ export async function apply(ctx, conf: Config) {
           return;
         }
         const berryBag = new PlantTree(player.farm);
-        berryBag.water = Math.min(
-          berryBag.water + (player.vip > 0 ? 90 : 30),
-          player.vip > 0 ? 500 : 200
-        );
+        berryBag.water = player.vip > 0 ? 500 : 200;
         const addMerits = player.cyberMerit > 99 ? 0 : 1;
 
         await ctx.database.set(
@@ -815,9 +809,10 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
         if (!player.isMix) {
           return;
         }
+        console.log(d);
         await ctx.database.set(
           "pokebattle",
-          { id: op_member_openid },
+          { id: d.group_member_openid },
           {
             isMix: false,
           }
@@ -843,10 +838,11 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
           },
         };
         const mixData = JSON.parse(d.data.resolved.button_data.split("=")[1]);
-        const time = parseInt(d.data.resolved.button_data.split("=")[0]);
+        const clickTime = Number(d.data.resolved.button_data.split("=")[0]);
+        const time = new Date().getTime();
         const isPoke =
-          time > session.timestamp + mixData.perfectClick - 500 &&
-          time < session.timestamp + mixData.perfectClick + 500;
+          time > clickTime + mixData.perfectClick - 500 &&
+          time < clickTime + mixData.perfectClick + 500;
         const isEventMix =
           player.lap >= 3 &&
           player.level >= 90 &&
@@ -1734,6 +1730,7 @@ ${
     .command("宝可梦")
     .subcommand("捕捉宝可梦 [key]", "随机遇到3个宝可梦")
     .action(async ({ session }, key) => {
+      const isDirect = session.isDirect;
       let capturMessage = { id: "" };
       const catchArea = ["初级区域", "中级区域", "高级区域"];
       const catchPokemonNumber = [
@@ -1936,6 +1933,7 @@ ${
             capturMessage = await sendMarkdown(ctx, md, session, {
               keyboard: {
                 content: catchbutton(
+                  session,
                   black[0],
                   black[1],
                   black[2],
@@ -2511,14 +2509,14 @@ ${result ? "恭喜你捕捉到了宝可梦！" : "很遗憾，宝可梦逃走了
                       {
                         buttons: [
                           button(
-                            0,
+                            isDirect ? 2 : 0,
                             pokemonCal.pokemonlist(userArr[0].AllMonster[0]),
                             "1",
                             session.userId,
                             "1"
                           ),
                           button(
-                            0,
+                            isDirect ? 2 : 0,
                             pokemonCal.pokemonlist(userArr[0].AllMonster[1]),
                             "2",
                             session.userId,
@@ -2529,14 +2527,14 @@ ${result ? "恭喜你捕捉到了宝可梦！" : "很遗憾，宝可梦逃走了
                       {
                         buttons: [
                           button(
-                            0,
+                            isDirect ? 2 : 0,
                             pokemonCal.pokemonlist(userArr[0].AllMonster[2]),
                             "3",
                             session.userId,
                             "3"
                           ),
                           button(
-                            0,
+                            isDirect ? 2 : 0,
                             pokemonCal.pokemonlist(userArr[0].AllMonster[3]),
                             "4",
                             session.userId,
@@ -2547,14 +2545,14 @@ ${result ? "恭喜你捕捉到了宝可梦！" : "很遗憾，宝可梦逃走了
                       {
                         buttons: [
                           button(
-                            0,
+                            isDirect ? 2 : 0,
                             pokemonCal.pokemonlist(userArr[0].AllMonster[4]),
                             "5",
                             session.userId,
                             "5"
                           ),
                           button(
-                            0,
+                            isDirect ? 2 : 0,
                             pokemonCal.pokemonlist(userArr[0].AllMonster[5]),
                             "6",
                             session.userId,
