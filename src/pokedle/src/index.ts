@@ -1416,6 +1416,11 @@ export async function apply(ctx: Context) {
         fallback: 1,
       })
       .action(async ({ session, options }) => {
+        await session.send(
+          `宝可梦猜名功能暂时关闭，奖励与神兽触发移动至宝可问答`
+        );
+        await session.execute("宝可问答");
+        return;
         let { channelId, userId, username, timestamp, platform } = session;
         const [player]: Pokebattle[] = await ctx.database.get(
           "pokebattle",
@@ -1725,6 +1730,11 @@ ${unknowns.map((u) => `${u.name}`).join("\n")}
     .command("猜 [inputWord:text]", "做出一次猜测")
     .option("random", "-r 随机", { fallback: false })
     .action(async ({ session, options }, inputWord) => {
+      await session.send(
+        `宝可梦猜名功能暂时关闭，奖励与神兽触发移动至宝可问答`
+      );
+      await session.execute("宝可问答");
+      return;
       const [player]: Pokebattle[] = await ctx.database.get(
         "pokebattle",
         session.userId
