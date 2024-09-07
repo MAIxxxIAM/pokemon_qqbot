@@ -65,8 +65,8 @@ import { FishingGame, FishItem, Lucky } from "./fishing/type";
 export const name = "pokemon";
 
 export const inject = {
-  required: ["database", "downloads", "canvas", "cron", "markdownToImage"],
-  optional: ["censor"],
+  required: ["database", "downloads", "canvas", "cron",],
+  optional: ["censor", "markdownToImage"],
 };
 
 export const usage = ``;
@@ -1596,7 +1596,7 @@ ${
           if (userArr[0].lap < 3 || checkDays !== dateNow) return;
 
           if (pokeDex.check(pokeName)) {
-            if (checkInDays > 14 && !pokeDex.check("381.381")) {
+            if (checkInDays >= 14 && !pokeDex.check("381.381")) {
               pokeId = pokemonObj[6];
               pokeName = `${pokeId}.${pokeId}`;
             } else if (checkInDays >= 29 && !pokeDex.check("378.378")) {
