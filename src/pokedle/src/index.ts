@@ -1416,11 +1416,6 @@ export async function apply(ctx: Context) {
         fallback: 1,
       })
       .action(async ({ session, options }) => {
-        await session.send(
-          `宝可梦猜名功能暂时关闭，奖励与神兽触发移动至宝可问答`
-        );
-        await session.execute("宝可问答");
-        return;
         let { channelId, userId, username, timestamp, platform } = session;
         const [player]: Pokebattle[] = await ctx.database.get(
           "pokebattle",

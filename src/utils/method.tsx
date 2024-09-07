@@ -831,16 +831,22 @@ export async function sendNoticeMarkdown(
   button = null
 ) {
   const b = getMarkdownParams(a);
-  return await session.bot.internal.sendMessage(session.channelId, {
-    content: "111",
-    msg_type: 2,
-    markdown: {
-      custom_template_id: "102072441_1711377105",
-      params: b,
-    },
-    timestamp: session.timestamp,
-    msg_seq: Math.floor(Math.random() * 1000000),
-  });
+  return await session.bot.internal.sendMessage(
+    session.channelId,
+    Object.assign(
+      {
+        content: "111",
+        msg_type: 2,
+        markdown: {
+          custom_template_id: "102072441_1711377105",
+          params: b,
+        },
+        timestamp: session.timestamp,
+        msg_seq: Math.floor(Math.random() * 1000000),
+      },
+      button
+    )
+  );
 }
 
 export async function toUrl(ctx, session, img) {

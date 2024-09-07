@@ -1832,6 +1832,7 @@ ${
               legendaryPokemonId?.[key],
             ];
             black = [`✨${pokename}✨`, `✨${pokename}✨`, `✨${pokename}✨`];
+            delete legendaryPokemonId?.[key];
           }
 
           let poke_img = [];
