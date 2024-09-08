@@ -209,6 +209,7 @@ ${msg}`;
         platform: session.platform,
       });
       const group_id = groups.map((group) => group.id);
+      await session.send(`共有${group_id.length}个群,推送中~`)
       const md = `修仙智能体推荐\n![图片 #1024px #1792px](http://sanae.xn--vhq524a5mldjj.com:5400/y1.jpg)`;
       const kb = {
         keyboard: {
