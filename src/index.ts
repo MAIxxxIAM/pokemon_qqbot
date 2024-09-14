@@ -523,7 +523,7 @@ export async function apply(ctx, conf: Config) {
 
         await ctx.database.set(
           "pokebattle",
-          { id: d.group_member_openid },
+          { id: isDirect ? d.user_openid : d.group_member_openid },
           (row) => ({
             isfish: false,
             cyberMerit: $.add(row.cyberMerit, addMerits),
@@ -812,7 +812,7 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
         console.log(d);
         await ctx.database.set(
           "pokebattle",
-          { id: d.group_member_openid },
+          { id: isDirect ? d.user_openid : d.group_member_openid},
           {
             isMix: false,
           }
