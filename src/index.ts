@@ -65,7 +65,7 @@ import { FishingGame, FishItem, Lucky } from "./fishing/type";
 export const name = "pokemon";
 
 export const inject = {
-  required: ["database", "downloads", "canvas", "cron",],
+  required: ["database", "downloads", "canvas", "cron"],
   optional: ["censor", "markdownToImage"],
 };
 
@@ -812,7 +812,7 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
         console.log(d);
         await ctx.database.set(
           "pokebattle",
-          { id: isDirect ? d.user_openid : d.group_member_openid},
+          { id: isDirect ? d.user_openid : d.group_member_openid },
           {
             isMix: false,
           }
@@ -1300,6 +1300,12 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
                   row.captureTimes,
                   config.签到获得个数 + vipRBoll
                 ),
+                MissSignDates: $.add(row.MissSignDates, checkDays - dateNow),
+                historySigns: $.if(
+                  $.eq(userArr[0].historySigns, 0),
+                  $.add(userArr[0].checkInDays, checkDays - dateNow + 1),
+                  $.add(row.historySigns, checkDays - dateNow + 1)
+                ),
                 checkInDays: $.if(
                   $.eq(dateNow, checkDays),
                   $.add(row.checkInDays, 1),
@@ -1470,7 +1476,15 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
           const pokeDex = new Pokedex(userArr[0]);
           try {
             const md = `<qqbot-at-user id="${session.userId}" />签到成功
-连续签到天数${checkDays == dateNow ? userArr[0].checkInDays + 1 : 1}天
+连续签到天数${checkDays == dateNow ? userArr[0].checkInDays + 1 : 1}天${
+              userArr[0].MissSignDates + checkDays - dateNow < 0
+                ? ""
+                : `可补签 [补签](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
+                    `补签`
+                  )}&reply=false&enter=true)，需要花费${
+                    userArr[0].MissSignDates + checkDays - dateNow
+                  }张补签卡`
+            }
 ![img#512px #763px](${await toUrl(ctx, session, src)})
 
 > [📃 问答](mqqapi://aio/inlinecmd?command=${encodeURIComponent(

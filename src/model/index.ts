@@ -193,6 +193,8 @@ export interface Pokebattle {
   name: string;
   date?: number;
   checkInDays?: number;
+  historySigns?: number;
+  MissSignDates?: number;
   fossil_bag?: DigItem[];
   total_battle?: number;
   win_count?: number;
@@ -314,6 +316,8 @@ export async function model(ctx: Context) {
       name: "string",
       date: "integer",
       checkInDays: "unsigned",
+      historySigns: "unsigned",
+      MissSignDates: "unsigned",
       fossil_bag: {
         type: "json",
         initial: [],

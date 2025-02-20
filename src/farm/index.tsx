@@ -379,7 +379,13 @@ ${
         if (player.vip < 1)
           return `非vip用户无法使用一键施肥。请输入要施肥的树果id,多个id请用空格隔开`;
         await session.send("一键施肥中，请稍等");
-        id=player.farm.trees.filter(tree => new Date(tree.eventTime).getTime() < new Date().getTime() &&tree.event == Event["缺肥"]).map(tree => tree.id);
+        id = player.farm.trees
+          .filter(
+            (tree) =>
+              new Date(tree.eventTime).getTime() < new Date().getTime() &&
+              tree.event == Event["缺肥"]
+          )
+          .map((tree) => tree.id);
       }
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
@@ -706,9 +712,15 @@ ${
       }
       if (id.length == 0) {
         if (player.vip < 1)
-          return `非vip用户无法使用一键施肥。请输入要施肥的树果id,多个id请用空格隔开`;
+          return `非vip用户无法使用一键除虫。请输入要施肥的树果id,多个id请用空格隔开`;
         await session.send("一键施肥中，请稍等");
-        id=player.farm.trees.filter(tree => new Date(tree.eventTime).getTime() < new Date().getTime() &&tree.event == Event["虫害"]).map(tree => tree.id);
+        id = player.farm.trees
+          .filter(
+            (tree) =>
+              new Date(tree.eventTime).getTime() < new Date().getTime() &&
+              tree.event == Event["虫害"]
+          )
+          .map((tree) => tree.id);
       }
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
