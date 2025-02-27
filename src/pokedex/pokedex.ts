@@ -260,16 +260,12 @@ export async function apply(ctx) {
         poke
       )}
 ---
-![img#512px #512px](${await toUrl(
-        ctx,
-        session,
-        `${
-          pokemonCal
-            .pokemomPic(poke, false)
-            .toString()
-            .match(/src="([^"]*)"/)[1]
-        }`
-      )})
+![img#512px #512px](${
+        pokemonCal
+          .pokemomPic(poke, false)
+          .toString()
+          .match(/src="([^"]*)"/)[1]
+      })
         
 ---
 花费1200金币接收到了${pokemonCal.pokemonlist(poke)}`;

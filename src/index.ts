@@ -355,6 +355,13 @@ export async function apply(ctx, conf: Config) {
         rankScore: 0,
       })
     );
+    await ctx.database.set(
+      "pokebattle",
+      { id: { vip: { $gt: 0 } } },
+      (row) => ({
+        signCard: $.add(row.signCard, 1),
+      })
+    );
   });
 
   ctx.cron("0 0 */2 * *", async () => {
@@ -1282,7 +1289,7 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
             ${pokemonCal.pokemomPic(userArr[0].monster_1, true)}
             `;
           } else {
-            ToDo = "快去杂交出属于你的宝可梦吧";
+            ToDo = "快去融合出属于你的宝可梦吧";
           }
           let playerName = userArr[0].name
             ? userArr[0].name
@@ -1505,8 +1512,8 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
               `/使用 `
             )}&reply=false&enter=false) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
               `/放生`
-            )}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
-              `/杂交宝可梦`
+            )}&reply=false&enter=true) || [♂ 融合](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
+              `/融合宝可梦`
             )}&reply=false&enter=true)
 ${
   userArr[0].lap == 3 &&
@@ -1739,7 +1746,35 @@ ${
         }
       }
     });
-
+  ctx.command("补签").action(async ({ session }) => {
+    const [player]: Pokebattle[] = await ctx.database.get("pokebattle", {
+      id: session.userId,
+    });
+    const vip = isVip(player);
+    if (!player) {
+      return `请先输入签到指令领取属于你的宝可梦和精灵球`;
+    }
+    const nowDays = Math.floor(
+      (Math.round(Number(new Date()) / 1000) + 28800) / 86400
+    );
+    const datePlayer = Math.floor((player.date + 28800) / 86400);
+    const missSignDays = player.MissSignDates;
+    if (missSignDays == 0) {
+      return `你没有漏签的天数，不需要使用补签`;
+    }
+    if (player.signCard < missSignDays) {
+      return `你的补签卡不足，无法补签，加入vip可每周一自动获得一张补签卡`;
+    }
+    if (nowDays - datePlayer != 0) {
+      return `你今天还未签到，请先签到后在进行补签`;
+    }
+    ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
+      checkInDays: player.historySigns,
+      MissSignDates: 0,
+      signCard: $.sub(row.signCard, missSignDays),
+    }));
+    return `补签成功，你的连续签到天数为${player.historySigns}天`;
+  });
   ctx
     .command("宝可梦")
     .subcommand("捕捉宝可梦 [key]", "随机遇到3个宝可梦")
@@ -2649,7 +2684,7 @@ ${h("at", { id: session.userId })}
 
   ctx
     .command("宝可梦")
-    .subcommand("杂交宝可梦", "选择两只宝可梦杂交")
+    .subcommand("融合宝可梦", "选择两只宝可梦融合")
     .action(async ({ session }) => {
       let fusionId = { id: "" };
       let sonId = { id: "" };
@@ -2722,7 +2757,7 @@ ${h("at", { id: session.userId })}
           const md = `# <qqbot-at-user id="${session.userId}" />选择两只宝可梦
 ![img#512px #381px](${await toUrl(ctx, session, src)})
 ---
-当前你也可以 [点击这里杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
+当前你也可以 [点击这里融合](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
             ` `
           )}&reply=false&enter=false)`;
           const kb = {
@@ -2790,7 +2825,7 @@ ${h("at", { id: session.userId })}
           fusionId = await sendMarkdown(ctx, md, session, kb);
         } catch (e) {
           fusionId = await session.send(`\n${image}
-回复【编号】 【编号】进行杂交
+回复【编号】 【编号】进行融合
 官方机器人输入
 @Bot【编号】 【编号】
 `);
@@ -2824,8 +2859,8 @@ ${h("at", { id: session.userId })}
                         buttons: [
                           button(
                             2,
-                            "输入错误点击按钮重新杂交",
-                            "/杂交宝可梦",
+                            "输入错误点击按钮重新融合",
+                            "/融合宝可梦",
                             session.userId,
                             "1"
                           ),
@@ -2840,7 +2875,7 @@ ${h("at", { id: session.userId })}
               });
               return;
             } catch {
-              //处理杂交错误
+              //处理融合错误
               return "输入错误";
             }
           } else {
@@ -3093,7 +3128,7 @@ ${point}
               );
 
               return `恭喜你
-成功杂交出优秀的后代宝可梦【${dan[0]}】
+成功融合出优秀的后代宝可梦【${dan[0]}】
 ${pokemonCal.pokemomPic(dan[1], true)}
 成功将${dan[0]}放入战斗栏
 ${h("at", { id: session.userId })}`;
@@ -3309,8 +3344,8 @@ ${h("at", { id: session.userId })}`;
             `/使用 `
           )}&reply=false&enter=false) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
             `/放生`
-          )}&reply=false&enter=true) || [♂ 杂交](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
-            `/杂交宝可梦`
+          )}&reply=false&enter=true) || [♂ 融合](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
+            `/融合宝可梦`
           )}&reply=false&enter=true)
 
 
@@ -3327,7 +3362,8 @@ ${h("at", { id: session.userId })}`;
               ? playerLimit.rank
               : `未进入前十`
           }
-- 金币获取剩余：${playerLimit.resource.goldLimit}
+- 金币获取剩余：${playerLimit.resource.goldLimit} 
+- 补签卡：${userArr[0].signCard}
 - 宝可梦属性：${getType(userArr[0].monster_1).join(" ")}
 
 ---
@@ -3381,8 +3417,8 @@ ${
             `/使用 `
           )}&reply=false&enter=false) || [👐 放生](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
             `/放生`
-          )}&reply=false&enter=true) || [♂ 杂交宝可梦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
-            `/杂交宝可梦`
+          )}&reply=false&enter=true) || [♂ 融合宝可梦](mqqapi://aio/inlinecmd?command=${encodeURIComponent(
+            `/融合宝可梦`
           )}&reply=false&enter=true)
 
 ---
@@ -3791,7 +3827,7 @@ ${h("at", { id: session.userId })}
         }
       }
       if (userArr[0].monster_1 == "0")
-        return `你还没有战斗宝可梦，快去 杂交宝可梦 吧`;
+        return `你还没有战斗宝可梦，快去 融合宝可梦 吧`;
       const img = userArr[0].monster_1;
       const fath =
         userArr[0].monster_1.split(".")[0] +
@@ -3859,8 +3895,8 @@ ${point}`;
                   buttons: [
                     button(
                       0,
-                      "♂ 杂交宝可梦",
-                      "/杂交宝可梦",
+                      "♂ 融合宝可梦",
+                      "/融合宝可梦",
                       session.userId,
                       "1"
                     ),
@@ -3890,7 +3926,7 @@ ${point}`;
 ${userArr[0].battlename}
 ${toDo}
 ============
-tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
+tips:听说不同种的宝可梦融合更有优势噢o(≧v≦)o~~
       `;
       }
     });
@@ -3946,7 +3982,7 @@ tips:听说不同种的宝可梦杂交更有优势噢o(≧v≦)o~~
         let commands = "";
         let img = "";
         if (userArr[0].monster_1 == "0") {
-          commands = `杂交宝可梦`;
+          commands = `融合宝可梦`;
         }
         if (userArr[0].skillbag.length == 0) {
           commands = `技能扭蛋机`;
@@ -4241,8 +4277,8 @@ ${
                     buttons: [
                       button(
                         2,
-                        "♂ 杂交宝可梦",
-                        "/杂交宝可梦",
+                        "♂ 融合宝可梦",
+                        "/融合宝可梦",
                         session.userId,
                         "1"
                       ),
@@ -5164,7 +5200,7 @@ ${isLegendaryPokemon ? `飞机安全抵达目的地：${place[areaId]} 赛博功
 
 > 比例 1积分：10token，当麦麦对话 **每日token** 不足时才会消耗
 
-**提升效果仅对相同杂交宝可梦有效**
+**提升效果仅对相同融合宝可梦有效**
 
 ---
 

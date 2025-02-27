@@ -192,6 +192,7 @@ export interface Pokebattle {
   id: string;
   name: string;
   date?: number;
+  signCard?: number;
   checkInDays?: number;
   historySigns?: number;
   MissSignDates?: number;
@@ -315,9 +316,26 @@ export async function model(ctx: Context) {
       id: "string",
       name: "string",
       date: "integer",
-      checkInDays: "unsigned",
-      historySigns: "unsigned",
-      MissSignDates: "unsigned",
+      signCard: {
+        type: "unsigned",
+        initial: 0,
+        nullable: false,
+      },
+      checkInDays: {
+        type: "unsigned",
+        initial: 0,
+        nullable: false,
+      },
+      historySigns: {
+        type: "unsigned",
+        initial: 0,
+        nullable: false,
+      },
+      MissSignDates: {
+        type: "unsigned",
+        initial: 0,
+        nullable: false,
+      },
       fossil_bag: {
         type: "json",
         initial: [],
