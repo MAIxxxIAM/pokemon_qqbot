@@ -1,5 +1,5 @@
 import { $, Context } from "koishi";
-import { PlantTree, BerryFood } from "./berryTreeFarm";
+import { PlantTree, BerryFood, PEvent } from "./berryTreeFarm";
 import { berry_food, berry_trees } from "../utils/data";
 import { actionbutton, button, sendMarkdown, toUrl } from "../utils/method";
 import { drawFarm } from "./utils";
@@ -383,7 +383,7 @@ ${
           .filter(
             (tree) =>
               new Date(tree.eventTime).getTime() < new Date().getTime() &&
-              tree.event == Event["缺肥"]
+              tree.event == PEvent["缺肥"]
           )
           .map((tree) => tree.id);
       }
@@ -718,7 +718,7 @@ ${
           .filter(
             (tree) =>
               new Date(tree.eventTime).getTime() < new Date().getTime() &&
-              tree.event == Event["虫害"]
+              tree.event == PEvent["虫害"]
           )
           .map((tree) => tree.id);
       }

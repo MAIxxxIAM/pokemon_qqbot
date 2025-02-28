@@ -2,7 +2,7 @@ import { Skill } from "../battle";
 import { PVP } from "../battle/pvp";
 import { berry_trees } from "../utils/data";
 
-export enum Event {
+export enum PEvent {
   "无事件",
   "干涸",
   "缺肥",
@@ -92,7 +92,7 @@ export interface BerryTree {
   berry: string;
   plantTime: Date;
   stage: number;
-  event: Event;
+  event: PEvent;
   eventTime: Date;
   growth: number;
   water: number;
@@ -208,7 +208,7 @@ export class PlantTree implements Farm {
       berry: berry.name,
       plantTime: new Date(),
       stage: 0,
-      event: Event["无事件"],
+      event: PEvent["无事件"],
       eventTime: new Date(new Date().getTime() + 60 * 1000 * 60 * 6),
       growth: 0,
       water: 100,
@@ -218,18 +218,18 @@ export class PlantTree implements Farm {
   }
 
   bug(id: number[]) {
-    const bugs = this.trees.filter((tree) => tree.event == Event["虫害"]);
+    const bugs = this.trees.filter((tree) => tree.event == PEvent["虫害"]);
     if (bugs.length <= 0) return false;
     id.forEach((id) => {
       const tree = this.trees.find(
         (tree) =>
           new Date(tree.eventTime).getTime() < new Date().getTime() &&
           tree.id === id &&
-          tree.event == Event["虫害"]
+          tree.event == PEvent["虫害"]
       );
       if (!tree) return;
       tree.growth += Math.floor(Math.random() * 10 + 5);
-      tree.event = Event["无事件"];
+      tree.event = PEvent["无事件"];
     });
     return true;
   }
@@ -251,7 +251,7 @@ export class PlantTree implements Farm {
         });
       }
       harvest.yield = 0;
-      harvest.event = Event["无事件"];
+      harvest.event = PEvent["无事件"];
       this.exp_farm += 34;
       if (this.exp_farm >= 100) {
         this.exp_farm = 0;
@@ -261,7 +261,7 @@ export class PlantTree implements Farm {
         (harvest.berry = "枯树"),
         (harvest.plantTime = new Date()),
         (harvest.stage = 0),
-        (harvest.event = Event["无事件"]),
+        (harvest.event = PEvent["无事件"]),
         (harvest.eventTime = new Date()),
         (harvest.growth = 0),
         (harvest.water = 0),
@@ -277,14 +277,14 @@ export class PlantTree implements Farm {
         (tree) =>
           new Date(tree.eventTime).getTime() < new Date().getTime() &&
           tree.id === id &&
-          tree.event == Event["缺肥"]
+          tree.event == PEvent["缺肥"]
       );
       if (!tree) return;
       const needFertilize = Math.min(120 - tree.yield, this.fertilizes, 20);
       tree.yield += needFertilize;
       this.fertilizes -= needFertilize;
       tree.growth += Math.floor(needFertilize / 3);
-      tree.event = Event["无事件"];
+      tree.event = PEvent["无事件"];
     });
     return true;
   }
@@ -298,8 +298,8 @@ export class PlantTree implements Farm {
       tree.water += waterNeeded;
       this.water -= waterNeeded;
       tree.growth += waterNeeded / 2;
-      if (tree.water >= 30 && tree.event == Event["干涸"]) {
-        tree.event = Event["无事件"];
+      if (tree.water >= 30 && tree.event == PEvent["干涸"]) {
+        tree.event = PEvent["无事件"];
       }
     });
     return true;
@@ -312,8 +312,8 @@ export class PlantTree implements Farm {
       tree.water += waterNeeded;
       this.water -= waterNeeded;
       tree.growth += waterNeeded / 2;
-      if (tree.water >= 30 && tree.event == Event["干涸"]) {
-        tree.event = Event["无事件"];
+      if (tree.water >= 30 && tree.event == PEvent["干涸"]) {
+        tree.event = PEvent["无事件"];
       }
     });
     return true;
@@ -341,12 +341,12 @@ export class PlantTree implements Farm {
       const subtime = endTime - startTime;
       let subyield: number;
       switch (tree.event) {
-        case Event["无事件"]:
+        case PEvent["无事件"]:
           if (tree.water <= 30) {
             if (tree.water <= 0) {
               tree.water = 0;
             }
-            tree.event = Event["干涸"];
+            tree.event = PEvent["干涸"];
             tree.eventTime = new Date();
           } else {
             const nextEvent = Math.floor(Math.random() * 2) + 2;
@@ -359,17 +359,17 @@ export class PlantTree implements Farm {
             tree.eventTime = eventTime;
           }
           break;
-        case Event["干涸"]:
+        case PEvent["干涸"]:
           subyield = Math.floor(subtime);
           tree.yield -= subyield;
           tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;
-        case Event["缺肥"]:
+        case PEvent["缺肥"]:
           subyield = Math.floor(subtime) * 1;
           tree.yield -= subyield;
           tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
           break;
-        case Event["虫害"]:
+        case PEvent["虫害"]:
           subyield = Math.floor(subtime) * 2;
           tree.yield -= subyield;
           tree.eventTime = subyield > 0 ? new Date() : tree.eventTime;
@@ -383,7 +383,7 @@ export class PlantTree implements Farm {
           (tree.berry = "枯树"),
           (tree.plantTime = new Date()),
           (tree.stage = 0),
-          (tree.event = Event["无事件"]),
+          (tree.event = PEvent["无事件"]),
           (tree.eventTime = new Date()),
           (tree.growth = 0),
           (tree.water = 0),

@@ -1,7 +1,7 @@
 import { resolve } from "path";
 import { testcanvas } from "..";
 import { BerryTree, Farm } from "./berryTreeFarm";
-import { Event } from "./berryTreeFarm";
+import { PEvent } from "./berryTreeFarm";
 import { dirname } from "../dirname";
 
 export async function drawFarm(ctx: any, farm: Farm) {
@@ -30,11 +30,11 @@ export async function drawFarm(ctx: any, farm: Farm) {
         )}`
       );
     }
-    const inEvent = new Date().getTime() > new Date(tree.eventTime).getTime();
+    const inPEvent = new Date().getTime() > new Date(tree.eventTime).getTime();
     const treeInfo = {
       id: tree.id,
       berry: tree.berry,
-      event: inEvent ? Event[tree.event] : "无事件",
+      event: inPEvent ? PEvent[tree.event] : "无事件",
       stage: stages(tree),
       needWater: tree.water,
       growth: tree.growth,
@@ -52,10 +52,10 @@ export async function drawFarm(ctx: any, farm: Farm) {
   }
   const farmImage = await ctx.canvas.render(
     128 * 4,
-    128 * treesImages.length,
+    128 * Math.max(1, treesImages.length),
     (ctx: any) => {
       ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, 128 * 4, 128 * treesImages.length);
+      ctx.fillRect(0, 0, 128 * 4, 128 * Math.max(1, treesImages.length));
       for (let i = 0; i < treesImages.length; i++) {
         const treeGroup = treesImages[i];
         for (let j = 0; j < treeGroup.length; j++) {
