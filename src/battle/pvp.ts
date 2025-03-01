@@ -61,16 +61,16 @@ export class PVP implements Battlers {
       readySkill = new Skill(0);
     }
     //old
-    const hit = Math.random() < this.hitSpeed / 4 / 256 ? 2 : 1;
-    hit == 2 ? target.food?.subPower(readySkill, target) : null;
-    const skillCategory = readySkill.category;
-    const attCategory = skillCategory;
-    const defCategory = attCategory + 1;
+    const hit = Math.random() < this.hitSpeed / 4 / 256 ? 2 : 1; //计算暴击概率
+    hit == 2 ? target.food?.subPower(readySkill, target) : null; //暴击时触发食物效果
+    const skillCategory = readySkill.category; //技能属性
+    const attCategory = skillCategory; //判断攻击物理还是特殊
+    const defCategory = attCategory + 1; //判断防御物理还是特殊
     const Effect = typeEffect(
       this.monster_1,
       target.monster_1,
       readySkill.type
-    );
+    ); //计算属性相克
     let damage = Math.floor(
       (((((2 * this.level + 10) / 250) *
         this.power[this.getKeys(this.power, attCategory)]) /
@@ -80,7 +80,7 @@ export class PVP implements Battlers {
         hit *
         Effect *
         (Math.random() * 0.15 + 0.85)
-    );
+    ); //计算伤害
     target.power.hp = target.power.hp - damage;
     if (
       target.food?.effectCategory == "hp" &&

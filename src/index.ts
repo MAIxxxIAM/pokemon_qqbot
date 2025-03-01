@@ -355,13 +355,9 @@ export async function apply(ctx, conf: Config) {
         rankScore: 0,
       })
     );
-    await ctx.database.set(
-      "pokebattle",
-      { id: { vip: { $gt: 0 } } },
-      (row) => ({
-        signCard: $.add(row.signCard, 1),
-      })
-    );
+    await ctx.database.set("pokebattle", { vip: { $gt: 0 } }, (row) => ({
+      signCard: $.add(row.signCard, 1),
+    }));
   });
 
   ctx.cron("0 0 */2 * *", async () => {
