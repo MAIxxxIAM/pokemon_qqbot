@@ -106,6 +106,7 @@ declare module "koishi" {
     "pokemon.isPokemon": IsPokemon;
     card_battle: CardPlayer;
     "pokemon.cry": Cry_info;
+    pokeEmoji_BOT: pokeEmoji;
   }
 }
 //邀请表
@@ -113,6 +114,19 @@ export interface AddGroup {
   id: string;
   count: number;
   addGroup: string[];
+}
+
+//emoji
+export interface pokeEmoji {
+  id: string;
+  pokeEmoji: string;
+  isGameing: boolean;
+  answer: string;
+  pos?: boolean;
+  isOver: boolean;
+  round?: number;
+  goldPool?: number;
+  img?: string;
 }
 
 //个人金币上限
@@ -192,6 +206,7 @@ export interface Pokebattle {
   id: string;
   name: string;
   date?: number;
+  pieceCard?: number;
   signCard?: number;
   checkInDays?: number;
   historySigns?: number;
@@ -317,6 +332,11 @@ export async function model(ctx: Context) {
       name: "string",
       date: "integer",
       signCard: {
+        type: "unsigned",
+        initial: 0,
+        nullable: false,
+      },
+      pieceCard: {
         type: "unsigned",
         initial: 0,
         nullable: false,

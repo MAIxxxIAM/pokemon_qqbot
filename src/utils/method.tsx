@@ -405,12 +405,13 @@ export function normalKb(session: Session, userArr: Pokebattle[]) {
             buttons: [
               button(2, "❤ 领取麦麦", "/领取麦麦 ", session.userId, "l", false),
               button(2, "🎣 钓鱼", "/钓鱼", session.userId, "d"),
+              button(2, "🧩 猜emoji", "/emoji.s", session.userId, "emoji"),
             ],
           },
           {
             buttons: [
-              button(2, "化石挖掘", "/挖掘 ", session.userId, "w"),
-              button(2, "宝可问答", "/宝可问答 ", session.userId, "q"),
+              button(2, "⛏ 化石挖掘", "/挖掘 ", session.userId, "w"),
+              button(2, "❓宝可问答", "/宝可问答 ", session.userId, "q"),
             ],
           },
           config.是否开启友链

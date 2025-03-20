@@ -33,6 +33,7 @@ import * as lapTwo from "./lap/index";
 import * as pokedex from "./pokedex/pokedex";
 import * as notice from "./notice/index";
 import * as fishings from "./fishing/index";
+import * as pokeEmoji from "./pokeEmoji/index";
 import * as formGame from "./farm/index";
 import crypto from "crypto";
 import * as digGame from "./dig_game/index";
@@ -65,7 +66,7 @@ import { FishingGame, FishItem, Lucky } from "./fishing/type";
 export const name = "pokemon";
 
 export const inject = {
-  required: ["database", "downloads", "canvas", "cron"],
+  required: ["database", "downloads", "canvas", "cron", "puppeteer"],
   optional: ["censor", "markdownToImage"],
 };
 
@@ -460,6 +461,7 @@ export async function apply(ctx, conf: Config) {
   });
 
   ctx.plugin(pokeGuess);
+  ctx.plugin(pokeEmoji);
   ctx.plugin(notice);
   ctx.plugin(fishings);
   ctx.plugin(digGame);
@@ -5017,10 +5019,6 @@ tips:${tips}`;
         const addFlyCount = userArr[0].fly_count > 0 ? 1 : 0;
         const isEvent = userArr[0].lap < 3 || userArr[0].level < 90;
         const areaId = area.indexOf(item);
-        const events =
-          legendaryPokemonRandom > 99 - userArr[0].cyberMerit * 0.04
-            ? `飞机航行中似乎出现了意外，请注意`
-            : `飞机安全抵达目的地：${place[areaId]} 赛博功德+1`;
         if (userArr[0].lap <= areaId) return `你还没有获得更强的认证，无法购买`;
         if (userArr[0].gold < Math.floor(500 * vipReward))
           return `你的金币不足`;

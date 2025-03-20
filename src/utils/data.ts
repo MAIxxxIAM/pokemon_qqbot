@@ -20,6 +20,9 @@ import fs from "fs";
 import { resolve } from "path";
 import { Food, treesData } from "../farm/berryTreeFarm";
 import { dirname } from "../dirname";
+import { Emojis } from "../pokeEmoji/type";
+import emojiList from "../assets/json/pokeEmoji.json";
+import emojiList2 from "../assets/json/pokeEmoji2.json";
 
 export const expToLv = exptolv;
 export const expBase = expbase;
@@ -33,7 +36,8 @@ export const natures: Natures[] = nature;
 export const fishing: FishItem[] = Fishing;
 export const digItems: DigItem[] = DigItems;
 export const trainer_list: Trainer[] = trainerList;
-
+export const emojis: Emojis[] = emojiList;
+export const emojis2: Emojis[] = emojiList2;
 export const md_ky: any = yaml.load(
   fs.readFileSync(resolve(dirname, "../markdown.yaml"), "utf8")
 );
