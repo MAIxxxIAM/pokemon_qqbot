@@ -1,6 +1,6 @@
 import { $, Context } from "koishi";
-import { CardPlayer } from "./type";
-import { getPlayer, searchTarget } from "./method";
+import {} from "./type";
+import {} from "./method";
 
 export async function apply(ctx: Context) {
   await ctx.database.remove("card_battle", (row) => $.eq(row.channel_id, ""));
