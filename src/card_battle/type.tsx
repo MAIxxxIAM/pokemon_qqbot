@@ -4,21 +4,28 @@ import { PVP } from "../battle/pvp";
 import { Pokebattle } from "../model";
 import { getType } from "../utils/method";
 import { battleType } from "../utils/data";
+import { Robot } from "../utils/robot";
 
-enum CardRarity {
+export enum CardRarity {
   Common,
   Uncommon,
   Rare,
 }
-enum WildPokemonType {
+export enum WildPokemonType {
   NormalWild,
   UncommonPokemon,
   Legendary,
 }
 
-type CardType = "attack" | "defense" | "skill" | "event" | "armorBreak";
+export type CardType =
+  | "attack"
+  | "specialattack"
+  | "defense"
+  | "skill"
+  | "event"
+  | "armorBreak";
 
-type StatusType = "poison" | "strength" | "weak";
+export type StatusType = "poison" | "strength" | "weak";
 
 export interface CardCharacter {
   name: string;
@@ -32,7 +39,7 @@ export interface CardCharacter {
   skill: Skill[];
 }
 
-interface StatusEffect {
+export interface StatusEffect {
   type: StatusType;
   stacks: number;
   duration: number;
@@ -66,11 +73,12 @@ export abstract class RougueCard {
       | "妖精" = "一般"
   ) {}
   abstract effect(user: CardCharacter, target?: CardCharacter): void;
+  abstract restor(data: any): RougueCard;
 }
 
 //玩家角色
 
-class CardPlayer implements CardCharacter {
+export class CardPlayer implements CardCharacter {
   currentHp: number;
   armor = 0;
   energy: number;
@@ -99,7 +107,19 @@ class CardPlayer implements CardCharacter {
     }
     const hand = this.deck.splice(0, size);
     this.discardPile.push(...hand);
+    this.currentHand = hand;
+    this.restor();
     return hand;
+  }
+  restor() {
+    this.currentHand = this.currentHand?.map((c) => {
+      console.log(c);
+      const CardCtor = CardClassMap[c.type];
+      if (!CardCtor) {
+        throw new Error(`未知卡牌类型: ${c.type}`);
+      }
+      return new CardCtor().restor(c);
+    });
   }
 }
 
@@ -117,11 +137,20 @@ export class BaseAttckCard extends RougueCard {
       Math.max(user.power.attack * 0.35 - target.armor, 0)
     )}点伤害`;
   }
+  restor(data: any): BaseAttckCard {
+    return Object.assign(new BaseAttckCard(), data);
+  }
 }
 
 export class BaseSpecialAttackCard extends RougueCard {
   constructor() {
-    super("特殊攻击卡", "attack", "造成0.35*特攻的伤害", 2, CardRarity.Common);
+    super(
+      "特殊攻击卡",
+      "specialattack",
+      "造成0.35*特攻的伤害",
+      2,
+      CardRarity.Common
+    );
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
     if (!target) return "请选择目标";
@@ -131,6 +160,9 @@ export class BaseSpecialAttackCard extends RougueCard {
     return `${user.name}使用了[${this.name}],对${target.name}造成了${Math.floor(
       Math.max(user.power.specialAttack * 0.35 - target.armor, 0)
     )}点伤害`;
+  }
+  restor(data: any): BaseSpecialAttackCard {
+    return Object.assign(new BaseSpecialAttackCard(), data);
   }
 }
 
@@ -148,12 +180,55 @@ export class BaseArmorCard extends RougueCard {
         0.15 * user.power.speed
     )}点护甲`;
   }
+  restor(data: any): BaseArmorCard {
+    return Object.assign(new BaseArmorCard(), data);
+  }
+}
+
+export class ArmorBreakCard extends RougueCard {
+  constructor() {
+    super("破甲卡", "armorBreak", "破除目标护甲", 3, CardRarity.Common);
+  }
+  effect(user: CardCharacter, target?: CardCharacter): void | string {
+    if (!target) return "请选择目标";
+    target.armor = Math.floor(target.armor / 2);
+    return `${user.name}使用了[${this.name}],对${target.name}造成了破甲`;
+  }
+  restor(data: any): ArmorBreakCard {
+    return Object.assign(new ArmorBreakCard(), data);
+  }
 }
 
 //技能卡
 
+export class SkillCard extends RougueCard {
+  constructor() {
+    super("技能卡", "skill", "使用技能", 1, CardRarity.Common);
+  }
+  effect(user: CardCharacter): void | string {
+    return `${user.name}使用了[${this.name}]`;
+  }
+  restor(data: any): SkillCard {
+    return Object.assign(new SkillCard(), data);
+  }
+}
+
+//效果卡
+
+export class EventCard extends RougueCard {
+  constructor() {
+    super("效果卡", "event", "触发某个效果", 1, CardRarity.Common);
+  }
+  effect(user: CardCharacter): void | string {
+    return `${user.name}使用了[${this.name}]`;
+  }
+  restor(data: any): EventCard {
+    return Object.assign(new EventCard(), data);
+  }
+}
+
 //卡组池
-class CardPool {
+export class CardPool {
   private static readonly cards = [
     { class: BaseAttckCard, weight: 8 },
     { class: BaseSpecialAttackCard, weight: 8 },
@@ -189,21 +264,29 @@ class CardPool {
 }
 
 //战斗上下文
-interface CombatContext {
+export interface CombatContext {
   player: CardCharacter;
   self: CardCharacter;
   currentEnergy: number;
   turnCount: number;
 }
 
-interface AIStrategy {
+export interface AIStrategy {
   selectCard(hand: RougueCard[], context: CombatContext): RougueCard | null;
 }
 
-class EnemyAI implements AIStrategy {
+export class EnemyAI implements AIStrategy {
   private memory = {
     playerArmorHistory: [] as number[],
   };
+  constructor(
+    memorys?: { memory: { playerArmorHistory: number[] } } | EnemyAI
+  ) {
+    this.memory.playerArmorHistory =
+      memorys instanceof EnemyAI
+        ? memorys.memory.playerArmorHistory
+        : memorys.memory.playerArmorHistory || [];
+  }
   selectCard(hand: RougueCard[], context: CombatContext): RougueCard | null {
     this.memory.playerArmorHistory.push(context.player.armor);
     const armorTrend = this.calculateArmorTrend();
@@ -262,12 +345,12 @@ class EnemyAI implements AIStrategy {
 }
 
 //敌人类
-class Enemy implements CardCharacter {
+export class Enemy implements CardCharacter {
   currentHp: number;
   armor = 0;
   energy: number;
   enymyType: WildPokemonType;
-  aiStrategy: AIStrategy = new EnemyAI();
+  aiStrategy: AIStrategy;
   currentHand: RougueCard[];
   constructor(
     wildPokemon: Pokebattle,
@@ -298,6 +381,7 @@ class Enemy implements CardCharacter {
     }
     const hand = this.deck.splice(0, size);
     this.discardPile.push(...hand);
+    this.currentHand = hand;
     return hand;
   }
   act(context: CombatContext) {
@@ -309,4 +393,23 @@ class Enemy implements CardCharacter {
       this.currentHand = this.currentHand.filter((c) => c !== selectedCard);
     }
   }
+  restor() {
+    this.currentHand = this.currentHand?.map((c) => {
+      console.log(c);
+      const CardCtor = CardClassMap[c.type];
+      if (!CardCtor) {
+        throw new Error(`未知卡牌类型: ${c.type}`);
+      }
+      return new CardCtor().restor(c);
+    });
+  }
 }
+
+export const CardClassMap: Record<CardType, new () => RougueCard> = {
+  attack: BaseAttckCard,
+  specialattack: BaseSpecialAttackCard,
+  defense: BaseArmorCard,
+  armorBreak: ArmorBreakCard,
+  event: EventCard,
+  skill: SkillCard,
+};

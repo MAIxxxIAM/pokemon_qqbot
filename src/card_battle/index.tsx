@@ -1,23 +1,108 @@
 import { $, Context } from "koishi";
-import {} from "./type";
-import {} from "./method";
+import { CardPlayer, Enemy, EnemyAI, WildPokemonType } from "./type";
+import { initType } from "./method";
+import { Robot } from "../utils/robot";
+import { Skill } from "../battle";
 
 export async function apply(ctx: Context) {
-  await ctx.database.remove("card_battle", (row) => $.eq(row.channel_id, ""));
-  // ctx.command('宝可梦').subcommand('地牢对战')
-  // .action(async ({ session }) => {
-  //     const {userId,channelId} = session
-  //     const player: CardPlayer= await getPlayer(session,ctx)
-  //     const targetPlayer: CardPlayer = await searchTarget(session,ctx)
-  //     if(!targetPlayer){
-  //         ctx.setTimeout( async()=>{
-  //             const targetPlayer: CardPlayer = await getPlayer(session,ctx)
-  //             if(!targetPlayer.target_id){
-  //                 await ctx.database.remove('card_battle',userId)
-  //                 return <message>未找到对手，稍后再试</message>
-  //             }
-  //         },10000)
-  //         return <message>未找到对手，10秒内在尝试为你匹配</message>
-  //     }
-  // })
+  const a = {
+    currentHp: 3,
+    armor: 0,
+    energy: 2,
+    enymyType: 2,
+    aiStrategy: { memory: { playerArmorHistory: [] } },
+    currentHand: [],
+    name: "洛托姆322号",
+    maxHp: 241,
+    maxEnergy: 3,
+    power: {
+      hp: 241,
+      attack: 241,
+      defense: 265,
+      specialAttack: 217,
+      specialDefense: 215,
+      speed: 165,
+    },
+    deck: [
+      {
+        name: "护甲卡",
+        type: "defense",
+        description: "获得一定量的护甲",
+        cost: 1,
+        rarity: 0,
+        cardCategory: "一般",
+      },
+      {
+        name: "特殊攻击卡",
+        type: "attack",
+        description: "造成0.35*特攻的伤害",
+        cost: 2,
+        rarity: 0,
+        cardCategory: "一般",
+      },
+      {
+        name: "攻击卡",
+        type: "attack",
+        description: "造成0.35*攻击力的伤害",
+        cost: 1,
+        rarity: 0,
+        cardCategory: "一般",
+      },
+    ],
+    discardPile: [],
+    skill: [
+      {
+        id: 126,
+        name: "终结门牙",
+        type: "一般",
+        category: 1,
+        dam: 80,
+        hit: 90,
+        descript: "用锋利的门牙牢牢地咬住对手进行攻击。有时会使对手畏缩。",
+        cd: 2,
+        round: 2,
+      },
+      {
+        id: 79,
+        name: "银色旋风",
+        type: "虫",
+        category: 3,
+        dam: 60,
+        hit: 100,
+        descript: "在风中掺入鳞粉攻击对手。有时会提高自己的全部能力。",
+        cd: 2,
+        round: 2,
+      },
+      {
+        id: 22,
+        name: "起风",
+        type: "飞行",
+        category: 3,
+        dam: 40,
+        hit: 100,
+        descript: "用翅膀将刮起的狂风袭向对手进行攻击。",
+        cd: 1,
+        round: 1,
+      },
+      {
+        id: 18,
+        name: "流沙深渊",
+        type: "地面",
+        category: 1,
+        dam: 35,
+        hit: 85,
+        descript: "将对手困在铺天盖地的沙暴中，在４～５回合内进行攻击。",
+        cd: 1,
+        round: 1,
+      },
+    ],
+    pokemonCategory: ["毒", "草"],
+  };
+
+  const b = new Robot(100);
+  const restoredObject: Enemy = initType(a, Enemy, b);
+  const c = restoredObject.drawHand(2);
+  restoredObject.restor();
+  const d = restoredObject.currentHand[0];
+  console.log(d.effect(restoredObject, restoredObject));
 }

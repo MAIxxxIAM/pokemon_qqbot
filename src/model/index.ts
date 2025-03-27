@@ -7,7 +7,6 @@ import { natures } from "../utils/data";
 import { DigItem, DigMine } from "../dig_game/type";
 import { unknowns } from "../pokedle/src/type/type";
 import { Trainer } from "../trainer/type";
-import { CardPlayer } from "../card_battle/type";
 import { Farm, Food, PlantTree } from "../farm/berryTreeFarm";
 import { Cry_info } from "../guess_cry/type";
 
@@ -104,7 +103,6 @@ declare module "koishi" {
     intellegentBody: IntellegentBody;
     "pokemon.digChannel": DigChannel;
     "pokemon.isPokemon": IsPokemon;
-    card_battle: CardPlayer;
     "pokemon.cry": Cry_info;
     pokeEmoji_BOT: pokeEmoji;
   }

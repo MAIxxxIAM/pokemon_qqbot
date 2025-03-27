@@ -30,6 +30,7 @@ import * as path from "path";
 import os from "os";
 import pidusage from "pidusage";
 import * as lapTwo from "./lap/index";
+import * as cardTest from "./card_battle/index";
 import * as pokedex from "./pokedex/pokedex";
 import * as notice from "./notice/index";
 import * as fishings from "./fishing/index";
@@ -468,6 +469,7 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(handleAndCiying);
   ctx.plugin(trainercmd);
   ctx.plugin(cry_guess);
+  ctx.plugin(cardTest);
 
   if (config.指令使用日志) {
     ctx.on("command/before-execute", ({ session, command }) => {
