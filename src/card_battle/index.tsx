@@ -101,8 +101,14 @@ export async function apply(ctx: Context) {
 
   const b = new Robot(100);
   const restoredObject: Enemy = initType(a, Enemy, b);
+  const b1 = new Enemy(b);
   const c = restoredObject.drawHand(2);
-  restoredObject.restor();
-  const d = restoredObject.currentHand[0];
-  console.log(d.effect(restoredObject, restoredObject));
+  const context = {
+    player: restoredObject,
+    self: restoredObject,
+    currentEnergy: 100,
+    turnCount: 10,
+  };
+  const e = restoredObject.act(context);
+  console.log(b1.deck);
 }

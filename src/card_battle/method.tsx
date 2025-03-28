@@ -6,5 +6,7 @@ export function initType<O extends new (...args: any[]) => any>(
   type: O,
   newData: any
 ) {
-  return Object.assign(new type(newData), data);
+  const restorData = Object.assign(new type(newData), data);
+  restorData.restor();
+  return restorData;
 }
