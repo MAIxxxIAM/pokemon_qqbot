@@ -11,6 +11,7 @@ export class PVP implements Battlers {
   level: number;
   monster_1: string;
   battlename: string;
+  itemBag?: number[];
   hitSpeed: number;
   power: PokemonPower;
   maxHp?: number;
@@ -22,6 +23,7 @@ export class PVP implements Battlers {
     this.name = player1.name;
     this.level = player1.level;
     this.monster_1 = player1.monster_1;
+    this.itemBag = player1.itemBag;
     this.battlename = player1.battlename;
     this.hitSpeed = Number(player1.base[5]);
     this.food = player1.berry_food ? new BerryFood(player1.berry_food) : null;

@@ -208,6 +208,7 @@ export interface Pokebattle {
   signCard?: number;
   checkInDays?: number;
   historySigns?: number;
+  itemBag?: number[];
   MissSignDates?: number;
   fossil_bag?: DigItem[];
   total_battle?: number;

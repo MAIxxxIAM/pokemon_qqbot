@@ -12,9 +12,9 @@ export enum CardRarity {
   Rare,
 }
 export enum WildPokemonType {
-  NormalWild,
-  UncommonPokemon,
-  Legendary,
+  NormalWild = 2,
+  UncommonPokemon = 3,
+  Legendary = 4,
 }
 
 export type CardType =
@@ -22,6 +22,7 @@ export type CardType =
   | "specialattack"
   | "defense"
   | "skill"
+  | "health"
   | "event"
   | "armorBreak";
 
@@ -93,6 +94,11 @@ export class CardPlayer implements CardCharacter {
     this.restor();
     return hand;
   }
+  discardCard(): void {
+    this.discardPile.push(...this.currentHand);
+    this.currentHand = [];
+    this.energy = this.maxEnergy;
+  }
   restor() {
     this.currentHand = this.currentHand?.map((c) => {
       const CardCtor = CardClassMap[c.type];
@@ -107,16 +113,20 @@ export class CardPlayer implements CardCharacter {
 //基础战斗卡
 export class BaseAttckCard extends RougueCard {
   constructor() {
-    super("攻击卡", "attack", "造成0.35*攻击力的伤害", 1, CardRarity.Common);
+    super("攻击卡", "attack", "造成0.12*攻击力的伤害", 1, CardRarity.Common);
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
-    if (!target) return "请选择目标";
-    target.currentHp -= Math.floor(
-      Math.max(user.power.attack * 0.35 - target.armor, 0)
-    );
-    return `${user.name}使用了[${this.name}],对${target.name}造成了${Math.floor(
-      Math.max(user.power.attack * 0.35 - target.armor, 0)
-    )}点伤害`;
+    if (!target || this.cost > user.energy) return null;
+    const damage = Math.floor(Math.max(user.power.attack * 0.12, 0));
+    if (damage >= target.armor) {
+      const realDamage = damage - target.armor;
+      target.armor = 0;
+      target.currentHp = Math.max(target.currentHp - realDamage, 0);
+    } else {
+      target.armor -= damage;
+    }
+    user.energy -= this.cost;
+    return `${user.name}使用了[${this.name}],对${target.name}造成了${damage}点伤害`;
   }
   restor(data: any): BaseAttckCard {
     return Object.assign(new BaseAttckCard(), data);
@@ -128,19 +138,23 @@ export class BaseSpecialAttackCard extends RougueCard {
     super(
       "特殊攻击卡",
       "specialattack",
-      "造成0.35*特攻的伤害",
+      "造成0.12*特攻的伤害",
       2,
       CardRarity.Common
     );
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
-    if (!target) return "请选择目标";
-    target.currentHp -= Math.floor(
-      Math.max(user.power.specialAttack * 0.35 - target.armor, 0)
-    );
-    return `${user.name}使用了[${this.name}],对${target.name}造成了${Math.floor(
-      Math.max(user.power.specialAttack * 0.35 - target.armor, 0)
-    )}点伤害`;
+    if (!target || this.cost > user.energy) return null;
+    const damage = Math.floor(Math.max(user.power.specialAttack * 0.12, 0));
+    if (damage >= target.armor) {
+      const realDamage = damage - target.armor;
+      target.armor = 0;
+      target.currentHp = Math.max(target.currentHp - realDamage, 0);
+    } else {
+      target.armor -= damage;
+    }
+    user.energy -= this.cost;
+    return `${user.name}使用了[${this.name}],对${target.name}造成了${damage}点伤害`;
   }
   restor(data: any): BaseSpecialAttackCard {
     return Object.assign(new BaseSpecialAttackCard(), data);
@@ -151,14 +165,15 @@ export class BaseArmorCard extends RougueCard {
   constructor() {
     super("护甲卡", "defense", "获得一定量的护甲", 1, CardRarity.Common);
   }
-  effect(user: CardCharacter): void | string {
+  effect(user: CardCharacter, target: CardCharacter): void | string {
     user.armor += Math.floor(
-      (0.35 * (user.power.defense + user.power.specialDefense)) / 4 +
-        0.15 * user.power.speed
+      (0.3 * (user.power.defense + user.power.specialDefense)) / 4 +
+        0.1 * user.power.speed
     );
+    user.energy -= this.cost;
     return `${user.name}使用了[${this.name}],获得了${Math.floor(
-      (0.35 * (user.power.defense + user.power.specialDefense)) / 4 +
-        0.15 * user.power.speed
+      (0.3 * (user.power.defense + user.power.specialDefense)) / 4 +
+        0.1 * user.power.speed
     )}点护甲`;
   }
   restor(data: any): BaseArmorCard {
@@ -171,8 +186,9 @@ export class ArmorBreakCard extends RougueCard {
     super("破甲卡", "armorBreak", "破除目标护甲", 3, CardRarity.Common);
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
-    if (!target) return "请选择目标";
+    if (!target || this.cost > user.energy) return null;
     target.armor = Math.floor(target.armor / 2);
+    user.energy -= this.cost;
     return `${user.name}使用了[${this.name}],对${target.name}造成了破甲`;
   }
   restor(data: any): ArmorBreakCard {
@@ -180,10 +196,70 @@ export class ArmorBreakCard extends RougueCard {
   }
 }
 
+//治疗道具卡
+export enum HealItemType {
+  potion = 1,
+  SuperPotion = 2,
+  HyperPotion = 3,
+}
+
+class HealCard extends RougueCard {
+  constructor(potin?: HealItemType) {
+    if (!potin) potin = HealItemType.potion;
+    const potionList = {
+      [HealItemType.potion]: {
+        name: "伤药",
+        cost: 1,
+        description: "恢复少量的生命值",
+      },
+      [HealItemType.SuperPotion]: {
+        name: "超级伤药",
+        cost: 2,
+        description: "恢复一定的生命值",
+      },
+      [HealItemType.HyperPotion]: {
+        name: "高级伤药",
+        cost: 3,
+        description: "恢复大量的生命值",
+      },
+    };
+    super(
+      potionList[potin].name,
+      "health",
+      "恢复一定量的生命值",
+      potionList[potin].cost,
+      potionList[potin].cost
+    );
+  }
+  effect(user: CardCharacter, target: CardCharacter): void | string {
+    if (this.cost > user.energy) return null;
+    user.currentHp = Math.min(
+      user.currentHp + user.currentHp * this.cost * 0.1,
+      user.maxHp
+    );
+    user.energy -= this.cost;
+    return `${user.name}使用了[${this.name}],恢复了20点生命值`;
+  }
+  restor(data: any): HealCard {
+    return Object.assign(new HealCard(1), data);
+  }
+}
+
 //技能卡
 
+export enum SkillCardType {
+  attack = 1,
+  defense = 2,
+  specialAttack = 3,
+  specialDefense = 4,
+}
+
 export class SkillCard extends RougueCard {
+  damage: number;
+  atttype: SkillCardType;
   constructor(skill?: Skill) {
+    if (!skill) skill = new Skill(1);
+
     const rarity = skill.cd - 1;
     super(
       skill.name,
@@ -193,9 +269,34 @@ export class SkillCard extends RougueCard {
       rarity,
       skill.type
     );
+    this.atttype = skill.category;
+    this.damage = skill.dam;
   }
-  effect(user: CardCharacter): void | string {
-    return `${user.name}使用了[${this.name}]`;
+  effect(user: CardCharacter, target: CardCharacter): void | string {
+    if (!target || this.cost > user.energy) return null;
+    const efct =
+      battleType.data[this.cardCategory][target.pokemonCategory[0]] *
+      battleType.data[this.cardCategory][target.pokemonCategory[1]] *
+      (user.pokemonCategory.includes(this.cardCategory) ? 1.5 : 1);
+    const userAttack = user.power[SkillCardType[this.atttype]];
+    const targetDefense = target.power[SkillCardType[this.atttype + 1]];
+    let damage = Math.floor(
+      (((((2 * 100 + 10) / 250) * userAttack) / (1.2 * targetDefense)) *
+        this.damage +
+        2) *
+        efct
+    ); //计算伤害
+
+    //
+    if (damage >= target.armor) {
+      const realDamage = damage - target.armor;
+      target.armor = 0;
+      target.currentHp = Math.max(target.currentHp - realDamage, 0);
+    } else {
+      target.armor -= damage;
+    }
+    user.energy -= this.cost;
+    return `${user.name}使用了[${this.name}],造成${efct}倍伤害——${damage}，`;
   }
   restor(data: any): SkillCard {
     return Object.assign(new SkillCard(new Skill(1)), data);
@@ -208,7 +309,7 @@ export class EventCard extends RougueCard {
   constructor() {
     super("效果卡", "event", "触发某个效果", 1, CardRarity.Common);
   }
-  effect(user: CardCharacter): void | string {
+  effect(user: CardCharacter, target: CardCharacter): void | string {
     return `${user.name}使用了[${this.name}]`;
   }
   restor(data: any): EventCard {
@@ -229,7 +330,11 @@ export class CardPool {
     { class: EventCard, weight: 4 },
   ];
 
-  static spawnCard(sizs: number, character: PVP): RougueCard[] {
+  static spawnCard(
+    sizs: number,
+    character: PVP,
+    isplayer?: boolean
+  ): RougueCard[] {
     this.cards.push(
       {
         class: SkillCard,
@@ -252,6 +357,17 @@ export class CardPool {
         args: character.skill[3],
       }
     );
+    if (isplayer) {
+      this.cards = this.cards.concat(
+        character.itemBag?.map((item) => {
+          return {
+            class: HealCard,
+            weight: 5 - item,
+            args: item,
+          };
+        }) || []
+      );
+    }
     const deck: RougueCard[] = [];
     const pool = this.createWeightedPool();
     const guaranteedCards = [
@@ -305,22 +421,34 @@ export class EnemyAI implements AIStrategy {
     this.memory.playerArmorHistory.push(context.player.armor);
     const armorTrend = this.calculateArmorTrend();
     const validCards = hand.filter((c) => c.cost <= context.currentEnergy);
+    if (validCards.length === 0) return null;
     const attackCard = validCards.filter((c) => c.type === "attack");
+    const specialAttackCard = validCards.filter(
+      (c) => c.type === "specialattack"
+    );
+    const armorCard = validCards.filter((c) => c.type === "defense");
     const armorBreakCard = validCards.filter((c) => c.type === "armorBreak");
     const skillCard = validCards.filter(
       (c) =>
         c.type === "skill" &&
         context.self.pokemonCategory.includes(c.cardCategory)
     );
-    if (armorTrend > context.player.maxHp * 0.1) {
+    if (armorTrend > 0) {
       return armorBreakCard.reduce(
         (maxCard, currCard) =>
           currCard.cost > maxCard.cost ? currCard : maxCard,
         hand[0]
       );
     }
+    if (armorCard.length != 0) {
+      return armorCard.reduce(
+        (maxCard, currCard) =>
+          currCard.cost > maxCard.cost ? currCard : maxCard,
+        hand[0]
+      );
+    }
     const categoryEffect: number = this.calculateCategory(context);
-    if (categoryEffect > 1) {
+    if (categoryEffect >= 1) {
       return skillCard.reduce(
         (maxCard, currCard) =>
           currCard.cost > maxCard.cost ? currCard : maxCard,
@@ -328,11 +456,17 @@ export class EnemyAI implements AIStrategy {
       );
     }
     if (attackCard.length != 0) {
-      return attackCard.reduce(
-        (maxCard, currCard) =>
-          currCard.cost > maxCard.cost ? currCard : maxCard,
-        hand[0]
-      );
+      return context.self.power.attack > context.self.power.specialAttack
+        ? attackCard.reduce(
+            (maxCard, currCard) =>
+              currCard.cost > maxCard.cost ? currCard : maxCard,
+            hand[0]
+          )
+        : specialAttackCard.reduce(
+            (maxCard, currCard) =>
+              currCard.cost > maxCard.cost ? currCard : maxCard,
+            hand[0]
+          );
     }
     return validCards.reduce(
       (maxCard, currCard) =>
@@ -367,7 +501,7 @@ export class Enemy implements CardCharacter {
   armor = 0;
   energy: number;
   enymyType: WildPokemonType;
-  aiStrategy: AIStrategy;
+  aiStrategy: EnemyAI = new EnemyAI();
   currentHand: RougueCard[];
   constructor(
     wildPokemon: Pokebattle,
@@ -389,6 +523,7 @@ export class Enemy implements CardCharacter {
     if (powerSum > 1200) this.enymyType = WildPokemonType.Legendary;
     else if (powerSum > 800) this.enymyType = WildPokemonType.UncommonPokemon;
     else this.enymyType = WildPokemonType.NormalWild;
+    maxHp = Math.floor(this.enymyType * this.power.hp); //敌对角色血量补正
     this.currentHp = maxHp;
     this.energy = maxEnergy;
   }
@@ -401,9 +536,14 @@ export class Enemy implements CardCharacter {
     this.currentHand = hand;
     return hand;
   }
+  discardCard(): void {
+    this.discardPile.push(...this.currentHand);
+    this.currentHand = [];
+    this.energy = this.maxEnergy;
+  }
   act(context: CombatContext): string | void {
+    context.currentEnergy = this.energy;
     const selectedCard = this.aiStrategy.selectCard(this.currentHand, context);
-
     if (selectedCard) {
       context.currentEnergy -= selectedCard.cost;
       const enemyLog = selectedCard.effect(this, context.player);
@@ -432,5 +572,6 @@ export const CardClassMap: Record<CardType, new () => RougueCard> = {
   defense: BaseArmorCard,
   armorBreak: ArmorBreakCard,
   event: EventCard,
+  health: HealCard,
   skill: SkillCard,
 };
