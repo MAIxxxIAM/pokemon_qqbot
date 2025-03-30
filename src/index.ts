@@ -67,8 +67,8 @@ import { FishingGame, FishItem, Lucky } from "./fishing/type";
 export const name = "pokemon";
 
 export const inject = {
-  required: ["database", "downloads", "canvas", "cron", "puppeteer"],
-  optional: ["censor", "markdownToImage"],
+  required: ["database", "downloads", "canvas", "cron"],
+  optional: ["censor", "markdownToImage", "puppeteer"],
 };
 
 export const usage = ``;

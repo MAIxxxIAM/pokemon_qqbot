@@ -1,16 +1,29 @@
-import { Random } from "koishi";
+import { Context, Random } from "koishi";
 import { PokemonPower, Skill } from "../battle";
 import { PVP } from "../battle/pvp";
 import { Pokebattle } from "../model";
 import { getType } from "../utils/method";
 import { battleType } from "../utils/data";
-import { Robot } from "../utils/robot";
+import {} from "koishi-plugin-canvas";
+import { dirname } from "../dirname";
+import { testcanvas } from "..";
+import { resolve } from "path";
+
+const cardFaceDir = () =>
+  `${testcanvas}${resolve(dirname, `./assets/img/card`, `卡面.png`)}`;
 
 export enum CardRarity {
   Common,
   Uncommon,
   Rare,
 }
+
+const cardColor = {
+  [CardRarity.Common]: "#afafaf",
+  [CardRarity.Uncommon]: "#00CC44",
+  [CardRarity.Rare]: "#9932CC",
+};
+
 export enum WildPokemonType {
   NormalWild = 2,
   UncommonPokemon = 3,
@@ -57,6 +70,7 @@ export abstract class RougueCard {
   ) {}
   abstract effect(user: CardCharacter, target?: CardCharacter): void | string;
   abstract restor(data: any): RougueCard;
+  abstract drwaCard(ctx: Context): Promise<any>;
 }
 
 //玩家角色
@@ -131,6 +145,30 @@ export class BaseAttckCard extends RougueCard {
   restor(data: any): BaseAttckCard {
     return Object.assign(new BaseAttckCard(), data);
   }
+  async drwaCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const attackIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `攻击.png`)}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
+  }
 }
 
 export class BaseSpecialAttackCard extends RougueCard {
@@ -159,6 +197,30 @@ export class BaseSpecialAttackCard extends RougueCard {
   restor(data: any): BaseSpecialAttackCard {
     return Object.assign(new BaseSpecialAttackCard(), data);
   }
+  async drwaCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const attackIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `特殊攻击.png`)}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
+  }
 }
 
 export class BaseArmorCard extends RougueCard {
@@ -179,6 +241,30 @@ export class BaseArmorCard extends RougueCard {
   restor(data: any): BaseArmorCard {
     return Object.assign(new BaseArmorCard(), data);
   }
+  async drwaCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const attackIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `护甲.png`)}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
+  }
 }
 
 export class ArmorBreakCard extends RougueCard {
@@ -193,6 +279,30 @@ export class ArmorBreakCard extends RougueCard {
   }
   restor(data: any): ArmorBreakCard {
     return Object.assign(new ArmorBreakCard(), data);
+  }
+  async drwaCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const attackIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `护甲破碎.png`)}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
   }
 }
 
@@ -243,6 +353,30 @@ class HealCard extends RougueCard {
   restor(data: any): HealCard {
     return Object.assign(new HealCard(1), data);
   }
+  async drwaCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const attackIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `攻击.png`)}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
+  }
 }
 
 //技能卡
@@ -264,7 +398,7 @@ export class SkillCard extends RougueCard {
     super(
       skill.name,
       "skill",
-      `使用技能${skill.name}`,
+      `使用技能卡\n[${skill.name}]`,
       skill.cd,
       rarity,
       skill.type
@@ -301,6 +435,33 @@ export class SkillCard extends RougueCard {
   restor(data: any): SkillCard {
     return Object.assign(new SkillCard(new Skill(1)), data);
   }
+  async drwaCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const swardIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `剑.png`)}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.globalAlpha = 0.3;
+      c.drawImage(icon, 85, 125, 250, 250);
+      c.globalAlpha = 1;
+      c.drawImage(swardIcon, 85, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
+  }
 }
 
 //效果卡
@@ -315,6 +476,30 @@ export class EventCard extends RougueCard {
   restor(data: any): EventCard {
     return Object.assign(new EventCard(), data);
   }
+  async drwaCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const attackIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `攻击.png`)}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
+  }
 }
 
 //卡组池
@@ -324,10 +509,11 @@ export class CardPool {
     weight: number;
     args?: any;
   }[] = [
-    { class: BaseAttckCard, weight: 8 },
-    { class: BaseSpecialAttackCard, weight: 8 },
-    { class: BaseArmorCard, weight: 4 },
-    { class: EventCard, weight: 4 },
+    { class: BaseAttckCard, weight: 6 },
+    { class: BaseSpecialAttackCard, weight: 6 },
+    { class: BaseArmorCard, weight: 3 },
+    // { class: EventCard, weight: 4 },
+    { class: ArmorBreakCard, weight: 2 },
   ];
 
   static spawnCard(
@@ -575,3 +761,62 @@ export const CardClassMap: Record<CardType, new () => RougueCard> = {
   health: HealCard,
   skill: SkillCard,
 };
+
+function typeDirname(zhName: string): string {
+  const type = {
+    一般: "normal",
+    火: "fire",
+    水: "water",
+    草: "grass",
+    电: "electric",
+    冰: "ice",
+    格斗: "fighting",
+    毒: "poison",
+    地面: "ground",
+    飞行: "flying",
+    超能力: "psychic",
+    妖精: "fairy",
+    岩石: "rock",
+    幽灵: "ghost",
+    钢: "steel",
+    虫: "bug",
+    恶: "dark",
+    龙: "dragon",
+  };
+  return `${testcanvas}${resolve(
+    dirname,
+    "./assets/img/typeicon",
+    type[zhName]
+  )}.png`;
+}
+
+function wrapText(
+  context: any,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number
+) {
+  const chars = text.split("");
+  let line = "";
+  let lineY = y;
+
+  for (let i = 0; i < chars.length; i++) {
+    const testLine = line + chars[i];
+    const metrics = context.measureText(testLine);
+    const testWidth = metrics.width;
+
+    if ((testWidth > maxWidth && line !== "") || chars[i] === "\n") {
+      context.fillText(line, x, lineY);
+      line = chars[i];
+      lineY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+
+  context.fillText(line, x, lineY);
+
+  return lineY;
+}

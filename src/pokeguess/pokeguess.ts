@@ -2,6 +2,8 @@ import { resolve } from "path";
 import { config, testcanvas } from "..";
 import pokemonCal from "../utils/pokemon";
 import { dirname } from "../dirname";
+import {} from "koishi-plugin-canvas";
+import { Context } from "koishi";
 
 export interface IPokeGuess {
   options: string[];
@@ -32,7 +34,7 @@ export class PokeGuess implements IPokeGuess {
     this.other =
       Math.floor(Math.random() * 420) + 1 + "." + n[randomIndex].split(".")[0];
   }
-  async q(ctx) {
+  async q(ctx: Context) {
     const { options, which, other } = this;
     const qImage = await ctx.canvas.loadImage(
       `${testcanvas}${resolve(dirname, "./assets/img/components", "q.png")}`
