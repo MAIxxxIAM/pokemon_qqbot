@@ -16,12 +16,14 @@ export enum CardRarity {
   Common,
   Uncommon,
   Rare,
+  Epic,
 }
 
 const cardColor = {
   [CardRarity.Common]: "#afafaf",
   [CardRarity.Uncommon]: "#00CC44",
   [CardRarity.Rare]: "#9932CC",
+  [CardRarity.Epic]: "rgb(255, 220, 67)",
 };
 
 export enum WildPokemonType {
@@ -70,7 +72,7 @@ export abstract class RougueCard {
   ) {}
   abstract effect(user: CardCharacter, target?: CardCharacter): void | string;
   abstract restor(data: any): RougueCard;
-  abstract drwaCard(ctx: Context): Promise<any>;
+  abstract drawCard(ctx: Context): Promise<any>;
 }
 
 //玩家角色
@@ -145,7 +147,7 @@ export class BaseAttckCard extends RougueCard {
   restor(data: any): BaseAttckCard {
     return Object.assign(new BaseAttckCard(), data);
   }
-  async drwaCard(ctx: Context): Promise<any> {
+  async drawCard(ctx: Context): Promise<any> {
     const icondir = typeDirname(this.cardCategory);
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
@@ -197,7 +199,7 @@ export class BaseSpecialAttackCard extends RougueCard {
   restor(data: any): BaseSpecialAttackCard {
     return Object.assign(new BaseSpecialAttackCard(), data);
   }
-  async drwaCard(ctx: Context): Promise<any> {
+  async drawCard(ctx: Context): Promise<any> {
     const icondir = typeDirname(this.cardCategory);
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
@@ -241,7 +243,7 @@ export class BaseArmorCard extends RougueCard {
   restor(data: any): BaseArmorCard {
     return Object.assign(new BaseArmorCard(), data);
   }
-  async drwaCard(ctx: Context): Promise<any> {
+  async drawCard(ctx: Context): Promise<any> {
     const icondir = typeDirname(this.cardCategory);
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
@@ -280,12 +282,12 @@ export class ArmorBreakCard extends RougueCard {
   restor(data: any): ArmorBreakCard {
     return Object.assign(new ArmorBreakCard(), data);
   }
-  async drwaCard(ctx: Context): Promise<any> {
+  async drawCard(ctx: Context): Promise<any> {
     const icondir = typeDirname(this.cardCategory);
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `护甲破碎.png`)}`
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `护甲碎裂.png`)}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
@@ -353,7 +355,7 @@ class HealCard extends RougueCard {
   restor(data: any): HealCard {
     return Object.assign(new HealCard(1), data);
   }
-  async drwaCard(ctx: Context): Promise<any> {
+  async drawCard(ctx: Context): Promise<any> {
     const icondir = typeDirname(this.cardCategory);
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
@@ -435,7 +437,7 @@ export class SkillCard extends RougueCard {
   restor(data: any): SkillCard {
     return Object.assign(new SkillCard(new Skill(1)), data);
   }
-  async drwaCard(ctx: Context): Promise<any> {
+  async drawCard(ctx: Context): Promise<any> {
     const icondir = typeDirname(this.cardCategory);
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
@@ -476,7 +478,7 @@ export class EventCard extends RougueCard {
   restor(data: any): EventCard {
     return Object.assign(new EventCard(), data);
   }
-  async drwaCard(ctx: Context): Promise<any> {
+  async drawCard(ctx: Context): Promise<any> {
     const icondir = typeDirname(this.cardCategory);
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
