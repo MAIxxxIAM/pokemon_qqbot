@@ -1,15 +1,23 @@
 import { $, Context, Element } from "koishi";
-import { Enemy } from "./type";
+import { CardPlayer, Enemy, HealItemType } from "./type";
 import { initType } from "./method";
 import { Robot } from "../utils/robot";
 
 export async function apply(ctx: Context) {
   ctx.command("card-battle", "卡牌对战").action(async ({ session }) => {
     const a = new Robot(100);
-    const a1: Enemy = new Enemy(a);
+    a.itemBag = [
+      {
+        name: "毒药",
+        type: "poison",
+        level: 2,
+      },
+    ];
+    const a1: CardPlayer = new CardPlayer(a);
+
     a1.drawHand(5);
     let playerHand: [string, Element, number][] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < a1.currentHand.length; i++) {
       const name = a1.currentHand[i].name;
       const image = await a1.currentHand[i].drawCard(ctx);
       const cost = a1.currentHand[i].cost;
@@ -23,8 +31,8 @@ export async function apply(ctx: Context) {
     const handImages = Images.map((image) => {
       return image[1].attrs.src;
     });
-    const width = 500; // 适应高清画布
-    const height = 500;
+    const width = 1000; // 适应高清画布
+    const height = 500 * 2 + (Math.ceil(Images.length / 3) - 2) * 422;
     // 清空画布
     return ctx.canvas.render(width, height, async (c) => {
       // 绘制背景
@@ -41,86 +49,75 @@ export async function apply(ctx: Context) {
 
       const numCards = handImages.length;
 
-      // 动态布局参数
-      const cx = width / 2; // 圆心X
-      const cy = height - 50; // 圆心Y（向下偏移）
-      const cardAspect = 445 / 670; // 原始宽高比
-      const cardHeight = 180; // 显示高度
-      const cardWidth = cardHeight * cardAspect;
+      // 网格布局参数
+      const cardsPerRow = 3; // 每行显示3张卡片
+      const horizontalGap = 40; // 卡片之间的水平间距
+      const verticalGap = 20; // 卡片之间的垂直间距
 
-      // 自动计算布局参数
-      const baseRadius = cardHeight * 0.8;
-      const radiusIncrement = cardHeight * 0.05;
-      const maxAngle = 120; // 最大展开角度
+      // 计算卡片尺寸
+      const totalCardWidth = width * 0.85; // 卡片区域占画布90%宽度
+      const cardWidth =
+        (totalCardWidth - horizontalGap * (cardsPerRow - 1)) / cardsPerRow;
+      const cardAspect = 670 / 445;
+      const cardHeight = cardWidth * cardAspect;
 
-      // 动态布局计算
-      const radius = baseRadius + Math.min(5, numCards) * radiusIncrement;
-      const totalAngle = Math.min(maxAngle, numCards * 15);
-      const angleStep = numCards > 1 ? totalAngle / (numCards - 1) : 0;
-      const startAngle = 270 - totalAngle / 2 + 5; // 从正下方开始
+      // 计算左边距，使卡片水平居中
+      const leftMargin = (width - totalCardWidth) / 2;
 
-      // 添加表格区域
-      c.fillStyle = "rgba(20, 40, 80, 0.6)";
-      c.fillRect(cx - 150, 30, 300, 100);
-      c.strokeStyle = "#4a5b6c";
-      c.lineWidth = 2;
-      c.strokeRect(cx - 150, 30, 300, 100);
+      const cx = width / 2;
+
+      // // 添加表格区域
+      // c.fillStyle = "rgba(20, 40, 80, 0.6)";
+      // c.fillRect(cx - 150, 30, 300, 100);
+      // c.strokeStyle = "#4a5b6c";
+      // c.lineWidth = 2;
+      // c.strokeRect(cx - 150, 30, 300, 100);
 
       // 添加标题文字
-      c.font = "bold 20px";
+      c.font = "bold 50px";
       c.fillStyle = "#ffffff";
       c.textAlign = "center";
-      c.fillText("当前手牌", cx, 20);
+      c.fillText("当前手牌", cx, 80);
 
       // 预加载所有图片
       const images = await Promise.all(
         handImages.map((path) => ctx.canvas.loadImage(path))
       );
 
-      // 先画后面的卡，再画前面的卡
+      // 绘制卡片
       for (let i = 0; i < numCards; i++) {
-        const angle = startAngle + angleStep * i;
-        const radian = (angle * Math.PI) / 180;
+        // 计算行和列索引
+        const row = Math.floor(i / cardsPerRow);
+        const col = i % cardsPerRow;
 
-        // 动态高度偏移创建层叠效果
-        const yOffset = Math.sin((i / numCards) * Math.PI) * 20;
-        const x = cx + radius * Math.cos(radian) - 15;
-        const y = cy + radius * Math.sin(radian) - yOffset;
+        // 计算卡片位置
+        const x = leftMargin + col * (cardWidth + horizontalGap);
+        const y = 120 + row * (cardHeight + verticalGap);
 
         // 保存当前状态
         c.save();
 
-        // 移动到卡牌位置
-        c.translate(x, y);
-
-        // 稍微旋转卡牌，让它们朝向圆心
-        c.rotate(radian + Math.PI / 2);
-
         // 添加投影
         c.shadowColor = "rgba(0, 0, 0, 0.7)";
-        c.shadowOffsetX = 10;
-        c.shadowOffsetY = 10;
-        c.shadowBlur = 15;
+        c.shadowOffsetX = 5;
+        c.shadowOffsetY = 5;
+        c.shadowBlur = 10;
 
-        // 绘制卡牌（从中心点开始）
-        c.drawImage(
-          images[i],
-          -cardWidth / 2, // 水平居中
-          -cardHeight / 2, // 垂直居中
-          cardWidth,
-          cardHeight
-        );
+        // 绘制卡牌
+        c.drawImage(images[i], x, y, cardWidth, cardHeight);
 
         // 还原画布状态
         c.restore();
-        c.textAlign = "center";
-        c.textBaseline = "middle";
-        c.fillStyle = "white";
-        c.font = "15px";
-        for (let i = 0; i < 5; i++) {
-          c.fillText(`${Images[i][0]}`, width / 2, 40 + i * 20);
-        }
       }
+
+      // 绘制卡片信息
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.fillStyle = "white";
+      c.font = "15px";
+      // for (let i = 0; i < 5; i++) {
+      //   c.fillText(`${Images[i][0]} 🌟${Images[i][2]}`, width / 2, 40 + i * 20);
+      // }
 
       // 添加提示文字
       c.font = "24px";

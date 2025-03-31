@@ -9,6 +9,7 @@ import { unknowns } from "../pokedle/src/type/type";
 import { Trainer } from "../trainer/type";
 import { Farm, Food, PlantTree } from "../farm/berryTreeFarm";
 import { Cry_info } from "../guess_cry/type";
+import { CardItem } from "../card_battle/type";
 
 //智能体兼容
 
@@ -208,7 +209,7 @@ export interface Pokebattle {
   signCard?: number;
   checkInDays?: number;
   historySigns?: number;
-  itemBag?: number[];
+  itemBag?: CardItem[];
   MissSignDates?: number;
   fossil_bag?: DigItem[];
   total_battle?: number;
@@ -356,6 +357,11 @@ export async function model(ctx: Context) {
         nullable: false,
       },
       fossil_bag: {
+        type: "json",
+        initial: [],
+        nullable: false,
+      },
+      itemBag: {
         type: "json",
         initial: [],
         nullable: false,

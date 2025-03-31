@@ -1,4 +1,4 @@
-import { Schema, h, $, Session, is } from "koishi";
+import { Schema, h, $, Session, is, Logger } from "koishi";
 import pokemonCal from "./utils/pokemon";
 import * as pokeGuess from "./pokeguess";
 import { fishing } from "./utils/data";
@@ -63,6 +63,7 @@ import { catchPokemon } from "./battle/pve";
 import { Skill } from "./battle";
 import { BerrySend, PlantTree } from "./farm/berryTreeFarm";
 import { FishingGame, FishItem, Lucky } from "./fishing/type";
+import { PoisonStatusHandler, StatusSystem } from "./card_battle/status";
 
 export const name = "pokemon";
 
@@ -283,6 +284,8 @@ export let config: Config;
 export let legendaryPokemonId = {};
 
 export async function apply(ctx, conf: Config) {
+  logger = ctx.logger("pokemon");
+  logger.info("状态注册系统启动成功");
   config = conf;
   ctx.on("before-send", async (session: Session, msg_id) => {
     const { message } = session.event;
@@ -1021,7 +1024,6 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
       return ``;
     }
   });
-  logger = ctx.logger("pokemon");
 
   try {
     testcanvas = "file://";

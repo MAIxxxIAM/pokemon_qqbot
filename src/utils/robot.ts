@@ -1,5 +1,6 @@
 import { Pokebattle } from "..";
 import { Skill } from "../battle";
+import { CardItem } from "../card_battle/type";
 import { PokemonList } from "../model";
 import { Trainer } from "../trainer/type";
 import pokemonCal from "./pokemon";
@@ -13,6 +14,7 @@ export class Robot implements Pokebattle {
   battlename: string;
   battleTimes: number;
   battleToTrainer: number;
+  itemBag?: CardItem[];
   base: string[];
   power: string[];
   skill: number;

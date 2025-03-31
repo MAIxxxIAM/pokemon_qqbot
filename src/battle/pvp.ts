@@ -1,4 +1,5 @@
 import { Pokebattle, logger } from "..";
+import { CardItem } from "../card_battle/type";
 import { BerryFood } from "../farm/berryTreeFarm";
 import { skillMachine } from "../utils/data";
 import { typeEffect } from "../utils/method";
@@ -11,7 +12,7 @@ export class PVP implements Battlers {
   level: number;
   monster_1: string;
   battlename: string;
-  itemBag?: number[];
+  itemBag?: CardItem[];
   hitSpeed: number;
   power: PokemonPower;
   maxHp?: number;

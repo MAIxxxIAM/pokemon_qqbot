@@ -8,9 +8,10 @@ import {} from "koishi-plugin-canvas";
 import { dirname } from "../dirname";
 import { testcanvas } from "..";
 import { resolve } from "path";
+import { PoisonStatusHandler, StatusSystem, statusSystems } from "./status";
 
 const cardFaceDir = () =>
-  `${testcanvas}${resolve(dirname, `./assets/img/card`, `卡面.png`)}`;
+  `${testcanvas}${resolve(dirname, `./assets/img/card`, `cardface.png`)}`;
 
 export enum CardRarity {
   Common,
@@ -37,6 +38,7 @@ export type CardType =
   | "specialattack"
   | "defense"
   | "skill"
+  | "poison"
   | "health"
   | "event"
   | "armorBreak";
@@ -53,6 +55,16 @@ export interface CardCharacter {
   power: PokemonPower;
   pokemonCategory: string[];
   skill: Skill[];
+  statusEffects: Map<StatusType, StatusEffect>;
+  addStatusEffect(type: StatusType, stacks: number): void;
+  processTurnStart(): void;
+  processTurnEnd(): void;
+}
+
+export interface CardItem {
+  type: CardType;
+  name: "伤药" | "毒药";
+  level: number;
 }
 
 export interface StatusEffect {
@@ -82,6 +94,7 @@ export class CardPlayer implements CardCharacter {
   armor = 0;
   energy: number;
   currentHand: RougueCard[];
+  statusEffects = new Map<StatusType, StatusEffect>();
 
   constructor(
     players: Pokebattle,
@@ -91,10 +104,11 @@ export class CardPlayer implements CardCharacter {
       new PVP(players).power.speed / 45
     ),
     public readonly power: PokemonPower = new PVP(players).power,
-    public deck: RougueCard[] = CardPool.spawnCard(30, new PVP(players)),
+    public deck: RougueCard[] = CardPool.spawnCard(30, new PVP(players), true),
     public discardPile: RougueCard[] = [],
     public skill: Skill[] = new PVP(players).skill,
-    public pokemonCategory: string[] = getType(new PVP(players).monster_1)
+    public pokemonCategory: string[] = getType(new PVP(players).monster_1),
+    private statusSystem: StatusSystem = statusSystems
   ) {
     this.currentHp = maxHp;
     this.energy = maxEnergy;
@@ -115,7 +129,23 @@ export class CardPlayer implements CardCharacter {
     this.currentHand = [];
     this.energy = this.maxEnergy;
   }
+  addStatusEffect(type: StatusType, stacks: number) {
+    this.statusSystem.getHandler(type)?.applyEffect(this, stacks);
+  }
+
+  processTurnStart() {
+    this.statusEffects.forEach((_, type) => {
+      this.statusSystem.getHandler(type)?.processTurnStart(this);
+    });
+  }
+
+  processTurnEnd() {
+    this.statusEffects.forEach((_, type) => {
+      this.statusSystem.getHandler(type)?.processTurnEnd(this);
+    });
+  }
   restor() {
+    this.statusSystem = new StatusSystem().restor(this.statusSystem);
     this.currentHand = this.currentHand?.map((c) => {
       const CardCtor = CardClassMap[c.type];
       if (!CardCtor) {
@@ -129,7 +159,7 @@ export class CardPlayer implements CardCharacter {
 //基础战斗卡
 export class BaseAttckCard extends RougueCard {
   constructor() {
-    super("攻击卡", "attack", "造成0.12*攻击力的伤害", 1, CardRarity.Common);
+    super("攻击卡", "attack", "造成0.12*攻击的伤害", 1, CardRarity.Common);
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
     if (!target || this.cost > user.energy) return null;
@@ -152,13 +182,17 @@ export class BaseAttckCard extends RougueCard {
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `攻击.png`)}`
+      `${testcanvas}${resolve(
+        dirname,
+        `./assets/img/card`,
+        `${this.type}.png`
+      )}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
       c.fillRect(0, 0, 445, 670);
       c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
       c.drawImage(icon, 45, 545, 80, 80);
       c.font = "bold 30px";
       c.fillStyle = "#000000";
@@ -204,13 +238,17 @@ export class BaseSpecialAttackCard extends RougueCard {
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `特殊攻击.png`)}`
+      `${testcanvas}${resolve(
+        dirname,
+        `./assets/img/card`,
+        `${this.type}.png`
+      )}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
       c.fillRect(0, 0, 445, 670);
       c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
       c.drawImage(icon, 45, 545, 80, 80);
       c.font = "bold 30px";
       c.fillStyle = "#000000";
@@ -248,13 +286,17 @@ export class BaseArmorCard extends RougueCard {
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `护甲.png`)}`
+      `${testcanvas}${resolve(
+        dirname,
+        `./assets/img/card`,
+        `${this.type}.png`
+      )}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
       c.fillRect(0, 0, 445, 670);
       c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
       c.drawImage(icon, 45, 545, 80, 80);
       c.font = "bold 30px";
       c.fillStyle = "#000000";
@@ -271,7 +313,7 @@ export class BaseArmorCard extends RougueCard {
 
 export class ArmorBreakCard extends RougueCard {
   constructor() {
-    super("破甲卡", "armorBreak", "破除目标护甲", 3, CardRarity.Common);
+    super("破甲卡", "armorBreak", "破除目标一半护甲", 3, CardRarity.Common);
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
     if (!target || this.cost > user.energy) return null;
@@ -287,13 +329,17 @@ export class ArmorBreakCard extends RougueCard {
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `护甲碎裂.png`)}`
+      `${testcanvas}${resolve(
+        dirname,
+        `./assets/img/card`,
+        `${this.type}.png`
+      )}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
       c.fillRect(0, 0, 445, 670);
       c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
       c.drawImage(icon, 45, 545, 80, 80);
       c.font = "bold 30px";
       c.fillStyle = "#000000";
@@ -315,7 +361,88 @@ export enum HealItemType {
   HyperPotion = 3,
 }
 
-class HealCard extends RougueCard {
+export enum PoisonCardType {
+  poison = 1,
+  SuperPoison = 2,
+  HyperPoison = 3,
+}
+
+export class PoisonCard extends RougueCard {
+  constructor(poison?: PoisonCardType) {
+    if (!poison) poison = PoisonCardType.poison;
+    const poisonList = {
+      [PoisonCardType.poison]: {
+        name: "毒药",
+        cost: 1,
+        description: "使目标中毒1层",
+      },
+      [PoisonCardType.SuperPoison]: {
+        name: "好毒药",
+        cost: 2,
+        description: "使目标中毒2层",
+      },
+      [PoisonCardType.HyperPoison]: {
+        name: "厉害毒药",
+        cost: 3,
+        description: "使目标中毒3层",
+      },
+    };
+    super(
+      poisonList[poison].name,
+      "poison",
+      poisonList[poison].description,
+      poisonList[poison].cost,
+      poisonList[poison].cost - 1
+    );
+  }
+  effect(user: CardCharacter, target: CardCharacter): void | string {
+    if (this.cost > user.energy) return null;
+    if (target.statusEffects.has("poison")) {
+      const effect = target.statusEffects.get("poison");
+      if (effect) {
+        effect.stacks += this.cost;
+        effect.duration = Math.max(effect.duration, 3); // 刷新持续时间
+      }
+    } else {
+      target.addStatusEffect("poison", this.cost);
+    }
+    user.energy -= this.cost;
+    return `${user.name}使用了[${this.name}],对${target.name}造成了20点伤害`;
+  }
+  restor(data: any): PoisonCard {
+    return Object.assign(new PoisonCard(1), data);
+  }
+  async drawCard(ctx: Context): Promise<any> {
+    const icondir = typeDirname(this.cardCategory);
+    const icon = await ctx.canvas.loadImage(icondir);
+    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+    const attackIcon = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(
+        dirname,
+        `./assets/img/card`,
+        `${this.type}.png`
+      )}`
+    );
+    return ctx.canvas.render(445, 670, (c) => {
+      c.fillStyle = cardColor[this.rarity];
+      c.fillRect(0, 0, 445, 670);
+      c.drawImage(cardFace, 10, 10, 425, 650);
+      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+      c.drawImage(icon, 45, 545, 80, 80);
+      c.font = "bold 30px";
+      c.fillStyle = "#000000";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      wrapText(c, this.description, 220, 480, 300, 30);
+      wrapText(c, this.name, 220, 415, 300, 30);
+      c.font = "bold 80px";
+      c.fillStyle = "#ab8818";
+      c.fillText(this.cost.toString(), 360, 585);
+    });
+  }
+}
+
+export class HealCard extends RougueCard {
   constructor(potin?: HealItemType) {
     if (!potin) potin = HealItemType.potion;
     const potionList = {
@@ -325,12 +452,12 @@ class HealCard extends RougueCard {
         description: "恢复少量的生命值",
       },
       [HealItemType.SuperPotion]: {
-        name: "超级伤药",
+        name: "好伤药",
         cost: 2,
         description: "恢复一定的生命值",
       },
       [HealItemType.HyperPotion]: {
-        name: "高级伤药",
+        name: "厉害伤药",
         cost: 3,
         description: "恢复大量的生命值",
       },
@@ -338,9 +465,9 @@ class HealCard extends RougueCard {
     super(
       potionList[potin].name,
       "health",
-      "恢复一定量的生命值",
+      potionList[potin].description,
       potionList[potin].cost,
-      potionList[potin].cost
+      potionList[potin].cost - 1
     );
   }
   effect(user: CardCharacter, target: CardCharacter): void | string {
@@ -360,13 +487,17 @@ class HealCard extends RougueCard {
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `攻击.png`)}`
+      `${testcanvas}${resolve(
+        dirname,
+        `./assets/img/card`,
+        `${this.type}.png`
+      )}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
       c.fillRect(0, 0, 445, 670);
       c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
       c.drawImage(icon, 45, 545, 80, 80);
       c.font = "bold 30px";
       c.fillStyle = "#000000";
@@ -442,7 +573,7 @@ export class SkillCard extends RougueCard {
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const swardIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `剑.png`)}`
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `sword.png`)}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
@@ -483,13 +614,13 @@ export class EventCard extends RougueCard {
     const icon = await ctx.canvas.loadImage(icondir);
     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
     const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `攻击.png`)}`
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `attack.png`)}`
     );
     return ctx.canvas.render(445, 670, (c) => {
       c.fillStyle = cardColor[this.rarity];
       c.fillRect(0, 0, 445, 670);
       c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 85, 125, 250, 250);
+      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
       c.drawImage(icon, 45, 545, 80, 80);
       c.font = "bold 30px";
       c.fillStyle = "#000000";
@@ -548,10 +679,14 @@ export class CardPool {
     if (isplayer) {
       this.cards = this.cards.concat(
         character.itemBag?.map((item) => {
+          const itemClass = {
+            伤药: HealCard,
+            毒药: PoisonCard,
+          };
           return {
-            class: HealCard,
-            weight: 5 - item,
-            args: item,
+            class: itemClass[item.name],
+            weight: 1,
+            args: item.level,
           };
         }) || []
       );
@@ -691,6 +826,7 @@ export class Enemy implements CardCharacter {
   enymyType: WildPokemonType;
   aiStrategy: EnemyAI = new EnemyAI();
   currentHand: RougueCard[];
+  statusEffects = new Map<StatusType, StatusEffect>();
   constructor(
     wildPokemon: Pokebattle,
     public readonly name: string = new PVP(wildPokemon).name,
@@ -702,7 +838,8 @@ export class Enemy implements CardCharacter {
     public deck: RougueCard[] = CardPool.spawnCard(30, new PVP(wildPokemon)),
     public discardPile: RougueCard[] = [],
     public skill: Skill[] = new PVP(wildPokemon).skill,
-    public pokemonCategory: string[] = getType(new PVP(wildPokemon).monster_1)
+    public pokemonCategory: string[] = getType(new PVP(wildPokemon).monster_1),
+    private statusSystem: StatusSystem = statusSystems
   ) {
     const powerSum = wildPokemon.power.reduce(
       (sum, curr) => sum + Number(curr),
@@ -714,6 +851,21 @@ export class Enemy implements CardCharacter {
     maxHp = Math.floor(this.enymyType * this.power.hp); //敌对角色血量补正
     this.currentHp = maxHp;
     this.energy = maxEnergy;
+  }
+  addStatusEffect(type: StatusType, stacks: number) {
+    this.statusSystem.getHandler(type)?.applyEffect(this, stacks);
+  }
+
+  processTurnStart() {
+    this.statusEffects.forEach((_, type) => {
+      this.statusSystem.getHandler(type)?.processTurnStart(this);
+    });
+  }
+
+  processTurnEnd() {
+    this.statusEffects.forEach((_, type) => {
+      this.statusSystem.getHandler(type)?.processTurnEnd(this);
+    });
   }
   drawHand(size: number): RougueCard[] {
     if (this.deck.length < size) {
@@ -743,6 +895,7 @@ export class Enemy implements CardCharacter {
     return null;
   }
   restor() {
+    this.statusSystem = new StatusSystem().restor(this.statusSystem);
     this.aiStrategy = new EnemyAI().restor(this.aiStrategy);
     this.deck = this.deck?.map((c) => {
       const CardCtor = CardClassMap[c.type];
@@ -762,6 +915,7 @@ export const CardClassMap: Record<CardType, new () => RougueCard> = {
   event: EventCard,
   health: HealCard,
   skill: SkillCard,
+  poison: PoisonCard,
 };
 
 function typeDirname(zhName: string): string {
@@ -822,3 +976,5 @@ function wrapText(
 
   return lineY;
 }
+const statusSystem = new StatusSystem();
+statusSystem.registerHandler(new PoisonStatusHandler());
