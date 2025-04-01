@@ -59,6 +59,7 @@ export interface CardCharacter {
   addStatusEffect(type: StatusType, stacks: number): void;
   processTurnStart(): void;
   processTurnEnd(): void;
+  takeDamage(damage: number, source?: CardCharacter): void;
 }
 
 export interface CardItem {
@@ -114,6 +115,14 @@ export class CardPlayer implements CardCharacter {
     this.energy = maxEnergy;
   }
 
+  takeDamage(damage: number): void {
+    this.currentHp = Math.max(this.currentHp - damage, 0);
+    this.statusEffects.forEach((effect) => {
+      if (this.statusSystem.getHandler(effect.type)?.onReceiveDamage) {
+        this.statusSystem.getHandler(effect.type)?.onReceiveDamage(this);
+      }
+    });
+  }
   drawHand(size: number): RougueCard[] {
     if (this.deck.length < size) {
       this.deck = Random.shuffle(this.discardPile);
@@ -854,6 +863,15 @@ export class Enemy implements CardCharacter {
   }
   addStatusEffect(type: StatusType, stacks: number) {
     this.statusSystem.getHandler(type)?.applyEffect(this, stacks);
+  }
+
+  takeDamage(damage: number): void {
+    this.currentHp = Math.max(this.currentHp - damage, 0);
+    this.statusEffects.forEach((effect) => {
+      if (this.statusSystem.getHandler(effect.type)?.onReceiveDamage) {
+        this.statusSystem.getHandler(effect.type)?.onReceiveDamage(this);
+      }
+    });
   }
 
   processTurnStart() {

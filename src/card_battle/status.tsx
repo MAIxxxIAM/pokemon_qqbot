@@ -5,7 +5,7 @@ export interface StatusHandler {
   applyEffect(target: CardCharacter, stacks: number): void;
   processTurnStart(target: CardCharacter): void;
   processTurnEnd(target: CardCharacter): void;
-  onReceiveDamage?(target: CardCharacter, damage: number): void;
+  onReceiveDamage?(target: CardCharacter): void;
 }
 
 export class PoisonStatusHandler implements StatusHandler {
