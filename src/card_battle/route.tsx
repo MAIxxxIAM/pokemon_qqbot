@@ -42,12 +42,8 @@ export class RouteGenerator {
     return Object.assign(new RouteGenerator(), data);
   }
 
-  // 初始生成仅包含第一层的路线图
   generateInitialRoute(): RouteNode {
-    // 创建根节点
     const root = this.createInitialNode(0);
-
-    // 根节点的子节点(只生成第一层)
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
       root.children.push(this.createInitialNode(1));
@@ -80,7 +76,7 @@ export class RouteGenerator {
   }
 
   private generateEnemies(type: RouteNodeType, depth: number): Enemy[] {
-    const enemyCount = Math.floor(Math.random() * 3) + 1; // 随机生成敌人数量
+    const enemyCount = Math.floor(Math.random() * 3) + 1;
     let enemies: Enemy[] = [];
 
     for (let i = 0; i < enemyCount; i++) {
@@ -91,7 +87,6 @@ export class RouteGenerator {
     return enemies;
   }
 
-  // 初始节点创建(不生成子节点)
   private createInitialNode(depth: number): RouteNode {
     const nodeType = this.determineNodeType(depth);
     const node: RouteNode = {
@@ -116,17 +111,13 @@ export class RouteGenerator {
     node.isExplored = true;
     this.currentDepth = node.depth;
 
-    // 如果已经是最大深度，不再生成子节点
     if (node.depth >= this.maxAllowedDepth - 1) {
       return;
     }
 
-    // 如果已经有子节点，不再重复生成
     if (node.children.length > 0) {
       return;
     }
-
-    // 生成下一层的选择分支
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
       node.children.push(this.createInitialNode(node.depth + 1));
