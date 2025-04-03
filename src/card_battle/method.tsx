@@ -4,9 +4,9 @@ import {} from "./type";
 export function initType<O extends new (...args: any[]) => any>(
   data: any,
   type: O,
-  newData: any
+  args?: any
 ) {
-  const restorData = Object.assign(new type(newData), data);
+  const restorData = Object.assign(new type(args), data);
   restorData.restor();
   return restorData;
 }
