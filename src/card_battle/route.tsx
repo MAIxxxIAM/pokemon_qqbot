@@ -27,6 +27,11 @@ interface RouteNode {
   isCompleted: boolean;
   isExplored: boolean;
 }
+enum RouteNodeStatus {
+  UNEXPLORED = "未探索",
+  EXPLORED = "已探索",
+  COMPLETED = "已完成",
+}
 
 export class inRouteNode implements RouteNode {
   type: RouteNodeType;
@@ -152,21 +157,50 @@ export class RouteGenerator {
 
     return node;
   }
-  exploreNode(node: RouteNode): void {
+
+  // 探索节点标记枚举
+
+  exploreNode(
+    node: RouteNode,
+    player?: CardPlayer
+  ): {
+    status: RouteNodeStatus;
+    text: string;
+  } {
+    let log = [];
+    player.activeBuffs.forEach((buff) => {
+      buff.duration--;
+      if (buff.duration <= 0) {
+        log = [buff.removeBuff(player), ...log];
+      }
+    });
     node.isExplored = true;
     this.currentDepth = node.depth;
 
     if (node.depth >= this.maxAllowedDepth - 1) {
-      return;
+      log = ["当前已探索完成！", ...log];
+      node.isCompleted = true;
+      return {
+        status: RouteNodeStatus.COMPLETED,
+        text: log.join("\n"),
+      };
     }
 
     if (node.children.length > 0) {
-      return;
+      log = ["当前位置已经探索过了！", ...log];
+      return {
+        status: RouteNodeStatus.EXPLORED,
+        text: log.join("\n"),
+      };
     }
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
       node.children.push(this.createNode(node.depth + 1));
     }
+    return {
+      status: RouteNodeStatus.UNEXPLORED,
+      text: log.join("\n"),
+    };
   }
 }
 

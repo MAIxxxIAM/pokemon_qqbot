@@ -9,6 +9,7 @@ import { dirname } from "../dirname";
 import { testcanvas } from "..";
 import { resolve } from "path";
 import { PoisonStatusHandler, StatusSystem, statusSystems } from "./status";
+import { BuffConfig } from "./buff";
 
 const cardFaceDir = () =>
   `${testcanvas}${resolve(dirname, `./assets/img/card`, `cardface.png`)}`;
@@ -99,6 +100,7 @@ export class CardPlayer implements CardCharacter {
   energy: number;
   currentHand: RougueCard[];
   statusEffects = new Map<StatusType, StatusEffect>();
+  activeBuffs: BuffConfig[] = [];
 
   constructor(
     players: Pokebattle,
@@ -175,6 +177,19 @@ export class CardPlayer implements CardCharacter {
     }
 
     return statusLog.join("\n");
+  }
+  addBuff(buff: BuffConfig): string {
+    this.activeBuffs.push(buff);
+    const log = buff.applyBuff(this);
+    return log;
+  }
+  removeBuff(buff: BuffConfig): string {
+    const index = this.activeBuffs.indexOf(buff);
+    if (index !== -1) {
+      this.activeBuffs.splice(index, 1);
+      return buff.removeBuff(this);
+    }
+    return undefined;
   }
   restor() {
     this.statusSystem = new StatusSystem().restor(this.statusSystem);
