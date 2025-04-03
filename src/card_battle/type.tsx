@@ -18,6 +18,7 @@ export enum CardRarity {
   Uncommon,
   Rare,
   Epic,
+  Legendary,
 }
 
 const cardColor = {
@@ -25,6 +26,7 @@ const cardColor = {
   [CardRarity.Uncommon]: "#00CC44",
   [CardRarity.Rare]: "#9932CC",
   [CardRarity.Epic]: "rgb(255, 220, 67)",
+  [CardRarity.Legendary]: "rgb(255, 89, 23)",
 };
 
 export enum WildPokemonType {
@@ -559,7 +561,7 @@ export class SkillCard extends RougueCard {
   constructor(skill?: Skill) {
     if (!skill) skill = new Skill(1);
 
-    const rarity = skill.cd - 1;
+    const rarity = skill.cd;
     super(
       skill.name,
       "skill",

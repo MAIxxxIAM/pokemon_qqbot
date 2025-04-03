@@ -1,6 +1,12 @@
 import { PokemonPower } from "../battle";
 import { Robot } from "../utils/robot";
-import { Enemy } from "./type";
+import {
+  CardCharacter,
+  CardPlayer,
+  Enemy,
+  StatusEffect,
+  StatusType,
+} from "./type";
 
 // 路线节点类型枚举
 export enum RouteNodeType {
@@ -20,6 +26,45 @@ interface RouteNode {
   children: RouteNode[];
   isCompleted: boolean;
   isExplored: boolean;
+}
+
+export class inRouteNode implements RouteNode {
+  type: RouteNodeType;
+  depth: number;
+  enemies?: Enemy[];
+  children: RouteNode[];
+  isCompleted: boolean;
+  isExplored: boolean;
+
+  constructor(routnode: RouteNode) {
+    this.type = routnode.type;
+    this.depth = routnode.depth;
+    this.enemies = routnode.enemies;
+    this.children = routnode.children;
+    this.isCompleted = routnode.isCompleted;
+    this.isExplored = routnode.isExplored;
+  }
+
+  restore(data: any): inRouteNode {
+    return Object.assign(new inRouteNode(this), data);
+  }
+  onEvent(player?: CardCharacter): void {
+    switch (this.type) {
+      case RouteNodeType.Event:
+        console.log("事件触发！");
+        break;
+      case RouteNodeType.Shop:
+        console.log("商店触发！");
+        break;
+      case RouteNodeType.Rest:
+        player.currentHp = player.maxHp;
+        //获取buff
+        break;
+      default:
+        console.log("未知事件！");
+        break;
+    }
+  }
 }
 
 // 路线生成配置
@@ -42,16 +87,16 @@ export class RouteGenerator {
     return Object.assign(new RouteGenerator(), data);
   }
 
-  generateInitialRoute(): RouteNode {
-    const root = this.createInitialNode(0);
+  createInitialRoute(): RouteNode {
+    const root = this.createNode(0);
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
-      root.children.push(this.createInitialNode(1));
+      root.children.push(this.createNode(1));
     }
 
     return root;
   }
-  private determineNodeType(depth: number): RouteNodeType {
+  private onNodeType(depth: number): RouteNodeType {
     if (depth % ROUTE_CONFIG.bossInterval === 0 && depth > 0) {
       return RouteNodeType.Boss;
     }
@@ -87,8 +132,8 @@ export class RouteGenerator {
     return enemies;
   }
 
-  private createInitialNode(depth: number): RouteNode {
-    const nodeType = this.determineNodeType(depth);
+  private createNode(depth: number): RouteNode {
+    const nodeType = this.onNodeType(depth);
     const node: RouteNode = {
       type: nodeType,
       depth,
@@ -120,7 +165,7 @@ export class RouteGenerator {
     }
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
-      node.children.push(this.createInitialNode(node.depth + 1));
+      node.children.push(this.createNode(node.depth + 1));
     }
   }
 }
