@@ -18,9 +18,10 @@ export interface BuffConfig {
   duration: number;
   stacks: number;
   baseValue?: number;
-  applyBuff: (target: CardPlayer) => string | undefined;
-  removeBuff: (target: CardPlayer) => string | undefined;
+  applyBuff?: (target: CardPlayer) => string | undefined;
+  removeBuff?: (target: CardPlayer) => string | undefined;
   levelUp?: (target: CardPlayer) => string | undefined;
+  restor?: (data: any) => BuffConfig;
 }
 
 const buffLiblary: BuffConfig[] = [
@@ -33,6 +34,15 @@ const buffLiblary: BuffConfig[] = [
     duration: 3,
     stacks: 1,
     baseValue: 20,
+    restor(data) {
+      return {
+        ...data,
+        applyBuff: this.applyBuff,
+        removeBuff: this.removeBuff,
+        levelUp: this.levelUp,
+        restor: this.restor,
+      };
+    },
     applyBuff(target) {
       const v = Math.min(
         this.baseValue + this.baseValue * Math.log(this.stacks + 1),
@@ -64,3 +74,13 @@ const buffLiblary: BuffConfig[] = [
     },
   },
 ];
+
+export class BuffFactory {
+  static restoreBuff(data: any): BuffConfig {
+    // 查找原型buff
+    const prototypeBuff = buffLiblary.find((buff) => buff.id === data.id);
+    if (prototypeBuff) {
+      return prototypeBuff.restor(data);
+    }
+  }
+}

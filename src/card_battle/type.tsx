@@ -9,7 +9,7 @@ import { dirname } from "../dirname";
 import { testcanvas } from "..";
 import { resolve } from "path";
 import { PoisonStatusHandler, StatusSystem, statusSystems } from "./status";
-import { BuffConfig } from "./buff";
+import { BuffConfig, BuffFactory } from "./buff";
 
 const cardFaceDir = () =>
   `${testcanvas}${resolve(dirname, `./assets/img/card`, `cardface.png`)}`;
@@ -192,6 +192,9 @@ export class CardPlayer implements CardCharacter {
     return undefined;
   }
   restor() {
+    this.activeBuffs.forEach((buff, index) => {
+      this.activeBuffs[index] = BuffFactory.restoreBuff(buff);
+    });
     this.statusSystem = new StatusSystem().restor(this.statusSystem);
     this.currentHand = this.currentHand?.map((c) => {
       const CardCtor = CardClassMap[c.type];

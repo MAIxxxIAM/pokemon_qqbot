@@ -13,6 +13,8 @@ import { resolve } from "path";
 import { dirname } from "../dirname";
 import { sendMarkdown, toUrl } from "../utils/method";
 import { displayRoute, RouteGenerator } from "./route";
+import { BuffConfig, BuffFactory, BuffType } from "./buff";
+import { Rarity } from "../fishing/type";
 
 export async function apply(ctx: Context) {
   // const routeGenerator = new RouteGenerator(21);
