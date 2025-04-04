@@ -16,6 +16,7 @@ export interface BuffConfig {
   id: string;
   rarity: Rarity;
   duration: number;
+  maxDuration: number;
   stacks: number;
   baseValue?: number;
   applyBuff?: (target: CardPlayer) => string | undefined;
@@ -26,12 +27,13 @@ export interface BuffConfig {
 
 const buffLiblary: BuffConfig[] = [
   {
-    name: "力量提升",
+    name: "攻击提升",
     type: BuffType.PowerBoost,
     description: "增加攻击力",
     id: "buff_power_boost_1",
     rarity: Rarity.Common,
-    duration: 3,
+    duration: 4,
+    maxDuration: 4,
     stacks: 1,
     baseValue: 20,
     restor(data) {
@@ -45,15 +47,16 @@ const buffLiblary: BuffConfig[] = [
     },
     applyBuff(target) {
       const v = Math.min(
-        this.baseValue + this.baseValue * Math.log(this.stacks + 1),
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
         600
       );
       target.power.attack += v;
+      this.duration = this.maxDuration;
       return `${target.name}的攻击力提升了${v}点！`;
     },
     removeBuff(target) {
       const v = Math.min(
-        this.baseValue + this.baseValue * Math.log(this.stacks + 1),
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
         600
       );
       target.power.attack -= v;
@@ -61,7 +64,7 @@ const buffLiblary: BuffConfig[] = [
     },
     levelUp(target) {
       const v = Math.min(
-        this.baseValue + this.baseValue * Math.log(this.stacks + 1),
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
         600
       );
       if (v >= 600) {
@@ -71,6 +74,106 @@ const buffLiblary: BuffConfig[] = [
       this.stacks += 1;
       this.applyBuff(target);
       return `${target.name}的力量提升效果升级了！`;
+    },
+  },
+  {
+    name: "特攻提升",
+    type: BuffType.PowerBoost,
+    description: "增加特殊攻击力",
+    id: "buff_power_boost_2",
+    rarity: Rarity.Common,
+    duration: 4,
+    maxDuration: 4,
+    stacks: 1,
+    baseValue: 20,
+    restor(data) {
+      return {
+        ...data,
+        applyBuff: this.applyBuff,
+        removeBuff: this.removeBuff,
+        levelUp: this.levelUp,
+        restor: this.restor,
+      };
+    },
+    applyBuff(target) {
+      const v = Math.min(
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+        600
+      );
+      target.power.specialAttack += v;
+      this.duration = this.maxDuration;
+      return `${target.name}的特殊攻击力提升了${v}点！`;
+    },
+    removeBuff(target) {
+      const v = Math.min(
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+        600
+      );
+      target.power.specialAttack -= v;
+      return `${target.name}的特殊攻击力恢复原状！`;
+    },
+    levelUp(target) {
+      const v = Math.min(
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+        600
+      );
+      if (v >= 600) {
+        return undefined;
+      }
+      target.power.specialAttack -= v;
+      this.stacks += 1;
+      this.applyBuff(target);
+      return `${target.name}的特殊攻击力提升效果升级了！`;
+    },
+  },
+  {
+    name: "特攻提升",
+    type: BuffType.PowerBoost,
+    description: "增加防御力",
+    id: "buff_power_boost_3",
+    rarity: Rarity.Common,
+    duration: 4,
+    maxDuration: 4,
+    stacks: 1,
+    baseValue: 20,
+    restor(data) {
+      return {
+        ...data,
+        applyBuff: this.applyBuff,
+        removeBuff: this.removeBuff,
+        levelUp: this.levelUp,
+        restor: this.restor,
+      };
+    },
+    applyBuff(target) {
+      const v = Math.min(
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+        600
+      );
+      target.power.defense += v;
+      this.duration = this.maxDuration;
+      return `${target.name}的防御力提升了${v}点！`;
+    },
+    removeBuff(target) {
+      const v = Math.min(
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+        600
+      );
+      target.power.defense -= v;
+      return `${target.name}的防御力恢复原状！`;
+    },
+    levelUp(target) {
+      const v = Math.min(
+        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+        600
+      );
+      if (v >= 600) {
+        return undefined;
+      }
+      target.power.defense -= v;
+      this.stacks += 1;
+      this.applyBuff(target);
+      return `${target.name}的防御力提升效果升级了！`;
     },
   },
 ];

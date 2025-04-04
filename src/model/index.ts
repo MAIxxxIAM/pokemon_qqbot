@@ -9,7 +9,9 @@ import { unknowns } from "../pokedle/src/type/type";
 import { Trainer } from "../trainer/type";
 import { Farm, Food, PlantTree } from "../farm/berryTreeFarm";
 import { Cry_info } from "../guess_cry/type";
-import { CardItem } from "../card_battle/type";
+import { CardItem, CardPlayer, Enemy } from "../card_battle/type";
+import { RouteNode } from "../card_battle/route";
+import { Robot } from "../utils/robot";
 
 //智能体兼容
 
@@ -106,6 +108,7 @@ declare module "koishi" {
     "pokemon.isPokemon": IsPokemon;
     "pokemon.cry": Cry_info;
     pokeEmoji_BOT: pokeEmoji;
+    carddata: CardData;
   }
 }
 //邀请表
@@ -113,6 +116,12 @@ export interface AddGroup {
   id: string;
   count: number;
   addGroup: string[];
+}
+
+export interface CardData {
+  id: string;
+  player: CardPlayer;
+  routmap: RouteNode;
 }
 
 //emoji
@@ -323,6 +332,11 @@ export async function model(ctx: Context) {
       initial: true,
       nullable: false,
     },
+  });
+  ctx.model.extend("carddata", {
+    id: "string",
+    player: "json",
+    routmap: "json",
   });
 
   ctx.model.extend(

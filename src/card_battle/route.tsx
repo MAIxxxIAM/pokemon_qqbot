@@ -19,10 +19,10 @@ export enum RouteNodeType {
 }
 
 // 节点数据接口
-interface RouteNode {
+export interface RouteNode {
   type: RouteNodeType;
   depth: number;
-  enemies?: Enemy[];
+  enemies?: Enemy;
   children: RouteNode[];
   isCompleted: boolean;
   isExplored: boolean;
@@ -36,7 +36,7 @@ enum RouteNodeStatus {
 export class inRouteNode implements RouteNode {
   type: RouteNodeType;
   depth: number;
-  enemies?: Enemy[];
+  enemies?: Enemy;
   children: RouteNode[];
   isCompleted: boolean;
   isExplored: boolean;
@@ -125,14 +125,11 @@ export class RouteGenerator {
     ][Math.floor(rand * 4)];
   }
 
-  private generateEnemies(type: RouteNodeType, depth: number): Enemy[] {
-    const enemyCount = Math.floor(Math.random() * 3) + 1;
-    let enemies: Enemy[] = [];
+  private generateEnemies(type: RouteNodeType, depth: number): Enemy {
+    let enemies: Enemy;
 
-    for (let i = 0; i < enemyCount; i++) {
-      const enemy = new Robot(100);
-      enemies = [...enemies, new Enemy(enemy)];
-    }
+    const enemy = new Robot(100);
+    enemies = new Enemy(enemy);
 
     return enemies;
   }
@@ -170,7 +167,7 @@ export class RouteGenerator {
     let log = [];
     player.activeBuffs.forEach((buff) => {
       buff.duration--;
-      if (buff.duration <= 0) {
+      if ((buff.duration = 0)) {
         log = [buff.removeBuff(player), ...log];
       }
     });

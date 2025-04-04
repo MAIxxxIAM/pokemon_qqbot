@@ -1052,5 +1052,3 @@ function wrapText(
 
   return lineY;
 }
-const statusSystem = new StatusSystem();
-statusSystem.registerHandler(new PoisonStatusHandler());

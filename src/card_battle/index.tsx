@@ -146,93 +146,130 @@ export async function apply(ctx: Context) {
   // p.drawHand(2);
   // console.log(p.currentHand);
 
-  ctx.command("card-battle", "卡牌对战").action(async ({ session }) => {
-    const a = new Robot(100);
-    a.itemBag = [
-      {
-        name: "毒药",
-        type: "poison",
-        level: 2,
-      },
-    ];
-    const b = new Robot(100);
-    a.itemBag = [
-      {
-        name: "毒药",
-        type: "poison",
-        level: 2,
-      },
-    ];
+  ctx
+    .command("cardstard", "卡牌对战")
+    .subcommand("开始卡牌")
+    .action(async ({ session }) => {
+      const [cardplayer] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      const [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (cardplayer) return `你已经在一场游戏中，请勿重复进入`;
+      if (!player) {
+        try {
+          await session.execute(`签到`);
+          return;
+        } catch (e) {
+          return `请先输入签到指令领取属于你的宝可梦和精灵球`;
+        }
+      }
+      if (player.skillSlot.length < 4) {
+        return `技能装备数量不足，请先装备技能`;
+      }
+      if (player.level < 100) {
+        return `等级不足，无法进入该游戏`;
+      }
+      const newPlayer = new CardPlayer(player);
+      const routGenerator = new RouteGenerator(31);
+      const newRoutMap = routGenerator.createInitialRoute();
+      await ctx.database.create("carddata", {
+        id: session.userId,
+        player: newPlayer,
+        routmap: newRoutMap,
+      });
 
-    const a1 = new Enemy(a);
-    const b1 = new CardPlayer(b);
-    let context = {
-      player: b1,
-      self: a1,
-      currentEnergy: 0,
-      turnCount: 0,
-      logs: [],
-    };
-    a1.drawHand(5);
-    b1.drawHand(5);
-    a1.act(context);
-    a1.act(context);
-    a1.act(context);
-    const md = await toMarkDown(b1, a1, context, session);
-    await sendMarkdown(ctx, md, session);
-    // battleLoop: while (a1.currentHp > 0 && b1.currentHp > 0) {
-    //   a1.drawHand(5);
-    //   b1.drawHand(5);
-    //   const statusStartLogA = a1.processTurnStart();
-    //   if (statusStartLogA.length > 0) console.log("a开始：" + statusStartLogA);
-    //   while (a1.energy > 0) {
-    //     let l = a1.act(context);
-    //     if (!l) break;
-    //     console.log(
-    //       l + "  " + b1.currentHp + "  " + b1.armor + "  " + a1.energy
-    //     );
-    //     if (b1.currentHp <= 0) {
-    //       break battleLoop;
-    //     }
-    //   }
-    //   a1.discardCard();
-    //   const statusEndLogA = a1.processTurnEnd();
-    //   if (statusEndLogA.length > 0) console.log("a结束:" + statusEndLogA);
-    //   context.player = a1;
-    //   context.self = b1;
-    //   const statusStartLogB = b1.processTurnStart();
-    //   if (statusStartLogB.length > 0) console.log("b开始：" + statusStartLogB);
-    //   while (b1.energy > 0) {
-    //     b1.drawHand(5);
-    //     let l = b1.act(context);
-    //     if (!l) break;
-    //     console.log(
-    //       l + "  " + a1.currentHp + "  " + a1.armor + "  " + b1.energy
-    //     );
-    //     if (a1.currentHp <= 0) {
-    //       break battleLoop;
-    //     }
-    //   }
-    //   b1.discardCard();
-    //   const statusEndLogB = b1.processTurnEnd();
-    //   if (statusEndLogB.length > 0) console.log("b结束:" + statusEndLogB);
-    //   context.player = b1;
-    //   context.self = a1;
-    // }
+      const md = `你即将和你的宝可梦进入一场随机的卡牌游戏中，当前地图
 
-    // const a1: CardPlayer = new CardPlayer(a);
+> ${displayRoute(newRoutMap)}`;
 
-    // a1.drawHand(5);
-    // let playerHand: [string, Element, number][] = [];
-    // for (let i = 0; i < a1.currentHand.length; i++) {
-    //   const name = a1.currentHand[i].name;
-    //   const image = await a1.currentHand[i].drawCard(ctx);
-    //   const cost = a1.currentHand[i].cost;
-    //   playerHand.push([name, image, cost]);
-    // }
-    // const hands = await drawHand(playerHand);
-    // return hands;
-  });
+      await sendMarkdown(ctx, md, session);
+      // return `你即将和你的宝可梦进入一场随机的卡牌游戏中，当前地图`;
+
+      // const a = new Robot(100);
+      // a.itemBag = [
+      //   {
+      //     name: "毒药",
+      //     type: "poison",
+      //     level: 2,
+      //   },
+      // ];
+      // const b = new Robot(100);
+      // a.itemBag = [
+      //   {
+      //     name: "毒药",
+      //     type: "poison",
+      //     level: 2,
+      //   },
+      // ];
+      // const a1 = new Enemy(a);
+      // const b1 = new CardPlayer(b);
+      // let context = {
+      //   player: b1,
+      //   self: a1,
+      //   currentEnergy: 0,
+      //   turnCount: 0,
+      //   logs: [],
+      // };
+      // a1.drawHand(5);
+      // b1.drawHand(5);
+      // a1.act(context);
+      // a1.act(context);
+      // a1.act(context);
+      // const md = await toMarkDown(b1, a1, context, session);
+      // await sendMarkdown(ctx, md, session);
+      // battleLoop: while (a1.currentHp > 0 && b1.currentHp > 0) {
+      //   a1.drawHand(5);
+      //   b1.drawHand(5);
+      //   const statusStartLogA = a1.processTurnStart();
+      //   if (statusStartLogA.length > 0) console.log("a开始：" + statusStartLogA);
+      //   while (a1.energy > 0) {
+      //     let l = a1.act(context);
+      //     if (!l) break;
+      //     console.log(
+      //       l + "  " + b1.currentHp + "  " + b1.armor + "  " + a1.energy
+      //     );
+      //     if (b1.currentHp <= 0) {
+      //       break battleLoop;
+      //     }
+      //   }
+      //   a1.discardCard();
+      //   const statusEndLogA = a1.processTurnEnd();
+      //   if (statusEndLogA.length > 0) console.log("a结束:" + statusEndLogA);
+      //   context.player = a1;
+      //   context.self = b1;
+      //   const statusStartLogB = b1.processTurnStart();
+      //   if (statusStartLogB.length > 0) console.log("b开始：" + statusStartLogB);
+      //   while (b1.energy > 0) {
+      //     b1.drawHand(5);
+      //     let l = b1.act(context);
+      //     if (!l) break;
+      //     console.log(
+      //       l + "  " + a1.currentHp + "  " + a1.armor + "  " + b1.energy
+      //     );
+      //     if (a1.currentHp <= 0) {
+      //       break battleLoop;
+      //     }
+      //   }
+      //   b1.discardCard();
+      //   const statusEndLogB = b1.processTurnEnd();
+      //   if (statusEndLogB.length > 0) console.log("b结束:" + statusEndLogB);
+      //   context.player = b1;
+      //   context.self = a1;
+      // }
+      // const a1: CardPlayer = new CardPlayer(a);
+      // a1.drawHand(5);
+      // let playerHand: [string, Element, number][] = [];
+      // for (let i = 0; i < a1.currentHand.length; i++) {
+      //   const name = a1.currentHand[i].name;
+      //   const image = await a1.currentHand[i].drawCard(ctx);
+      //   const cost = a1.currentHand[i].cost;
+      //   playerHand.push([name, image, cost]);
+      // }
+      // const hands = await drawHand(playerHand);
+      // return hands;
+    });
 
   async function toMarkDown(
     player: CardCharacter,
