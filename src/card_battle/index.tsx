@@ -11,8 +11,8 @@ import { initType } from "./method";
 import { Robot } from "../utils/robot";
 import { resolve } from "path";
 import { dirname } from "../dirname";
-import { sendMarkdown, toUrl } from "../utils/method";
-import { displayRoute, RouteGenerator } from "./route";
+import { button, sendMarkdown, toUrl } from "../utils/method";
+import { displayRoute, RouteGenerator, RouteNodeType } from "./route";
 import { BuffConfig, BuffFactory, BuffType } from "./buff";
 import { Rarity } from "../fishing/type";
 
@@ -178,13 +178,41 @@ export async function apply(ctx: Context) {
         id: session.userId,
         player: newPlayer,
         routmap: newRoutMap,
+        combatcontext: {
+          player: newPlayer,
+          self: newRoutMap.enemies,
+          currentEnergy: newRoutMap.enemies.energy,
+          turnCount: 0,
+          logs: [],
+        },
       });
 
-      const md = `你即将和你的宝可梦进入一场随机的卡牌游戏中，当前地图
+      const chooseButton = {
+        战斗: button(0, "开始战斗", "cardbattle", session.userId, "战斗"),
+        精英: button(0, "开始战斗", "cardbattle", session.userId, "精英"),
+        首领: button(0, "开始战斗", "cardbattle", session.userId, "首领"),
+        事件: button(0, "探索该事件", "cardexpore", session.userId, "事件"),
+        商店: button(0, "进入商店", "cardshop", session.userId, "商店"),
+        营地: button(0, "休息一下", "cardrest", session.userId, "营地"),
+      };
+      console.log(RouteNodeType[newRoutMap.type]);
+      const kybd = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [chooseButton[newRoutMap.type]],
+              },
+            ],
+          },
+        },
+      };
+      const md = `你即将和你的宝可梦进入一场随机的卡牌游戏中
+当前地图:${newRoutMap.type} 地图
 
 > ${displayRoute(newRoutMap)}`;
 
-      await sendMarkdown(ctx, md, session);
+      await sendMarkdown(ctx, md, session, kybd);
       // return `你即将和你的宝可梦进入一场随机的卡牌游戏中，当前地图`;
 
       // const a = new Robot(100);
@@ -269,6 +297,44 @@ export async function apply(ctx: Context) {
       // }
       // const hands = await drawHand(playerHand);
       // return hands;
+    });
+
+  ctx
+    .command("cardbattle [ident:number]")
+    .subcommand("卡牌战斗 [ident:number]")
+    .action(async ({ session }, ident) => {
+      let [cardplayer] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      let [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!cardplayer || !player) return `你还未参与到卡牌游戏中`;
+      if (
+        ![
+          RouteNodeType.Boss,
+          RouteNodeType.Combat,
+          RouteNodeType.Elite,
+        ].includes(cardplayer.routmap.type)
+      )
+        return `当前地图无法战斗`;
+      cardplayer.player = initType(cardplayer.player, CardPlayer, player);
+      cardplayer.routmap.enemies = initType(
+        cardplayer.routmap.enemies,
+        Enemy,
+        new Robot(100)
+      );
+      if (!cardplayer?.combatcontext) {
+        cardplayer.combatcontext = {
+          player: null,
+          self: null,
+          currentEnergy: 0,
+          turnCount: 0,
+          logs: [],
+        };
+      }
+      cardplayer.combatcontext.player = cardplayer.player;
+      cardplayer.combatcontext.self = cardplayer.routmap.enemies;
     });
 
   async function toMarkDown(

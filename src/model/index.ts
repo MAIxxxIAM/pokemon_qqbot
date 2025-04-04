@@ -9,7 +9,12 @@ import { unknowns } from "../pokedle/src/type/type";
 import { Trainer } from "../trainer/type";
 import { Farm, Food, PlantTree } from "../farm/berryTreeFarm";
 import { Cry_info } from "../guess_cry/type";
-import { CardItem, CardPlayer, Enemy } from "../card_battle/type";
+import {
+  CardItem,
+  CardPlayer,
+  CombatContext,
+  Enemy,
+} from "../card_battle/type";
 import { RouteNode } from "../card_battle/route";
 import { Robot } from "../utils/robot";
 
@@ -122,6 +127,7 @@ export interface CardData {
   id: string;
   player: CardPlayer;
   routmap: RouteNode;
+  combatcontext: CombatContext;
 }
 
 //emoji
@@ -337,6 +343,7 @@ export async function model(ctx: Context) {
     id: "string",
     player: "json",
     routmap: "json",
+    combatcontext: "json",
   });
 
   ctx.model.extend(
