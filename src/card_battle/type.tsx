@@ -958,6 +958,7 @@ export class Enemy implements CardCharacter {
     context.currentEnergy = this.energy;
     const selectedCard = this.aiStrategy.selectCard(this.currentHand, context);
     if (selectedCard) {
+      if (this.energy < selectedCard.cost) return null;
       this.takeCard = [selectedCard, ...this.takeCard];
       context.currentEnergy -= selectedCard.cost;
       const enemyLog = selectedCard.effect(this, context.player);
