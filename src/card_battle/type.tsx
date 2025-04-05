@@ -8,7 +8,12 @@ import {} from "koishi-plugin-canvas";
 import { dirname } from "../dirname";
 import { testcanvas } from "..";
 import { resolve } from "path";
-import { PoisonStatusHandler, StatusSystem, statusSystems } from "./status";
+import {
+  PoisonStatusHandler,
+  StatusEffectMap,
+  StatusSystem,
+  statusSystems,
+} from "./status";
 import { BuffConfig, BuffFactory } from "./buff";
 
 const cardFaceDir = () =>
@@ -59,7 +64,7 @@ export interface CardCharacter {
   power: PokemonPower;
   pokemonCategory: string[];
   skill: Skill[];
-  statusEffects: Map<StatusType, StatusEffect>;
+  statusEffects: StatusEffectMap;
   addStatusEffect(type: StatusType, stacks: number): string;
   processTurnStart(): string;
   processTurnEnd(): string;
@@ -99,7 +104,7 @@ export class CardPlayer implements CardCharacter {
   armor = 0;
   energy: number;
   currentHand: RougueCard[];
-  statusEffects = new Map<StatusType, StatusEffect>();
+  statusEffects = new StatusEffectMap();
   activeBuffs: BuffConfig[] = [];
 
   constructor(
@@ -113,8 +118,7 @@ export class CardPlayer implements CardCharacter {
     public deck: RougueCard[] = CardPool.spawnCard(30, new PVP(players), true),
     public discardPile: RougueCard[] = [],
     public skill: Skill[] = new PVP(players).skill,
-    public pokemonCategory: string[] = getType(new PVP(players).monster_1),
-    private statusSystem: StatusSystem = statusSystems
+    public pokemonCategory: string[] = getType(new PVP(players).monster_1) // private statusSystem: StatusSystem = statusSystems
   ) {
     this.currentHp = maxHp;
     this.energy = maxEnergy;
@@ -123,7 +127,7 @@ export class CardPlayer implements CardCharacter {
   useCard(context: CombatContext, c: string, tar?: CardCharacter) {
     const isNumber = /^\d+$/.test(c);
     const card = isNumber
-      ? this.currentHand[Number(c)]
+      ? this.currentHand[Number(c) - 1]
       : this.currentHand.find((card) => card.name === c);
     if (!card) return null;
     const playerLog = card.effect(this, tar);
@@ -135,8 +139,8 @@ export class CardPlayer implements CardCharacter {
   takeDamage(damage: number): void {
     this.currentHp = Math.max(this.currentHp - damage, 0);
     this.statusEffects.forEach((effect) => {
-      if (this.statusSystem.getHandler(effect.type)?.onReceiveDamage) {
-        this.statusSystem.getHandler(effect.type)?.onReceiveDamage(this);
+      if (statusSystems.getHandler(effect.type)?.onReceiveDamage) {
+        statusSystems.getHandler(effect.type)?.onReceiveDamage(this);
       }
     });
   }
@@ -156,13 +160,13 @@ export class CardPlayer implements CardCharacter {
     this.energy = this.maxEnergy;
   }
   addStatusEffect(type: StatusType, stacks: number) {
-    return this.statusSystem.getHandler(type)?.applyEffect(this, stacks);
+    return statusSystems.getHandler(type)?.applyEffect(this, stacks);
   }
 
   processTurnStart() {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
-      const result = this.statusSystem.getHandler(type)?.processTurnStart(this);
+      const result = statusSystems.getHandler(type)?.processTurnStart(this);
       if (result) statusLog.push(result);
     }
 
@@ -172,7 +176,7 @@ export class CardPlayer implements CardCharacter {
   processTurnEnd() {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
-      const result = this.statusSystem.getHandler(type)?.processTurnEnd(this);
+      const result = statusSystems.getHandler(type)?.processTurnEnd(this);
       if (result) statusLog.push(result);
     }
 
@@ -192,10 +196,10 @@ export class CardPlayer implements CardCharacter {
     return undefined;
   }
   restor() {
+    this.statusEffects = new StatusEffectMap(this.statusEffects);
     this.activeBuffs.forEach((buff, index) => {
       this.activeBuffs[index] = BuffFactory.restoreBuff(buff);
     });
-    this.statusSystem = new StatusSystem().restor(this.statusSystem);
     this.currentHand = this.currentHand?.map((c) => {
       const CardCtor = CardClassMap[c.type];
       if (!CardCtor) {
@@ -448,17 +452,11 @@ export class PoisonCard extends RougueCard {
   effect(user: CardCharacter, target: CardCharacter): void | string {
     if (this.cost > user.energy) return null;
     let statusLog = `,${target.name}中毒了`;
-    if (target.statusEffects.has("poison")) {
-      const effect = target.statusEffects.get("poison");
 
-      if (effect) {
-        effect.stacks += this.cost;
-        effect.duration = Math.max(effect.duration, 3); // 刷新持续时间
-      }
-    } else {
-      statusLog = target.addStatusEffect("poison", this.cost);
-    }
+    statusLog = target.addStatusEffect("poison", this.cost);
+
     user.energy -= this.cost;
+
     return `${user.name}使用了[${this.name}]${statusLog}`;
   }
   restor(data: any): PoisonCard {
@@ -704,8 +702,9 @@ export class CardPool {
   static spawnCard(
     sizs: number,
     character: PVP,
-    isplayer?: boolean
+    isplayer: boolean = false
   ): RougueCard[] {
+    const originalCards = [...this.cards];
     this.cards.push(
       {
         class: SkillCard,
@@ -737,12 +736,13 @@ export class CardPool {
           };
           return {
             class: itemClass[item.name],
-            weight: 1,
+            weight: 10,
             args: item.level,
           };
         }) || []
       );
     }
+    // console.log(this.cards);
     const deck: RougueCard[] = [];
     const pool = this.createWeightedPool();
     const guaranteedCards = [
@@ -755,7 +755,7 @@ export class CardPool {
       const cardClass = this.getRandomCardClass(pool);
       deck.push(new cardClass.class(cardClass?.args));
     }
-
+    this.cards = originalCards;
     return Random.shuffle(deck);
   }
 
@@ -779,6 +779,7 @@ export class CardPool {
 export interface CombatContext {
   player: CardCharacter;
   self: CardCharacter;
+  enemyturn: boolean;
   currentEnergy: number;
   turnCount: number;
   logs: string[];
@@ -879,7 +880,7 @@ export class Enemy implements CardCharacter {
   enymyType: WildPokemonType;
   aiStrategy: EnemyAI = new EnemyAI();
   currentHand: RougueCard[];
-  statusEffects = new Map<StatusType, StatusEffect>();
+  statusEffects = new StatusEffectMap();
   takeCard: RougueCard[];
   constructor(
     wildPokemon: Pokebattle,
@@ -892,8 +893,7 @@ export class Enemy implements CardCharacter {
     public deck: RougueCard[] = CardPool.spawnCard(30, new PVP(wildPokemon)),
     public discardPile: RougueCard[] = [],
     public skill: Skill[] = new PVP(wildPokemon).skill,
-    public pokemonCategory: string[] = getType(new PVP(wildPokemon).monster_1),
-    private statusSystem: StatusSystem = statusSystems
+    public pokemonCategory: string[] = getType(new PVP(wildPokemon).monster_1) // private statusSystem: StatusSystem = statusSystems
   ) {
     const powerSum = wildPokemon.power.reduce(
       (sum, curr) => sum + Number(curr),
@@ -909,14 +909,14 @@ export class Enemy implements CardCharacter {
     this.takeCard = [];
   }
   addStatusEffect(type: StatusType, stacks: number) {
-    return this.statusSystem.getHandler(type)?.applyEffect(this, stacks);
+    return statusSystems.getHandler(type).applyEffect(this, stacks);
   }
 
   takeDamage(damage: number): void {
     this.currentHp = Math.max(this.currentHp - damage, 0);
     this.statusEffects.forEach((effect) => {
-      if (this.statusSystem.getHandler(effect.type)?.onReceiveDamage) {
-        this.statusSystem.getHandler(effect.type)?.onReceiveDamage(this);
+      if (statusSystems.getHandler(effect.type)?.onReceiveDamage) {
+        statusSystems.getHandler(effect.type)?.onReceiveDamage(this);
       }
     });
   }
@@ -924,7 +924,7 @@ export class Enemy implements CardCharacter {
   processTurnStart() {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
-      const result = this.statusSystem.getHandler(type)?.processTurnStart(this);
+      const result = statusSystems.getHandler(type)?.processTurnStart(this);
       if (result) statusLog.push(result);
     }
 
@@ -934,7 +934,7 @@ export class Enemy implements CardCharacter {
   processTurnEnd() {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
-      const result = this.statusSystem.getHandler(type)?.processTurnEnd(this);
+      const result = statusSystems.getHandler(type)?.processTurnEnd(this);
       if (result) statusLog.push(result);
     }
 
@@ -970,7 +970,7 @@ export class Enemy implements CardCharacter {
     return null;
   }
   restor() {
-    this.statusSystem = new StatusSystem().restor(this.statusSystem);
+    this.statusEffects = new StatusEffectMap(this.statusEffects);
     this.aiStrategy = new EnemyAI().restor(this.aiStrategy);
     this.takeCard = [];
     this.deck = this.deck?.map((c) => {

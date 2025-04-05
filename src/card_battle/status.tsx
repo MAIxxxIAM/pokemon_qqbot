@@ -1,4 +1,4 @@
-import { CardCharacter, StatusType } from "./type";
+import { CardCharacter, StatusEffect, StatusType } from "./type";
 
 //
 
@@ -69,8 +69,104 @@ export class StatusSystem {
   getHandler(type: StatusType): StatusHandler | undefined {
     return this.handlers.get(type);
   }
-  restor(data: any): StatusSystem {
-    return Object.assign(new StatusSystem(), data);
+}
+
+export class StatusEffectMap {
+  // 使用普通对象作为内部存储
+  private _data: Record<string, StatusEffect> = {};
+
+  constructor(data?: any) {
+    if (data) {
+      this.fromJSON(data);
+    }
+  }
+
+  // 实现与 Map 相同的接口
+  public get(key: StatusType): StatusEffect | undefined {
+    return this._data[key];
+  }
+
+  public set(key: StatusType, value: StatusEffect): this {
+    this._data[key] = value;
+    return this;
+  }
+
+  public has(key: StatusType): boolean {
+    return key in this._data;
+  }
+
+  public delete(key: StatusType): boolean {
+    if (this.has(key)) {
+      delete this._data[key];
+      return true;
+    }
+    return false;
+  }
+
+  public clear(): void {
+    this._data = {};
+  }
+
+  public forEach(
+    callback: (value: StatusEffect, key: StatusType) => void
+  ): void {
+    Object.entries(this._data).forEach(([key, value]) => {
+      callback(value, key as StatusType);
+    });
+  }
+
+  // 返回可迭代的 entries，模拟 Map.entries()
+  public entries(): [StatusType, StatusEffect][] {
+    return Object.entries(this._data)
+      .filter(([key]) => this.isValidStatusType(key))
+      .map(([key, value]): [StatusType, StatusEffect] => [
+        key as StatusType,
+        value,
+      ]);
+  }
+
+  // 验证是否为有效的状态类型
+  private isValidStatusType(key: string): key is StatusType {
+    return key === "poison" || key === "strength" || key === "weak";
+  }
+
+  // 从任意数据源恢复
+  public fromJSON(data: any): this {
+    this.clear();
+
+    // 处理已经是 StatusEffectMap 的情况
+    if (data instanceof StatusEffectMap) {
+      data.forEach((value, key) => {
+        this.set(key, value);
+      });
+      return this;
+    }
+
+    // 处理是原生 Map 的情况
+    if (data instanceof Map) {
+      for (const [key, value] of data.entries()) {
+        if (this.isValidStatusType(key)) {
+          this.set(key, value);
+        }
+      }
+      return this;
+    }
+
+    // 处理普通对象的情况
+    if (data && typeof data === "object") {
+      Object.entries(data).forEach(([key, value]) => {
+        if (this.isValidStatusType(key)) {
+          this.set(key, value as StatusEffect);
+        }
+      });
+    }
+
+    return this;
+  }
+
+  // 返回纯对象用于 JSON 序列化
+  public toJSON(): Record<string, StatusEffect> {
+    return { ...this._data };
   }
 }
 

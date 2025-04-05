@@ -1,6 +1,7 @@
 import { $, Context, Element, h, Session } from "koishi";
 import {
   CardCharacter,
+  CardItem,
   CardPlayer,
   CombatContext,
   Enemy,
@@ -148,15 +149,15 @@ export async function apply(ctx: Context) {
 
   ctx
     .command("cardstard", "卡牌对战")
-    .subcommand("开始卡牌")
+    .alias("开始卡牌")
     .action(async ({ session }) => {
-      const [cardplayer] = await ctx.database.get("carddata", {
+      const [cardData] = await ctx.database.get("carddata", {
         id: session.userId,
       });
       const [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (cardplayer) return `你已经在一场游戏中，请勿重复进入`;
+      if (cardData) return `你已经在一场游戏中，请勿重复进入`;
       if (!player) {
         try {
           await session.execute(`签到`);
@@ -171,6 +172,14 @@ export async function apply(ctx: Context) {
       if (player.level < 100) {
         return `等级不足，无法进入该游戏`;
       }
+      const itembag: CardItem[] = [
+        {
+          name: "毒药",
+          type: "poison",
+          level: 2,
+        },
+      ];
+      player.itemBag = itembag;
       const newPlayer = new CardPlayer(player);
       const routGenerator = new RouteGenerator(31);
       const newRoutMap = routGenerator.createInitialRoute();
@@ -181,11 +190,15 @@ export async function apply(ctx: Context) {
         combatcontext: {
           player: newPlayer,
           self: newRoutMap.enemies,
-          currentEnergy: newRoutMap.enemies.energy,
+          currentEnergy: newRoutMap?.enemies?.energy
+            ? newRoutMap?.enemies?.energy
+            : 0,
           turnCount: 0,
           logs: [],
         },
       });
+
+      // console.log(newRoutMap.enemies);
 
       const chooseButton = {
         战斗: button(0, "开始战斗", "cardbattle", session.userId, "战斗"),
@@ -195,7 +208,6 @@ export async function apply(ctx: Context) {
         商店: button(0, "进入商店", "cardshop", session.userId, "商店"),
         营地: button(0, "休息一下", "cardrest", session.userId, "营地"),
       };
-      console.log(RouteNodeType[newRoutMap.type]);
       const kybd = {
         keyboard: {
           content: {
@@ -300,41 +312,171 @@ export async function apply(ctx: Context) {
     });
 
   ctx
-    .command("cardbattle [ident:number]")
-    .subcommand("卡牌战斗 [ident:number]")
+    .command("cardbattle [ident:string]")
+    .alias("卡牌战斗 [ident:string]")
     .action(async ({ session }, ident) => {
-      let [cardplayer] = await ctx.database.get("carddata", {
+      let [cardData] = await ctx.database.get("carddata", {
         id: session.userId,
       });
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardplayer || !player) return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player) return `你还未参与到卡牌游戏中`;
       if (
         ![
           RouteNodeType.Boss,
           RouteNodeType.Combat,
           RouteNodeType.Elite,
-        ].includes(cardplayer.routmap.type)
+        ].includes(cardData.routmap.type)
       )
         return `当前地图无法战斗`;
-      cardplayer.player = initType(cardplayer.player, CardPlayer, player);
-      cardplayer.routmap.enemies = initType(
-        cardplayer.routmap.enemies,
+      cardData.player = initType(cardData.player, CardPlayer, player);
+      cardData.routmap.enemies = initType(
+        cardData.routmap.enemies,
         Enemy,
         new Robot(100)
       );
-      if (!cardplayer?.combatcontext) {
-        cardplayer.combatcontext = {
+      if (!cardData?.combatcontext) {
+        cardData.combatcontext = {
           player: null,
           self: null,
+          enemyturn: false,
           currentEnergy: 0,
           turnCount: 0,
           logs: [],
         };
       }
-      cardplayer.combatcontext.player = cardplayer.player;
-      cardplayer.combatcontext.self = cardplayer.routmap.enemies;
+      const cardplayer = cardData.player;
+      const cardenemy = cardData.routmap.enemies;
+      const context = cardData.combatcontext;
+      context.player = cardplayer;
+      context.self = cardenemy;
+      let RandomPlayer: number;
+      let RandomEnemy: number;
+      if (context.logs.length <= 0) {
+        ident == undefined;
+        cardplayer.drawHand(5);
+        cardenemy.drawHand(5);
+        RandomPlayer = Math.floor(Math.random() * 6 + 1);
+        RandomEnemy = Math.floor(Math.random() * 6 + 1);
+        context.enemyturn = RandomEnemy <= RandomPlayer ? false : true;
+        context.turnCount = 0;
+        const code = "```";
+        const startMd = `${cardenemy.name} :![img#50px #50px](${await toUrl(
+          ctx,
+          session,
+          `file://${resolve(
+            dirname,
+            `./assets/img/card/random${RandomEnemy}.png`
+          )}`
+        )})
+
+${code}
+${RandomEnemy <= RandomPlayer ? "你取得了先手" : "对方将先手进行出卡"}
+${code}
+
+${cardplayer.name} :![img#50px #50px](${await toUrl(
+          ctx,
+          session,
+          `file://${resolve(
+            dirname,
+            `./assets/img/card/random${RandomPlayer}.png`
+          )}`
+        )})`;
+        context.logs.push(
+          RandomEnemy <= RandomPlayer ? "你取得了先手" : "对方将先手进行出卡"
+        );
+        await sendMarkdown(ctx, startMd, session);
+      }
+      if (context.enemyturn) {
+        if (cardenemy.energy == cardenemy.maxEnergy) {
+          cardenemy.drawHand(5);
+        }
+        context.enemyturn = false;
+        const statusStartLog = cardenemy.processTurnStart();
+        if (statusStartLog.length > 0) {
+          context.logs = [statusStartLog, ...context.logs];
+        }
+        while (cardenemy.energy > 0) {
+          let l = cardenemy.act(context);
+          if (!l) break;
+          if (cardplayer.currentHp <= 0) {
+            break;
+          }
+        }
+        const statusEndLog = cardenemy.processTurnEnd();
+        if (statusEndLog.length > 0) {
+          context.logs = [statusEndLog, ...context.logs];
+        }
+        if (cardplayer.energy == cardplayer.maxEnergy) {
+          cardplayer.drawHand(5);
+        }
+        const playerStatusStartLog = cardplayer.processTurnStart();
+        if (playerStatusStartLog.length > 0) {
+          context.logs = [playerStatusStartLog, ...context.logs];
+        }
+      }
+
+      if (ident && context.enemyturn == false) {
+        if (cardplayer.currentHp <= 0) {
+          return `你已经被击败了`;
+        }
+        cardplayer.useCard(context, ident, cardenemy);
+        if (
+          cardplayer.currentHand.length == 0 ||
+          (cardplayer.currentHand.length == 1 &&
+            cardplayer.currentHand[0].cost > cardplayer.energy) ||
+          cardplayer.energy <= 0
+        ) {
+          context.enemyturn = true;
+          cardplayer.discardCard();
+          const statusEndLog = cardplayer.processTurnEnd();
+          if (statusEndLog.length > 0) {
+            context.logs = [statusEndLog, ...context.logs];
+          }
+        }
+      }
+      if (context.enemyturn) {
+        if (cardenemy.energy == cardenemy.maxEnergy) {
+          cardenemy.drawHand(5);
+        }
+        context.enemyturn = false;
+        const statusStartLog = cardenemy.processTurnStart();
+        if (statusStartLog.length > 0) {
+          context.logs = [statusStartLog, ...context.logs];
+        }
+        while (cardenemy.energy > 0) {
+          let l = cardenemy.act(context);
+          if (!l) break;
+          if (cardplayer.currentHp <= 0) {
+            break;
+          }
+        }
+        const statusEndLog = cardenemy.processTurnEnd();
+        if (statusEndLog.length > 0) {
+          context.logs = [statusEndLog, ...context.logs];
+        }
+        if (cardplayer.energy == cardplayer.maxEnergy) {
+          cardplayer.drawHand(5);
+        }
+        const playerStatusStartLog = cardplayer.processTurnStart();
+        if (playerStatusStartLog.length > 0) {
+          context.logs = [playerStatusStartLog, ...context.logs];
+        }
+      }
+
+      const md = await toMarkDown(cardplayer, cardenemy, context, session);
+      cardenemy.discardCard();
+      await sendMarkdown(ctx, md, session);
+      await ctx.database.set(
+        "carddata",
+        { id: session.userId },
+        {
+          player: cardplayer,
+          routmap: cardData.routmap,
+          combatcontext: context,
+        }
+      );
     });
 
   async function toMarkDown(
@@ -499,10 +641,15 @@ ${code}
       );
       return [name, image, cost];
     };
+    const playerHandArray = player.currentHand || [];
+    const enemyTakeCardArray = enemy.takeCard || [];
+    const enemyCurrentHandArray = enemy.currentHand || [];
     const [playerCards, enemyTakeCards, enemyHiddenCards] = await Promise.all([
-      Promise.all(player.currentHand.map((card) => processCard(card, true))),
-      Promise.all(enemy.takeCard.map((card) => processCard(card, true))),
-      Promise.all(enemy.currentHand.map((card) => processCard(card, false))),
+      Promise.all(playerHandArray.map((card) => processCard(card, true))),
+      Promise.all(enemyTakeCardArray.map((card) => processCard(card, true))),
+      Promise.all(
+        enemyCurrentHandArray.map((card) => processCard(card, false))
+      ),
     ]);
 
     return {
