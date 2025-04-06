@@ -187,3 +187,27 @@ export class BuffFactory {
     }
   }
 }
+
+export const BuffSelecet: Record<string, number> = buffLiblary.reduce(
+  (acc, buff) => {
+    // 根据稀有度设置权重
+    let weight: number;
+    switch (buff.rarity) {
+      case Rarity.Common:
+        weight = 100;
+        break;
+      case Rarity.Uncommon:
+        weight = 60;
+        break;
+      case Rarity.Rare:
+        weight = 30;
+        break;
+      default:
+        weight = 5;
+    }
+
+    acc[buff.id] = weight;
+    return acc;
+  },
+  {} as Record<string, number>
+);

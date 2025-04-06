@@ -467,6 +467,8 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           : `other`;
       switch (whoseWin) {
         case "player":
+          cardData.routmap.isExplored = true;
+
         //奖励
 
         case "enemy":
