@@ -157,7 +157,8 @@ export async function apply(ctx: Context) {
       const [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (cardData) return `你已经在一场游戏中，请勿重复进入`;
+      if (cardData || cardData.routmap.isCompleted == false)
+        return `你已经在一场游戏中，请勿重复进入`;
       if (!player) {
         try {
           await session.execute(`签到`);
@@ -321,7 +322,11 @@ export async function apply(ctx: Context) {
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardData || !player) return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player || cardData?.routmap?.isCompleted)
+        return `你还未参与到卡牌游戏中`;
+      if (cardData.routmap.isExplored) {
+        //选择下一节点
+      }
       if (
         ![
           RouteNodeType.Boss,
@@ -353,6 +358,11 @@ export async function apply(ctx: Context) {
       context.self = cardenemy;
       let RandomPlayer: number;
       let RandomEnemy: number;
+      if ([`跳过`, `continue`].includes(ident)) {
+        ident = undefined;
+        cardplayer.discardCard();
+        context.enemyturn = true;
+      }
       if (context.logs.length <= 0) {
         ident == undefined;
         cardplayer.drawHand(5);
@@ -388,27 +398,36 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         );
         await sendMarkdown(ctx, startMd, session);
       }
+
+      //对手先手逻辑
       if (context.enemyturn) {
-        if (cardenemy.energy == cardenemy.maxEnergy) {
+        if (
+          cardenemy.energy == cardenemy.maxEnergy &&
+          cardenemy.currentHand.length <= 0
+        ) {
           cardenemy.drawHand(5);
         }
-        context.enemyturn = false;
+
         const statusStartLog = cardenemy.processTurnStart();
         if (statusStartLog.length > 0) {
           context.logs = [statusStartLog, ...context.logs];
         }
-        while (cardenemy.energy > 0) {
+        while (cardenemy.energy > 0 && context.enemyturn == true) {
           let l = cardenemy.act(context);
           if (!l) break;
           if (cardplayer.currentHp <= 0) {
             break;
           }
         }
+        context.enemyturn = false;
         const statusEndLog = cardenemy.processTurnEnd();
         if (statusEndLog.length > 0) {
           context.logs = [statusEndLog, ...context.logs];
         }
-        if (cardplayer.energy == cardplayer.maxEnergy) {
+        if (
+          cardplayer.energy == cardplayer.maxEnergy &&
+          cardplayer.currentHand.length <= 0
+        ) {
           cardplayer.drawHand(5);
         }
         const playerStatusStartLog = cardplayer.processTurnStart();
@@ -416,10 +435,13 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           context.logs = [playerStatusStartLog, ...context.logs];
         }
       }
-
+      //玩家逻辑
       if (ident && context.enemyturn == false) {
-        if (cardplayer.currentHp <= 0) {
-          return `你已经被击败了`;
+        if (
+          cardplayer.energy == cardplayer.maxEnergy &&
+          cardplayer.currentHand.length <= 0
+        ) {
+          cardplayer.drawHand(5);
         }
         cardplayer.useCard(context, ident, cardenemy);
         if (
@@ -436,28 +458,43 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           }
         }
       }
+      //胜负逻辑
+      const whoseWin =
+        cardenemy.currentHp <= 0
+          ? `player`
+          : cardplayer.currentHp <= 0
+          ? `enemy`
+          : `other`;
+      switch (whoseWin) {
+        case "player":
+        //奖励
+
+        case "enemy":
+          cardData.routmap.isCompleted = true;
+          return `战斗失败`;
+        //结束
+
+        default:
+          break;
+      }
+
+      //对手后手逻辑
       if (context.enemyturn) {
-        if (cardenemy.energy == cardenemy.maxEnergy) {
-          cardenemy.drawHand(5);
-        }
-        context.enemyturn = false;
         const statusStartLog = cardenemy.processTurnStart();
         if (statusStartLog.length > 0) {
           context.logs = [statusStartLog, ...context.logs];
         }
-        while (cardenemy.energy > 0) {
+        while (cardenemy.energy > 0 && context.enemyturn == true) {
           let l = cardenemy.act(context);
           if (!l) break;
           if (cardplayer.currentHp <= 0) {
             break;
           }
         }
+        context.enemyturn = false;
         const statusEndLog = cardenemy.processTurnEnd();
         if (statusEndLog.length > 0) {
           context.logs = [statusEndLog, ...context.logs];
-        }
-        if (cardplayer.energy == cardplayer.maxEnergy) {
-          cardplayer.drawHand(5);
         }
         const playerStatusStartLog = cardplayer.processTurnStart();
         if (playerStatusStartLog.length > 0) {

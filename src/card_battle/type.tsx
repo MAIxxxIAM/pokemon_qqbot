@@ -158,6 +158,7 @@ export class CardPlayer implements CardCharacter {
     this.discardPile.push(...this.currentHand);
     this.currentHand = [];
     this.energy = this.maxEnergy;
+    this.drawHand(5);
   }
   addStatusEffect(type: StatusType, stacks: number) {
     return statusSystems.getHandler(type)?.applyEffect(this, stacks);
@@ -953,6 +954,7 @@ export class Enemy implements CardCharacter {
     this.discardPile.push(...this.currentHand);
     this.currentHand = [];
     this.energy = this.maxEnergy;
+    this.drawHand(5);
   }
   act(context: CombatContext): string | void {
     context.currentEnergy = this.energy;
@@ -974,7 +976,7 @@ export class Enemy implements CardCharacter {
     this.statusEffects = new StatusEffectMap(this.statusEffects);
     this.aiStrategy = new EnemyAI().restor(this.aiStrategy);
     this.takeCard = [];
-    this.deck = this.deck?.map((c) => {
+    this.currentHand = this.currentHand?.map((c) => {
       const CardCtor = CardClassMap[c.type];
       if (!CardCtor) {
         throw new Error(`未知卡牌类型: ${c.type}`);
