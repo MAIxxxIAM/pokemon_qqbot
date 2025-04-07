@@ -144,6 +144,12 @@ export class CardPlayer implements CardCharacter {
       }
     });
   }
+  refresh() {
+    this.armor = 0;
+    this.currentHand = [];
+    this.statusEffects.clear();
+    this.energy = this.maxEnergy;
+  }
   drawHand(size: number): RougueCard[] {
     if (this.deck.length < size) {
       this.deck = Random.shuffle(this.discardPile);

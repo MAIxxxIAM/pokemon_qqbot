@@ -81,18 +81,17 @@ const ROUTE_CONFIG = {
 
 // 路线生成器
 export class RouteGenerator {
-  currentDepth = 0;
-  private maxAllowedDepth: number;
+  static maxAllowedDepth: number;
 
   constructor(maxDepth: number = ROUTE_CONFIG.maxDepth) {
-    this.maxAllowedDepth = maxDepth;
+    RouteGenerator.maxAllowedDepth = maxDepth;
   }
 
-  restore(data: any): RouteGenerator {
+  static restore(data: any): RouteGenerator {
     return Object.assign(new RouteGenerator(), data);
   }
 
-  createInitialRoute(): RouteNode {
+  static createInitialRoute(): RouteNode {
     const root = this.createNode(0);
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
@@ -101,7 +100,7 @@ export class RouteGenerator {
 
     return root;
   }
-  private onNodeType(depth: number): RouteNodeType {
+  private static onNodeType(depth: number): RouteNodeType {
     if (depth % ROUTE_CONFIG.bossInterval === 0 && depth > 0) {
       return RouteNodeType.Boss;
     }
@@ -125,7 +124,7 @@ export class RouteGenerator {
     ][Math.floor(rand * 4)];
   }
 
-  private generateEnemies(type: RouteNodeType, depth: number): Enemy {
+  private static generateEnemies(type: RouteNodeType, depth: number): Enemy {
     let enemies: Enemy;
 
     const enemy = new Robot(100);
@@ -134,7 +133,7 @@ export class RouteGenerator {
     return enemies;
   }
 
-  private createNode(depth: number): RouteNode {
+  private static createNode(depth: number): RouteNode {
     const nodeType = this.onNodeType(depth);
     const node: RouteNode = {
       type: nodeType,
@@ -157,7 +156,7 @@ export class RouteGenerator {
 
   // 探索节点标记枚举
 
-  exploreNode(
+  static exploreNode(
     node: RouteNode,
     player?: CardPlayer
   ): {
@@ -165,14 +164,15 @@ export class RouteGenerator {
     text: string;
   } {
     let log = [];
-    player.activeBuffs.forEach((buff) => {
-      buff.duration--;
-      if ((buff.duration = 0)) {
-        log = [buff.removeBuff(player), ...log];
-      }
-    });
-    node.isExplored = true;
-    this.currentDepth = node.depth;
+    if (player?.activeBuffs.length > 0) {
+      player.activeBuffs.forEach((buff) => {
+        buff.duration--;
+        if (buff.duration == 0) {
+          log = [buff.removeBuff(player), ...log];
+        }
+      });
+    }
+    node.depth++;
 
     if (node.depth >= this.maxAllowedDepth - 1) {
       log = ["当前已探索完成！", ...log];

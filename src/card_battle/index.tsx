@@ -13,14 +13,23 @@ import { Robot } from "../utils/robot";
 import { resolve } from "path";
 import { dirname } from "../dirname";
 import { button, sendMarkdown, toUrl } from "../utils/method";
-import { displayRoute, RouteGenerator, RouteNodeType } from "./route";
+import {
+  displayRoute,
+  RouteGenerator,
+  RouteNode,
+  RouteNodeType,
+} from "./route";
 import { BuffConfig, BuffFactory, BuffType } from "./buff";
 import { Rarity } from "../fishing/type";
+import { testcanvas } from "..";
 
 export async function apply(ctx: Context) {
-  // const routeGenerator = new RouteGenerator(21);
+  ctx.command("text1").action(async ({ session }) => {
+    const routeGenerator = new RouteGenerator(21);
 
-  // let gameMap = routeGenerator.generateInitialRoute();
+    let gameMap = RouteGenerator.createInitialRoute();
+    return await drawPortal(gameMap);
+  });
 
   // console.log(displayRoute(gameMap));
 
@@ -148,6 +157,76 @@ export async function apply(ctx: Context) {
   // console.log(p.currentHand);
 
   ctx
+    .command("cardgoon <cho:number>")
+    .alias("继续探索")
+    .action(async ({ session }, cho) => {
+      if (!cho) return `请选择探索的地图`;
+      let [cardData] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      let [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!cardData || !player || cardData?.routmap?.isCompleted)
+        return `你还未参与到卡牌游戏中`;
+      if (!cardData.routmap.isExplored) {
+        return `当前地图未探索完成`;
+      }
+      cardData.player = initType(cardData.player, CardPlayer, player);
+      cardData.routmap.enemies = initType(
+        cardData.routmap.enemies,
+        Enemy,
+        new Robot(100)
+      );
+      const selectedNode = cardData?.routmap?.children[cho - 1];
+      if (!selectedNode) return `该地图不存在`;
+      RouteGenerator.exploreNode(selectedNode, cardData.player);
+      cardData.routmap = selectedNode;
+      const chooseButton = {
+        战斗: button(0, "开始战斗", "cardbattle", session.userId, "战斗"),
+        精英: button(0, "开始战斗", "cardbattle", session.userId, "精英"),
+        首领: button(0, "开始战斗", "cardbattle", session.userId, "首领"),
+        事件: button(0, "探索该事件", "cardexpore", session.userId, "事件"),
+        商店: button(0, "进入商店", "cardshop", session.userId, "商店"),
+        营地: button(0, "休息一下", "cardrest", session.userId, "营地"),
+      };
+      const kybd = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [chooseButton[selectedNode.type]],
+              },
+            ],
+          },
+        },
+      };
+      const md = `你已经进入了新的地图：${selectedNode.type} 
+
+${"```"}
+${displayRoute(selectedNode)}
+${"```"}`;
+      await ctx.database.set(
+        "carddata",
+        { id: session.userId },
+        {
+          player: cardData.player,
+          routmap: selectedNode,
+          combatcontext: {
+            player: cardData.player,
+            self: selectedNode.enemies,
+            currentEnergy: selectedNode?.enemies?.energy
+              ? selectedNode?.enemies?.energy
+              : 0,
+            turnCount: 0,
+            logs: [],
+          },
+        }
+      );
+      await sendMarkdown(ctx, md, session, kybd);
+    });
+
+  ctx
     .command("cardstard", "卡牌对战")
     .alias("开始卡牌")
     .action(async ({ session }) => {
@@ -157,7 +236,7 @@ export async function apply(ctx: Context) {
       const [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (cardData || cardData.routmap.isCompleted == false)
+      if (cardData || cardData?.routmap?.isCompleted == false)
         return `你已经在一场游戏中，请勿重复进入`;
       if (!player) {
         try {
@@ -173,17 +252,9 @@ export async function apply(ctx: Context) {
       if (player.level < 100) {
         return `等级不足，无法进入该游戏`;
       }
-      const itembag: CardItem[] = [
-        {
-          name: "毒药",
-          type: "poison",
-          level: 2,
-        },
-      ];
-      player.itemBag = itembag;
       const newPlayer = new CardPlayer(player);
       const routGenerator = new RouteGenerator(31);
-      const newRoutMap = routGenerator.createInitialRoute();
+      const newRoutMap = RouteGenerator.createInitialRoute();
       await ctx.database.create("carddata", {
         id: session.userId,
         player: newPlayer,
@@ -221,9 +292,11 @@ export async function apply(ctx: Context) {
         },
       };
       const md = `你即将和你的宝可梦进入一场随机的卡牌游戏中
-当前地图:${newRoutMap.type} 地图
+当前地图:${newRoutMap.type} 
 
-> ${displayRoute(newRoutMap)}`;
+${"```"}
+${displayRoute(newRoutMap)}
+${"```"}`;
 
       await sendMarkdown(ctx, md, session, kybd);
       // return `你即将和你的宝可梦进入一场随机的卡牌游戏中，当前地图`;
@@ -313,8 +386,43 @@ export async function apply(ctx: Context) {
     });
 
   ctx
+    .command("cardmap")
+    .alias("卡牌地图")
+    .action(async ({ session }) => {
+      let [cardData] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      let [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!cardData || !player || cardData?.routmap?.isCompleted)
+        return `你还未参与到卡牌游戏中`;
+      const cardmap = displayRoute(cardData.routmap);
+      const md = `你当前的地图是：
+---
+
+${"```"}
+${cardmap}
+${"```"}`;
+      const keybord = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [
+                  button(0, `继续探索`, `cardbattle`, session.userId, `探索`),
+                ],
+              },
+            ],
+          },
+        },
+      };
+      await sendMarkdown(ctx, md, session, keybord);
+    });
+
+  ctx
     .command("cardbattle [ident:string]")
-    .alias("卡牌战斗 [ident:string]")
+    .alias("卡牌战斗")
     .action(async ({ session }, ident) => {
       let [cardData] = await ctx.database.get("carddata", {
         id: session.userId,
@@ -325,7 +433,35 @@ export async function apply(ctx: Context) {
       if (!cardData || !player || cardData?.routmap?.isCompleted)
         return `你还未参与到卡牌游戏中`;
       if (cardData.routmap.isExplored) {
-        //选择下一节点
+        const chooseRout = await drawPortal(cardData.routmap);
+        const buttons = cardData.routmap.children.map((item, index) => {
+          return button(
+            0,
+            `选择${item.type}`,
+            `cardgoon ${index + 1}`,
+            session.userId,
+            `${item.type}`
+          );
+        });
+
+        const md = `你当前的地图已经探索结束，是否继续探索？
+![img#500px #333px](${await toUrl(ctx, session, chooseRout.attrs.src)})
+
+---
+> <qqbot-cmd-input text="卡牌地图" show="地图" reference="false" />`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [...buttons],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
       }
       if (
         ![
@@ -438,6 +574,12 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
       //玩家逻辑
       if (ident && context.enemyturn == false) {
         if (
+          cardenemy.energy == cardenemy.maxEnergy &&
+          cardenemy.currentHand.length <= 0
+        ) {
+          cardenemy.drawHand(5);
+        }
+        if (
           cardplayer.energy == cardplayer.maxEnergy &&
           cardplayer.currentHand.length <= 0
         ) {
@@ -469,10 +611,28 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         case "player":
           cardData.routmap.isExplored = true;
 
-        //奖励
-
+          //奖励
+          await ctx.database.set(
+            "carddata",
+            { id: session.userId },
+            {
+              player: cardplayer,
+              routmap: cardData.routmap,
+              combatcontext: context,
+            }
+          );
+          return;
         case "enemy":
           cardData.routmap.isCompleted = true;
+          await ctx.database.set(
+            "carddata",
+            { id: session.userId },
+            {
+              player: cardplayer,
+              routmap: cardData.routmap,
+              combatcontext: context,
+            }
+          );
           return `战斗失败`;
         //结束
 
@@ -504,9 +664,34 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         }
       }
 
+      const keybord = {
+        keyboard: {
+          content: {
+            rows: keyboardItem(
+              cardplayer.currentHand.length,
+              cardplayer.currentHand,
+              session.userId
+            ),
+          },
+        },
+      };
+      keybord.keyboard.content.rows.push({
+        buttons: [button(0, `跳过`, "卡牌战斗 跳过", session.userId, `跳过`)],
+      });
+      // {
+      //   keyboard: {
+      //     content: {
+      //       rows: keyboardItem(
+      //         cardplayer.currentHand.length,
+      //         cardplayer.currentHand,
+      //         session.userId
+      //       ),
+      //     },
+      //   },
+      // };
       const md = await toMarkDown(cardplayer, cardenemy, context, session);
       cardenemy.discardCard();
-      await sendMarkdown(ctx, md, session);
+      await sendMarkdown(ctx, md, session, keybord);
       await ctx.database.set(
         "carddata",
         { id: session.userId },
@@ -562,6 +747,42 @@ ${code}
       player.maxEnergy
     } 🛡:${player.armor}
     `;
+  }
+
+  async function drawPortal(route: RouteNode) {
+    const portalBack = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `chooseRout.png`)}`
+    );
+    const portalsteps = await ctx.canvas.loadImage(
+      `${testcanvas}${resolve(dirname, `./assets/img/card`, `portal.png`)}`
+    );
+    const chooseRout = route.children.map(async (r) => {
+      const type = r.type;
+      const i = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(dirname, `./assets/img/card`, `${type}.png`)}`
+      );
+      return i;
+    });
+    const width = 500;
+    const height = 333;
+    const RoutImage = await Promise.all(chooseRout);
+    return ctx.canvas.render(width, height, async (c) => {
+      c.fillStyle = "rgb(255, 255, 255)";
+      c.font = "bold 30px";
+      c.fillRect(0, 0, 500, 333);
+      c.drawImage(portalBack, 0, 0, 500, 333);
+
+      for (let i = 0; i < RoutImage.length; i++) {
+        const cy = height - 70;
+        const cx =
+          ((width - RoutImage.length * 90) / (RoutImage.length + 1)) * (i + 1) +
+          i * 90;
+        c.drawImage(portalsteps, cx, cy - 130);
+        c.fillText(route.children[i].type, cx + 17, cy - 140);
+        c.fillText(String(i + 1), cx + 35, cy + 20);
+        c.drawImage(RoutImage[i], cx + 15, cy - 100, 60, 60);
+      }
+    });
   }
 
   async function drawHand(Images: [string, Element, number][]) {
@@ -621,6 +842,37 @@ ${code}
       c.fillText("使用 1-5 数字键选择卡牌", cx, height - 40);
     });
   }
+
+  function keyboardItem(length: number, cards: RougueCard[], serId) {
+    let buttonList: any[] = [];
+    let rowList: any[] = [];
+    // const line=length%5
+    for (let i = 0; i < length; i++) {
+      buttonList.push(
+        button(
+          0,
+          cards[i].name,
+          "卡牌战斗 " + cards[i].name,
+          serId,
+          cards[i].name
+        )
+      );
+      if (buttonList.length == 3) {
+        rowList.push({
+          buttons: buttonList,
+        });
+        buttonList = [];
+      }
+      if (i == length - 1 && buttonList.length > 0) {
+        rowList.push({
+          buttons: buttonList,
+        });
+        buttonList = [];
+      }
+    }
+    return rowList;
+  }
+
   async function drawEnemy(Images: [string, Element, number][]) {
     const handImages = Images.map((image) => {
       return image[1].attrs.src;
