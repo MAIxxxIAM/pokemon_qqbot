@@ -103,9 +103,17 @@ export class CardPlayer implements CardCharacter {
   currentHp: number;
   armor = 0;
   energy: number;
+  bonus: {
+    energy: number;
+    damage: number;
+    Hp: number;
+    handsize: number;
+    category: string[];
+  };
   currentHand: RougueCard[];
   statusEffects = new StatusEffectMap();
   activeBuffs: BuffConfig[] = [];
+  rewardBuffs: BuffConfig[] = [];
 
   constructor(
     players: Pokebattle,
@@ -122,6 +130,13 @@ export class CardPlayer implements CardCharacter {
   ) {
     this.currentHp = maxHp;
     this.energy = maxEnergy;
+    this.bonus = {
+      energy: 0,
+      damage: 0,
+      Hp: 0,
+      handsize: 0,
+      category: this.pokemonCategory,
+    };
   }
 
   useCard(context: CombatContext, c: string, tar?: CardCharacter) {
@@ -148,9 +163,10 @@ export class CardPlayer implements CardCharacter {
     this.armor = 0;
     this.currentHand = [];
     this.statusEffects.clear();
-    this.energy = this.maxEnergy;
+    this.energy = this.maxEnergy + this.bonus.energy;
   }
   drawHand(size: number): RougueCard[] {
+    size = size + this.bonus.handsize;
     if (this.deck.length < size) {
       this.deck = Random.shuffle(this.discardPile);
     }
@@ -189,15 +205,15 @@ export class CardPlayer implements CardCharacter {
 
     return statusLog.join("\n");
   }
-  addBuff(buff: BuffConfig): string {
-    this.activeBuffs.push(buff);
-    const log = buff.applyBuff(this);
+  addBuff(buff: BuffConfig, isReward = false): string {
+    (isReward ? this.rewardBuffs : this.activeBuffs).push(buff);
+    const log = buff.applyBuff(this, isReward);
     return log;
   }
   removeBuff(buff: BuffConfig): string {
     const index = this.activeBuffs.indexOf(buff);
     if (index !== -1) {
-      this.activeBuffs.splice(index, 1);
+      this.activeBuffs = this.activeBuffs.filter((_, i) => i !== index);
       return buff.removeBuff(this);
     }
     return undefined;
@@ -206,6 +222,9 @@ export class CardPlayer implements CardCharacter {
     this.statusEffects = new StatusEffectMap(this.statusEffects);
     this.activeBuffs.forEach((buff, index) => {
       this.activeBuffs[index] = BuffFactory.restoreBuff(buff);
+    });
+    this.rewardBuffs.forEach((buff, index) => {
+      this.rewardBuffs[index] = BuffFactory.restoreBuff(buff);
     });
     this.currentHand = this.currentHand?.map((c) => {
       const CardCtor = CardClassMap[c.type];
@@ -743,7 +762,7 @@ export class CardPool {
           };
           return {
             class: itemClass[item.name],
-            weight: 10,
+            weight: 1,
             args: item.level,
           };
         }) || []
