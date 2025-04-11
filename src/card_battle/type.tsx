@@ -206,6 +206,7 @@ export class CardPlayer implements CardCharacter {
     return statusLog.join("\n");
   }
   addBuff(buff: BuffConfig, isReward = false): string {
+    //探索事件 true 怪物战斗奖励false
     (isReward ? this.rewardBuffs : this.activeBuffs).push(buff);
     const log = buff.applyBuff(this, isReward);
     return log;
@@ -1021,6 +1022,14 @@ export const CardClassMap: Record<CardType, new () => RougueCard> = {
   skill: SkillCard,
   poison: PoisonCard,
 };
+
+function removeFirstOccurrence<T>(arr: T[], value: T): T[] {
+  const index = arr.indexOf(value);
+  if (index !== -1) {
+    arr.splice(index, 1);
+  }
+  return arr;
+}
 
 function typeDirname(zhName: string): string {
   const type = {

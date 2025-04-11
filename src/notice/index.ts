@@ -149,23 +149,19 @@ ${notice}`;
 
   ctx
     .command("宝可梦")
-    .subcommand("发送公告 <msg:text>", { authority: 4 })
-    .action(async ({ session }, msg) => {
+    .subcommand("发送公告", { authority: 4 })
+    .action(async ({ session }) => {
+      const msg = `
+- 预计下周将会更新**卡牌肉鸽**玩法的测试.敬请期待
+- 由于**不可抗力**因素,后续更新将不会推送更新消息.
+- 如需第一时间获取麦麦子的玩法更新,可以点击下方**按钮**
+- 如有更新,会在每周一或周四晚进行,并发布在公告中
+- 如有疑问,也可以点击下方按钮
+
+> 内容更新:树果携带信息已放置在面板,并更新了相关功能`;
       const groups = await ctx.database.get("channel", {
         platform: session.platform,
       });
-      const notices: PNotice[] = await ctx.database.get("pokemon.notice", {});
-      let notice: PNotice;
-      if (notices.length === 0 && !msg) {
-        return "未查询到公告信息";
-      }
-      notice = notices[notices.length - 1];
-      if (groups.length === 0) {
-        return "未查询到群信息";
-      }
-      if (!msg) {
-        msg = notice.notice;
-      }
       const group_id = groups.map((group) => group.id);
       const md = `# 宝可梦公告
 ---
@@ -178,14 +174,13 @@ ${msg}`;
                 buttons: [
                   urlbutton(
                     2,
-                    "查看麦麦文档",
-                    "https://docs.qq.com/doc/DTUJ6S3ZMUVZWaVRm",
+                    "点击加入群聊",
+                    "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=CEqeK9q1yilezUrsSX9L3kO0hK5Wpi_7&authKey=SBuSSQtld6nFctvq9d4Xm1lW%2B0C3QuFZ6FLhCJk8ELCbtOqiR4drHcrbfRLVmcvz&noverify=0&group_code=836655539",
                     session.userId,
                     "11"
                   ),
                 ],
               },
-              { buttons: [button(2, "签到", "签到", session.userId, "11")] },
             ],
           },
         },
@@ -194,7 +189,7 @@ ${msg}`;
         session.channelId = group;
         try {
           const mid = await sendNoticeMarkdown(md, session, kb);
-          await ctx.sleep(500);
+          await ctx.sleep(10);
           // console.log(mid)
         } catch (e) {
           console.log(e);
@@ -209,7 +204,7 @@ ${msg}`;
         platform: session.platform,
       });
       const group_id = groups.map((group) => group.id);
-      await session.send(`共有${group_id.length}个群,推送中~`)
+      await session.send(`共有${group_id.length}个群,推送中~`);
       const md = `修仙智能体推荐\n![图片 #1024px #1792px](http://sanae.xn--vhq524a5mldjj.com:5400/y1.jpg)`;
       const kb = {
         keyboard: {

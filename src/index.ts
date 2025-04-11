@@ -3156,7 +3156,7 @@ ${h("at", { id: session.userId })}`;
       let pokemonimg1 = [];
       let pokemonimg = [];
       let ultramonsterimg = [];
-      let userArr: string | any[];
+      let userArr: Pokebattle[] = [];
       let userId: string;
       const infoImgSelf_bg = await ctx.canvas.loadImage(
         `${testcanvas}${resolve(
@@ -3202,7 +3202,7 @@ ${h("at", { id: session.userId })}`;
       if (userArr.length != 0) {
         let bagspace: string[] = [];
         for (let i = 0; i < userArr[0].AllMonster.length; i++) {
-          if (userArr[0].AllMonster[i] != 0) {
+          if (userArr[0]?.AllMonster[i] != "0") {
             bagspace.push(userArr[0].AllMonster[i]);
           }
         }
@@ -3366,6 +3366,11 @@ ${h("at", { id: session.userId })}`;
           }
 - 金币获取剩余：${playerLimit.resource.goldLimit} 
 - 补签卡：${userArr[0].signCard}
+- 当前树果 :${
+            userArr[0].berry_food?.berrytree
+              ? userArr[0].berry_food?.berrytree
+              : `无 -> <qqbot-cmd-input text="/携带树果" show="点击携带" reference="false" />`
+          }
 - 宝可梦属性：${getType(userArr[0].monster_1).join(" ")}
 
 ---

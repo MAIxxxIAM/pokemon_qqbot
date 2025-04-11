@@ -1,11 +1,9 @@
 import { $, Context, Element, h, Session } from "koishi";
 import {
   CardCharacter,
-  CardItem,
   CardPlayer,
   CombatContext,
   Enemy,
-  HealItemType,
   RougueCard,
 } from "./type";
 import { initType } from "./method";
@@ -19,9 +17,8 @@ import {
   RouteNode,
   RouteNodeType,
 } from "./route";
-import { BuffConfig, BuffFactory, BuffType } from "./buff";
-import { Rarity } from "../fishing/type";
 import { testcanvas } from "..";
+import { BuffConfig, pickBuff } from "./buff";
 
 export async function apply(ctx: Context) {
   ctx.command("text1").action(async ({ session }) => {
@@ -375,7 +372,8 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         ) {
           cardplayer.drawHand(5);
         }
-        cardplayer.useCard(context, ident, cardenemy);
+        const usecard = cardplayer.useCard(context, ident, cardenemy);
+        if (!usecard) return `操作失败`;
         if (
           cardplayer.currentHand.length == 0 ||
           (cardplayer.currentHand.length == 1 &&
@@ -399,9 +397,52 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           : `other`;
       switch (whoseWin) {
         case "player":
-          cardData.routmap.isExplored = true;
+          const rarityBuff = pickBuff(3);
+          const rarityImage = await toUrl(
+            ctx,
+            session,
+            (
+              await drawPortal(undefined, rarityBuff)
+            ).attrs.src
+          );
+          const md = `你获得了胜利！成功探索了这一层地图
+领取你的奖励：
+![img#500px #333px](${rarityImage})
 
-          //奖励
+---
+> ${rarityBuff.map(
+            (item, i) =>
+              `<qqbot-cmd-input text="${i}" show="${item.name}" reference="false" /> ${item.description}`
+          ).join(`
+`)}`;
+          const buttons = rarityBuff.map((item, i) => {
+            return button(
+              0,
+              item.name,
+              String(i),
+              session.userId,
+              `${item.name}`
+            );
+          });
+          const keybord = {
+            keyboard: {
+              content: {
+                rows: [
+                  {
+                    buttons: buttons,
+                  },
+                ],
+              },
+            },
+          };
+          await sendMarkdown(ctx, md, session, keybord);
+          let chooseBuff = Number(await session.prompt(20000));
+          chooseBuff = chooseBuff
+            ? chooseBuff
+            : Math.floor(Math.random() * rarityBuff.length);
+          const thisBuff = rarityBuff[chooseBuff];
+          const logs = cardData.player.addBuff(thisBuff);
+          cardData.routmap.isExplored = true;
           await ctx.database.set(
             "carddata",
             { id: session.userId },
@@ -411,7 +452,8 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
               combatcontext: context,
             }
           );
-          return;
+          await session.execute(`cardbattle`);
+          return logs;
         case "enemy":
           cardData.routmap.isCompleted = true;
           await ctx.database.set(
@@ -482,6 +524,88 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
       const md = await toMarkDown(cardplayer, cardenemy, context, session);
       cardenemy.discardCard();
       await sendMarkdown(ctx, md, session, keybord);
+      const whoseWinLast =
+        cardenemy.currentHp <= 0
+          ? `player`
+          : cardplayer.currentHp <= 0
+          ? `enemy`
+          : `other`;
+      switch (whoseWinLast) {
+        case "player":
+          const rarityBuff = pickBuff(3);
+          const rarityImage = await toUrl(
+            ctx,
+            session,
+            (
+              await drawPortal(undefined, rarityBuff)
+            ).attrs.src
+          );
+          const md = `你获得了胜利！成功探索了这一层地图
+领取你的奖励：
+![img#500px #333px](${rarityImage})
+
+---
+> ${rarityBuff.map(
+            (item, i) =>
+              `<qqbot-cmd-input text="${i}" show="${item.name}" reference="false" /> ${item.description}`
+          ).join(`
+`)}`;
+          const buttons = rarityBuff.map((item, i) => {
+            return button(
+              0,
+              item.name,
+              String(i),
+              session.userId,
+              `${item.name}`
+            );
+          });
+          const keybord = {
+            keyboard: {
+              content: {
+                rows: [
+                  {
+                    buttons: buttons,
+                  },
+                ],
+              },
+            },
+          };
+          await sendMarkdown(ctx, md, session, keybord);
+          let chooseBuff = Number(await session.prompt(20000));
+          chooseBuff = chooseBuff
+            ? chooseBuff
+            : Math.floor(Math.random() * rarityBuff.length);
+          const thisBuff = rarityBuff[chooseBuff];
+          const logs = cardData.player.addBuff(thisBuff);
+          cardData.routmap.isExplored = true;
+          await ctx.database.set(
+            "carddata",
+            { id: session.userId },
+            {
+              player: cardplayer,
+              routmap: cardData.routmap,
+              combatcontext: context,
+            }
+          );
+          await session.execute(`cardbattle`);
+          return logs;
+        case "enemy":
+          cardData.routmap.isCompleted = true;
+          await ctx.database.set(
+            "carddata",
+            { id: session.userId },
+            {
+              player: cardplayer,
+              routmap: cardData.routmap,
+              combatcontext: context,
+            }
+          );
+          return `战斗失败`;
+        //结束
+
+        default:
+          break;
+      }
       await ctx.database.set(
         "carddata",
         { id: session.userId },
@@ -539,20 +663,39 @@ ${code}
     `;
   }
 
-  async function drawPortal(route: RouteNode) {
+  async function drawPortal(route?: RouteNode, buffs?: BuffConfig[]) {
+    const names = route
+      ? route.children.map((r) => r.type)
+      : buffs.map((b) => b.name);
     const portalBack = await ctx.canvas.loadImage(
       `${testcanvas}${resolve(dirname, `./assets/img/card`, `chooseRout.png`)}`
     );
     const portalsteps = await ctx.canvas.loadImage(
       `${testcanvas}${resolve(dirname, `./assets/img/card`, `portal.png`)}`
     );
-    const chooseRout = route.children.map(async (r) => {
+    const chooseRout = route
+      ? route.children.map(async (r) => {
       const type = r.type;
       const i = await ctx.canvas.loadImage(
-        `${testcanvas}${resolve(dirname, `./assets/img/card`, `${type}.png`)}`
-      );
-      return i;
-    });
+            `${testcanvas}${resolve(
+              dirname,
+              `./assets/img/card`,
+              `${type}.png`
+            )}`
+          );
+          return i;
+        })
+      : buffs.map(async (b) => {
+          const type = b.type;
+          const i = await ctx.canvas.loadImage(
+            `${testcanvas}${resolve(
+              dirname,
+              `./assets/img/card`,
+              `${type}.png`
+            )}`
+          );
+          return i;
+        });
     const width = 500;
     const height = 333;
     const RoutImage = await Promise.all(chooseRout);
@@ -568,7 +711,7 @@ ${code}
           ((width - RoutImage.length * 90) / (RoutImage.length + 1)) * (i + 1) +
           i * 90;
         c.drawImage(portalsteps, cx, cy - 130);
-        c.fillText(route.children[i].type, cx + 17, cy - 140);
+        route ? c.fillText(names[i], cx + 17, cy - 140) : null;
         c.fillText(String(i + 1), cx + 35, cy + 20);
         c.drawImage(RoutImage[i], cx + 15, cy - 100, 60, 60);
       }

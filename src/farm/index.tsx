@@ -787,27 +787,38 @@ ${
       farm.triggerEvent();
       const openBerrys = berry_food.filter((berry) => !!berry.type);
       const openBerrysName = openBerrys.map((berry) => berry.berrytree);
-      const openBerrysdes = openBerrys.map((berry) => {
-        const sx = {
-          hp: "生命",
-          attack: "攻击",
-          defense: "防御",
-          specialAttack: "特攻",
-          specialDefense: "特防",
-          speed: "速度",
-        };
-        return `${berry.berrytree}：${
-          berry.type == "category"
-            ? `${
-                berry.effectCategory == "hp" ? `生命值剩余50%时` : `对战时`
-              } 增加一定量的${sx[berry.effectCategory]}`
-            : `当对方${berry.effectCategory}属性招式命中要害时，伤害降低${berry.effectMagnitude}倍`
-        }`;
-      });
-      if (!openBerrysName.includes(id))
-        return `当前第一批开放树果为: \n${openBerrysdes.join(
+      const openBerrysdes = openBerrys
+        .map((berry) => {
+          const berryName = farm.berry_bag.map((berry) => berry.name);
+          const sx = {
+            hp: "生命",
+            attack: "攻击",
+            defense: "防御",
+            specialAttack: "特攻",
+            specialDefense: "特防",
+            speed: "速度",
+          };
+          if (berryName.includes(berry.berrytree))
+            return `<qqbot-cmd-input text="/携带树果 ${
+              berry.berrytree
+            }" show="${berry.berrytree}" reference="false" />：${
+              berry.type == "category"
+                ? `${
+                    berry.effectCategory == "hp" ? `生命值剩余50%时` : `对战时`
+                  } 增加一定量的${sx[berry.effectCategory]}`
+                : `当对方${berry.effectCategory}属性招式命中要害时，伤害降低${berry.effectMagnitude}倍`
+            }`;
+        })
+        .filter((berry) => berry != undefined);
+      console.log(openBerrysdes);
+      if (openBerrysdes.length == 0) return `你包里还没有成熟的树果`;
+      if (!openBerrysName.includes(id)) {
+        const md = `你包里可使用的树果: \n${openBerrysdes.join(
           "\n\n"
-        )} \n请检查输入`;
+        )} \n点击树果携带`;
+        await sendMarkdown(ctx, md, session);
+        return;
+      }
       const _id = parseInt(id);
       let _plantId = _id
         ? _id
@@ -815,7 +826,7 @@ ${
       const isTake = farm.take(_plantId);
       if (player.berry_food) await session.send(`将直接覆盖已携带的树果`);
       if (!isTake) {
-        return `没有该树果为空或者名字错误`;
+        return `没有该树果或者名字错误`;
       }
       const berry = berry_food.find((berry) => berry.id == _plantId);
       await ctx.database.set(
