@@ -295,7 +295,7 @@ export class BaseSpecialAttackCard extends RougueCard {
       "特殊攻击卡",
       "specialattack",
       "造成0.12*特攻的伤害",
-      2,
+      1,
       CardRarity.Common
     );
   }
@@ -347,7 +347,7 @@ export class BaseSpecialAttackCard extends RougueCard {
 
 export class BaseArmorCard extends RougueCard {
   constructor() {
-    super("护甲卡", "defense", "获得一定量的护甲", 1, CardRarity.Common);
+    super("护甲卡", "defense", "获得一定量的护甲", 3, CardRarity.Common);
   }
   effect(user: CardCharacter, target: CardCharacter): void | string {
     user.armor += Math.floor(
@@ -838,26 +838,26 @@ export class EnemyAI implements AIStrategy {
         c.type === "skill" &&
         context.self.pokemonCategory.includes(c.cardCategory)
     );
-    if (armorTrend > 0) {
+    if (armorTrend > 0 && armorBreakCard.length != 0) {
       return armorBreakCard.reduce(
         (maxCard, currCard) =>
           currCard.cost > maxCard.cost ? currCard : maxCard,
-        hand[0]
+        armorBreakCard[0]
       );
     }
     if (armorCard.length != 0) {
       return armorCard.reduce(
         (maxCard, currCard) =>
           currCard.cost > maxCard.cost ? currCard : maxCard,
-        hand[0]
+        armorCard[0]
       );
     }
     const categoryEffect: number = this.calculateCategory(context);
-    if (categoryEffect >= 1) {
+    if (categoryEffect >= 1 && skillCard.length != 0) {
       return skillCard.reduce(
         (maxCard, currCard) =>
           currCard.cost > maxCard.cost ? currCard : maxCard,
-        hand[0]
+        skillCard[0]
       );
     }
     if (attackCard.length != 0) {
@@ -865,18 +865,18 @@ export class EnemyAI implements AIStrategy {
         ? attackCard.reduce(
             (maxCard, currCard) =>
               currCard.cost > maxCard.cost ? currCard : maxCard,
-            hand[0]
+            attackCard[0]
           )
         : specialAttackCard.reduce(
             (maxCard, currCard) =>
               currCard.cost > maxCard.cost ? currCard : maxCard,
-            hand[0]
+            specialAttackCard[0]
           );
     }
     return validCards.reduce(
       (maxCard, currCard) =>
         currCard.cost > maxCard.cost ? currCard : maxCard,
-      hand[0]
+      validCards[0]
     );
   }
   private calculateArmorTrend(): number {
@@ -975,16 +975,23 @@ export class Enemy implements CardCharacter {
     const hand = this.deck.splice(0, size);
     this.discardPile.push(...hand);
     this.currentHand = hand;
-    return hand;
+    this.currentHand = this.currentHand?.map((c) => {
+      const CardCtor = CardClassMap[c.type];
+      if (!CardCtor) {
+        throw new Error(`未知卡牌类型: ${c.type}`);
+      }
+      return new CardCtor().restor(c);
+    });
+    return this.currentHand;
   }
   discardCard(): void {
     this.discardPile.push(...this.currentHand);
     this.currentHand = [];
     this.takeCard = [];
     this.energy = this.maxEnergy;
-    this.drawHand(5);
   }
   act(context: CombatContext): string | void {
+    console.log(this.energy);
     context.currentEnergy = this.energy;
     const selectedCard = this.aiStrategy.selectCard(this.currentHand, context);
     if (selectedCard) {
@@ -993,7 +1000,10 @@ export class Enemy implements CardCharacter {
       context.currentEnergy -= selectedCard.cost;
       const enemyLog = selectedCard.effect(this, context.player);
       context.logs = [enemyLog as string, ...context.logs];
-      this.currentHand = this.currentHand.filter((c) => c !== selectedCard);
+      const index = this.currentHand.indexOf(selectedCard);
+      if (index !== -1) {
+        this.currentHand.splice(index, 1);
+      }
       context.self = this;
       context.player = context.player;
       return enemyLog;

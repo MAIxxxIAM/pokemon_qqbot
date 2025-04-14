@@ -11,6 +11,7 @@ import {} from "koishi-plugin-text-censor";
 import { Telegram } from "@koishijs/plugin-adapter-telegram";
 import { markdownMessage } from "../utils/message";
 import { dirname } from "../dirname";
+import sharp from "sharp";
 
 export function mudPath(a: string) {
   return `${testcanvas}${resolve(
@@ -850,7 +851,14 @@ export async function sendNoticeMarkdown(
   );
 }
 
-export async function toUrl(ctx, session, img) {
+export async function toUrl(ctx, session, img_base64) {
+  let img = img_base64;
+  try {
+    const base64Data = img.replace(/^data:image\/\w+;base64,/, "");
+    const imgBuffer = Buffer.from(base64Data, "base64");
+    const webpBuffer = await sharp(imgBuffer).webp().toBuffer();
+    img = webpBuffer;
+  } catch (e) {}
   // if(ctx.get('server.temp')?.upload){
   //   const url = await ctx.get('server.temp').upload(img)
   //   return url.replace(/_/g, "%5F")
@@ -866,6 +874,7 @@ export async function toUrl(ctx, session, img) {
   //   const url = `http://multimedia.nt.qq.com/download?appid=1407&fileid=${a.file_uuid.replace(/_/g, "%5F")}&rkey=CAQSKAB6JWENi5LMtWVWVxS2RfZbDwvOdlkneNX9iQFbjGK7q7lbRPyD1v0&spec=0`
   //   return url
   // } catch (e) {
+
   if (ctx.get("server.temp")?.upload) {
     const url = await ctx.get("server.temp").upload(img);
     return url.replace(/_/g, "%5F");

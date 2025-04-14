@@ -21,12 +21,61 @@ import { testcanvas } from "..";
 import { BuffConfig, pickBuff } from "./buff";
 
 export async function apply(ctx: Context) {
-  ctx.command("text1").action(async ({ session }) => {
-    const routeGenerator = new RouteGenerator(21);
+  // ctx.command("text1").action(async ({ session }) => {
+  //   const routeGenerator = new RouteGenerator(21);
 
-    let gameMap = RouteGenerator.createInitialRoute();
-    return await drawPortal(gameMap);
-  });
+  //   let gameMap = RouteGenerator.createInitialRoute();
+  //   return await drawPortal(gameMap);
+  // });
+  ctx
+    .command("cardexpore")
+    .alias("探索事件")
+    .action(async ({ session }) => {
+      let [cardData] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      let [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!cardData || !player || cardData?.routmap?.isCompleted)
+        return `你还未参与到卡牌游戏中`;
+      if (!cardData.routmap.isExplored) {
+        return `当前地图未探索完成`;
+      }
+    });
+  ctx
+    .command("cardrest")
+    .alias("休息一下")
+    .action(async ({ session }) => {
+      let [cardData] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      let [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!cardData || !player || cardData?.routmap?.isCompleted)
+        return `你还未参与到卡牌游戏中`;
+      if (!cardData.routmap.isExplored) {
+        return `当前地图未探索完成`;
+      }
+      cardData.player = initType(cardData.player, CardPlayer, player);
+    });
+  ctx
+    .command("cardshop")
+    .alias("进入商店")
+    .action(async ({ session }) => {
+      let [cardData] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      let [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!cardData || !player || cardData?.routmap?.isCompleted)
+        return `你还未参与到卡牌游戏中`;
+      if (!cardData.routmap.isExplored) {
+        return `当前地图未探索完成`;
+      }
+    });
   ctx
     .command("cardgoon <cho:number>")
     .alias("继续探索")
@@ -107,7 +156,7 @@ ${"```"}`;
       const [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (cardData || cardData?.routmap?.isCompleted == false)
+      if (cardData && cardData?.routmap?.isCompleted == false)
         return `你已经在一场游戏中，请勿重复进入`;
       if (!player) {
         try {
@@ -125,20 +174,22 @@ ${"```"}`;
       }
       const newPlayer = new CardPlayer(player);
       const newRoutMap = RouteGenerator.createInitialRoute();
-      await ctx.database.create("carddata", {
-        id: session.userId,
-        player: newPlayer,
-        routmap: newRoutMap,
-        combatcontext: {
+      await ctx.database.upsert("carddata", (row) => [
+        {
+          id: session.userId,
           player: newPlayer,
-          self: newRoutMap.enemies,
-          currentEnergy: newRoutMap?.enemies?.energy
-            ? newRoutMap?.enemies?.energy
-            : 0,
-          turnCount: 0,
-          logs: [],
+          routmap: newRoutMap,
+          combatcontext: {
+            player: newPlayer,
+            self: newRoutMap.enemies,
+            currentEnergy: newRoutMap?.enemies?.energy
+              ? newRoutMap?.enemies?.energy
+              : 0,
+            turnCount: 0,
+            logs: [],
+          },
         },
-      });
+      ]);
 
       // console.log(newRoutMap.enemies);
 
@@ -224,7 +275,7 @@ ${"```"}`;
           return button(
             0,
             `选择${item.type}`,
-            `cardgoon ${index + 1}`,
+            `继续探索 ${index + 1}`,
             session.userId,
             `${item.type}`
           );
@@ -283,6 +334,7 @@ ${"```"}`;
       if ([`跳过`, `continue`].includes(ident)) {
         ident = undefined;
         cardplayer.discardCard();
+        cardenemy.discardCard();
         context.enemyturn = true;
       }
       if (context.logs.length <= 0) {
@@ -323,13 +375,8 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
 
       //对手先手逻辑
       if (context.enemyturn) {
-        if (
-          cardenemy.energy == cardenemy.maxEnergy &&
-          cardenemy.currentHand.length <= 0
-        ) {
-          cardenemy.drawHand(5);
-        }
-
+        cardenemy.discardCard();
+        cardenemy.drawHand(5);
         const statusStartLog = cardenemy.processTurnStart();
         if (statusStartLog.length > 0) {
           context.logs = [statusStartLog, ...context.logs];
@@ -468,10 +515,13 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
 
       //对手后手逻辑
       if (context.enemyturn) {
+        cardenemy.discardCard();
+        cardenemy.drawHand(5);
         const statusStartLog = cardenemy.processTurnStart();
         if (statusStartLog.length > 0) {
           context.logs = [statusStartLog, ...context.logs];
         }
+        console.log(cardenemy.currentHand, cardenemy.energy);
         while (cardenemy.energy > 0 && context.enemyturn == true) {
           let l = cardenemy.act(context);
           if (!l) break;

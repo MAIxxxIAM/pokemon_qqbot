@@ -472,7 +472,7 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(handleAndCiying);
   ctx.plugin(trainercmd);
   ctx.plugin(cry_guess);
-  ctx.plugin(cardTest);
+  // ctx.plugin(cardTest);
 
   if (config.指令使用日志) {
     ctx.on("command/before-execute", ({ session, command }) => {

@@ -37,7 +37,8 @@
     "js-yaml": "^4.1.0",
     "koishi-plugin-markdown": "*",
     "koishi-plugin-silk": "*",
-    "pidusage": "*"
+    "pidusage": "*",
+    "sharp": "*"
   },
   "repository": {
     "type": "git",
