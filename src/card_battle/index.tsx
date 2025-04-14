@@ -124,7 +124,6 @@ ${"```"}`;
         return `等级不足，无法进入该游戏`;
       }
       const newPlayer = new CardPlayer(player);
-      const routGenerator = new RouteGenerator(31);
       const newRoutMap = RouteGenerator.createInitialRoute();
       await ctx.database.create("carddata", {
         id: session.userId,
@@ -258,8 +257,8 @@ ${"```"}`;
         ].includes(cardData.routmap.type)
       )
         return `当前地图无法战斗`;
-      cardData.player = initType(cardData.player, CardPlayer, player);
-      cardData.routmap.enemies = initType(
+      cardData.player = await initType(cardData.player, CardPlayer, player);
+      cardData.routmap.enemies = await initType(
         cardData.routmap.enemies,
         Enemy,
         new Robot(100)
@@ -361,12 +360,6 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
       //玩家逻辑
       if (ident && context.enemyturn == false) {
         if (
-          cardenemy.energy == cardenemy.maxEnergy &&
-          cardenemy.currentHand.length <= 0
-        ) {
-          cardenemy.drawHand(5);
-        }
-        if (
           cardplayer.energy == cardplayer.maxEnergy &&
           cardplayer.currentHand.length <= 0
         ) {
@@ -382,6 +375,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         ) {
           context.enemyturn = true;
           cardplayer.discardCard();
+          cardenemy.discardCard();
           const statusEndLog = cardplayer.processTurnEnd();
           if (statusEndLog.length > 0) {
             context.logs = [statusEndLog, ...context.logs];
@@ -522,7 +516,6 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
       //   },
       // };
       const md = await toMarkDown(cardplayer, cardenemy, context, session);
-      cardenemy.discardCard();
       await sendMarkdown(ctx, md, session, keybord);
       const whoseWinLast =
         cardenemy.currentHp <= 0
@@ -675,8 +668,8 @@ ${code}
     );
     const chooseRout = route
       ? route.children.map(async (r) => {
-      const type = r.type;
-      const i = await ctx.canvas.loadImage(
+          const type = r.type;
+          const i = await ctx.canvas.loadImage(
             `${testcanvas}${resolve(
               dirname,
               `./assets/img/card`,

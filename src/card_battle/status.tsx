@@ -42,6 +42,7 @@ export class PoisonStatusHandler implements StatusHandler {
 
     const damage = Math.floor(effect.stacks * 0.05 * target.maxHp);
     target.currentHp -= damage;
+    if (target.currentHp < 0) target.currentHp = 0;
     effect.duration--;
 
     let log = `${target.name}受到${damage}点中毒伤害！`;

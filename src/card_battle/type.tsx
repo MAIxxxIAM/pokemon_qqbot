@@ -146,6 +146,7 @@ export class CardPlayer implements CardCharacter {
       : this.currentHand.find((card) => card.name === c);
     if (!card) return null;
     const playerLog = card.effect(this, tar);
+    if (!playerLog) return null;
     context.logs = [playerLog as string, ...context.logs];
     this.currentHand = this.currentHand.filter((c) => c !== card);
     return playerLog;
@@ -979,6 +980,7 @@ export class Enemy implements CardCharacter {
   discardCard(): void {
     this.discardPile.push(...this.currentHand);
     this.currentHand = [];
+    this.takeCard = [];
     this.energy = this.maxEnergy;
     this.drawHand(5);
   }
@@ -1001,8 +1003,21 @@ export class Enemy implements CardCharacter {
   restor() {
     this.statusEffects = new StatusEffectMap(this.statusEffects);
     this.aiStrategy = new EnemyAI().restor(this.aiStrategy);
-    this.takeCard = [];
+    this.deck = this.deck?.map((c) => {
+      const CardCtor = CardClassMap[c.type];
+      if (!CardCtor) {
+        throw new Error(`未知卡牌类型: ${c.type}`);
+      }
+      return new CardCtor().restor(c);
+    });
     this.currentHand = this.currentHand?.map((c) => {
+      const CardCtor = CardClassMap[c.type];
+      if (!CardCtor) {
+        throw new Error(`未知卡牌类型: ${c.type}`);
+      }
+      return new CardCtor().restor(c);
+    });
+    this.takeCard = this.takeCard?.map((c) => {
       const CardCtor = CardClassMap[c.type];
       if (!CardCtor) {
         throw new Error(`未知卡牌类型: ${c.type}`);
