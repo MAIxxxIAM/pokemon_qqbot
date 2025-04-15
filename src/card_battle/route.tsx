@@ -133,8 +133,8 @@ export class RouteGenerator {
     return enemies;
   }
 
-  private static createNode(depth: number): RouteNode {
-    const nodeType = this.onNodeType(depth);
+  static createNode(depth: number, e?: RouteNodeType): RouteNode {
+    const nodeType = e ? e : this.onNodeType(depth);
     const node: RouteNode = {
       type: nodeType,
       depth,

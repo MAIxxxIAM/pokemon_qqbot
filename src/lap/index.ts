@@ -268,41 +268,58 @@ export function apply(ctx: Context) {
   ctx
     .command("宝可梦")
     .subcommand("周目内容", "周目相关指令")
-    .subcommand("ultra", "传说中的宝可梦收集值")
-    .action(async ({ session }) => {
+    .subcommand("ultra [page:number]", "传说中的宝可梦收集值")
+    .action(async ({ session }, page) => {
       const { userId } = session;
+      page = page || page >= 1 ? page : 1;
       const userArr = await ctx.database.get("pokebattle", userId);
       const user: Pokebattle = userArr[0];
       const ultra = user?.ultra;
-      let str: string[] = [];
-      let mdStr: string[] = [];
-      for (let poke in ultra) {
-        if (ultra[poke] == null) continue;
-        const img = await toUrl(
-          ctx,
-          session,
-          `${config.图片源}/sr/${poke.split(".")[0]}.png`
-        );
-        str.push(`\u200b
-${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${
-          "🟩".repeat(Math.floor(ultra[poke] / 2)) +
-          "🟨".repeat(ultra[poke] % 2) +
-          "⬜⬜⬜⬜⬜".substring(Math.round(ultra[poke] / 2))
-        }`);
-        mdStr.push(
-          `![${pokemonCal.pokemonlist(poke)}#40px #40px](${img}) : ${
-            ultra[poke]
-          }0%  ${
-            "🟩".repeat(Math.floor(ultra[poke] / 2)) +
-            "🟨".repeat(ultra[poke] % 2) +
-            "⬜⬜⬜⬜⬜".substring(Math.round(ultra[poke] / 2))
-          }`
-        );
-      }
-      const md = mdStr.join("\n");
+      const ultras = Object.entries(ultra);
+      const ultraNumber = ultras.length;
+      const ultraImage = await ctx.canvas.render(400, 800, async (c) => {
+        c.fillStyle = "rgb(128, 152, 199)";
+        c.fillRect(0, 0, 600, 800);
+        c.globalAlpha = 0.1;
+        for (let i = 0; i < 20; i++) {
+          c.fillStyle =
+            i % 2 === 0 ? "rgb(86, 105, 143)" : "rgb(194, 122, 164)";
+          c.fillRect(0, i * 60, 600, 30);
+        }
+        c.globalAlpha = 1;
+        c.fillStyle = "rgb(255, 255, 255)";
+        c.font = "20px zpix";
+        let count = 0;
+        for (let i = (page - 1) * 8; i < ultras.length && i < page * 8; i++) {
+          const poke = ultras[i][0];
+          c.drawImage(
+            await ctx.canvas.loadImage(
+              `${config.图片源}/sr/${poke.split(".")[0]}.png`
+            ),
+            20,
+            20 + count * 90,
+            90,
+            90
+          );
+          c.fillText(
+            `: ${ultra[poke]}0% ${
+              "🟩".repeat(Math.floor(ultra[poke] / 2)) +
+              "🟨".repeat(ultra[poke] % 2) +
+              "⬜⬜⬜⬜⬜".substring(Math.round(ultra[poke] / 2))
+            }`,
+            140,
+            80 + count * 90
+          );
+          count++;
+        }
+      });
+      // const md = mdStr.join("\n");
+      const md = `<@${userId}> 传说中的宝可梦收集值
+---
+![img#400px #800px](${await toUrl(ctx, session, ultraImage.attrs.src)})`;
       const b = getMarkdownParams(md);
       if (!ultra) return `你还没有进入二周目`;
-      if (mdStr.length == 0) return `你还没有收集到传说中的宝可梦`;
+      if (ultraNumber == 0) return `你还没有收集到传说中的宝可梦`;
 
       try {
         await session.bot.internal.sendMessage(session.channelId, {
@@ -321,6 +338,18 @@ ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${
                     button(2, "♂ 杂交", "/杂交宝可梦", userId, "2"),
                   ],
                 },
+                {
+                  buttons: [
+                    button(
+                      2,
+                      "← 上一页",
+                      `/ultra ${Math.max(0, page - 1)}`,
+                      userId,
+                      "1"
+                    ),
+                    button(2, "→ 下一页", `/ultra ${page + 1}`, userId, "2"),
+                  ],
+                },
               ],
             },
           },
@@ -328,7 +357,7 @@ ${pokemonCal.pokemonlist(poke)} : ${ultra[poke]}0%  ${
           timestamp: session.timestamp,
         });
       } catch (e) {
-        return str.join("\n");
+        return `查询失败,稍后再试`;
       }
     });
 
