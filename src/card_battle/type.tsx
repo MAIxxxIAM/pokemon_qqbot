@@ -126,8 +126,9 @@ export class CardPlayer implements CardCharacter {
     players: Pokebattle,
     public readonly name: string = new PVP(players).name,
     public readonly maxHp: number = new PVP(players).maxHp,
-    public readonly maxEnergy: number = Math.floor(
-      new PVP(players).power.speed / 45
+    public readonly maxEnergy: number = Math.max(
+      Math.floor(new PVP(players).power.speed / 45),
+      1
     ),
     public readonly power: PokemonPower = new PVP(players).power,
     public deck: RougueCard[] = CardPool.spawnCard(30, new PVP(players), true),
@@ -166,6 +167,9 @@ export class CardPlayer implements CardCharacter {
         statusSystems.getHandler(effect.type)?.onReceiveDamage(this);
       }
     });
+  }
+  relax() {
+    this.currentHp = this.maxHp + this.bonus.Hp;
   }
   refresh() {
     this.armor = 0;

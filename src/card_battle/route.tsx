@@ -190,6 +190,7 @@ export class RouteGenerator {
         text: log.join("\n"),
       };
     }
+    player.refresh();
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
       node.children.push(this.createNode(node.depth + 1));

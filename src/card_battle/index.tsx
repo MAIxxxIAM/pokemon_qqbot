@@ -114,12 +114,49 @@ export async function apply(ctx: Context) {
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted)
         return `你还未参与到卡牌游戏中`;
-      if (!cardData.routmap.isExplored) {
-        return `当前地图未探索完成`;
-      }
       if (cardData.routmap.type !== RouteNodeType.Rest)
         return `当前地图无法探索事件`;
+      if (cardData.routmap.isExplored) {
+        await session.execute(`cardgoon`);
+        return;
+      }
       cardData.player = initType(cardData.player, CardPlayer, player);
+      cardData.player.relax();
+      cardData.routmap.isExplored = true;
+      await ctx.database.set(
+        "carddata",
+        { id: session.userId },
+        {
+          player: cardData.player,
+          routmap: cardData.routmap,
+          combatcontext: cardData.combatcontext,
+        }
+      );
+      const md = `![img#500px #500px](${await toUrl(
+        ctx,
+        session,
+        `file://${resolve(dirname, `./assets/img/card`, `relax.png`)}`
+      )})
+
+---
+
+> 你在营地休息了一下，已恢复全部${
+        cardData.player.maxHp + cardData.player.bonus.Hp
+      }点生命值`;
+      const keybord = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [
+                  button(0, `继续探索`, `cardgoon`, session.userId, `探索`),
+                ],
+              },
+            ],
+          },
+        },
+      };
+      await sendMarkdown(ctx, md, session, keybord);
     });
   ctx
     .command("cardshop")
@@ -134,8 +171,9 @@ export async function apply(ctx: Context) {
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted)
         return `你还未参与到卡牌游戏中`;
-      if (!cardData.routmap.isExplored) {
-        return `当前地图未探索完成`;
+      if (cardData.routmap.isExplored) {
+        await session.execute(`cardgoon`);
+        return;
       }
       if (cardData.routmap.type !== RouteNodeType.Shop)
         return `当前地图无法探索事件`;
@@ -556,7 +594,6 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           const thisBuff = rarityBuff[chooseBuff];
           const logs = cardData.player.addBuff(thisBuff);
           cardData.routmap.isExplored = true;
-          cardplayer.refresh();
           await ctx.database.set(
             "carddata",
             { id: session.userId },
