@@ -48,7 +48,7 @@ export type CardType =
   | "skill"
   | "poison"
   | "health"
-  | "event"
+  | "bossTicket"
   | "armorBreak";
 
 export type StatusType = "poison" | "strength" | "weak";
@@ -80,7 +80,7 @@ export interface CardCharacter {
 
 export interface CardItem {
   type: CardType;
-  name: "伤药" | "毒药";
+  name: "伤药" | "毒药" | "首领券";
   level: number;
 }
 
@@ -153,9 +153,16 @@ export class CardPlayer implements CardCharacter {
       ? this.currentHand[Number(c) - 1]
       : this.currentHand.find((card) => card.name === c);
     if (!card) return null;
-    const playerLog = card.effect(this, tar);
+    let playerLog = card.effect(this, tar);
     if (!playerLog) return null;
     context.logs = [playerLog as string, ...context.logs];
+    this.statusEffects.forEach((effect) => {
+      if (statusSystems.getHandler(effect.type)?.onUseCard(this)) {
+        const slogs = statusSystems.getHandler(effect.type)?.onUseCard(this);
+        context.logs = [slogs as string, ...context.logs];
+        playerLog = slogs + "\n" + playerLog;
+      }
+    });
     this.currentHand = this.currentHand.filter((c) => c !== card);
     return playerLog;
   }
@@ -566,7 +573,7 @@ export class HealCard extends RougueCard {
       user.maxHp + user.bonus.Hp
     );
     user.energy -= this.cost;
-    return `${user.name}使用了[${this.name}],恢复了20点生命值`;
+    return `${user.name}使用了[${this.name}],恢复了${this.cost * 10}%生命值`;
   }
   restor(data: any): HealCard {
     return Object.assign(new HealCard(1), data);
@@ -688,41 +695,41 @@ export class SkillCard extends RougueCard {
 
 //效果卡
 
-export class EventCard extends RougueCard {
-  constructor() {
-    super("效果卡", "event", "触发某个效果", 1, CardRarity.Common);
-  }
-  effect(user: CardCharacter, target: CardCharacter): void | string {
-    return `${user.name}使用了[${this.name}]`;
-  }
-  restor(data: any): EventCard {
-    return Object.assign(new EventCard(), data);
-  }
-  async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `attack.png`)}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
-  }
-}
+// export class EventCard extends RougueCard {
+//   constructor() {
+//     super("效果卡", "event", "触发某个效果", 1, CardRarity.Common);
+//   }
+//   effect(user: CardCharacter, target: CardCharacter): void | string {
+//     return `${user.name}使用了[${this.name}]`;
+//   }
+//   restor(data: any): EventCard {
+//     return Object.assign(new EventCard(), data);
+//   }
+//   async drawCard(ctx: Context): Promise<any> {
+//     const icondir = typeDirname(this.cardCategory);
+//     const icon = await ctx.canvas.loadImage(icondir);
+//     const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+//     const attackIcon = await ctx.canvas.loadImage(
+//       `${testcanvas}${resolve(dirname, `./assets/img/card`, `attack.png`)}`
+//     );
+//     return ctx.canvas.render(445, 670, (c) => {
+//       c.fillStyle = cardColor[this.rarity];
+//       c.fillRect(0, 0, 445, 670);
+//       c.drawImage(cardFace, 10, 10, 425, 650);
+//       c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+//       c.drawImage(icon, 45, 545, 80, 80);
+//       c.font = "bold 30px";
+//       c.fillStyle = "#000000";
+//       c.textAlign = "center";
+//       c.textBaseline = "middle";
+//       wrapText(c, this.description, 220, 480, 300, 30);
+//       wrapText(c, this.name, 220, 415, 300, 30);
+//       c.font = "bold 80px";
+//       c.fillStyle = "#ab8818";
+//       c.fillText(this.cost.toString(), 360, 585);
+//     });
+//   }
+// }
 
 //卡组池
 export class CardPool {
@@ -773,6 +780,7 @@ export class CardPool {
             伤药: HealCard,
             毒药: PoisonCard,
           };
+          if (!itemClass[item.name]) return null;
           return {
             class: itemClass[item.name],
             weight: 1,
@@ -1023,7 +1031,7 @@ export class Enemy implements CardCharacter {
       if (this.energy < selectedCard.cost) return null;
       this.takeCard = [selectedCard, ...this.takeCard];
       context.currentEnergy -= selectedCard.cost;
-      const enemyLog = selectedCard.effect(this, context.player);
+      let enemyLog = selectedCard.effect(this, context.player);
       context.logs = [enemyLog as string, ...context.logs];
       const index = this.currentHand.indexOf(selectedCard);
       if (index !== -1) {
@@ -1031,6 +1039,13 @@ export class Enemy implements CardCharacter {
       }
       context.self = this;
       context.player = context.player;
+      this.statusEffects.forEach((effect) => {
+        if (statusSystems.getHandler(effect.type)?.onUseCard(this)) {
+          const slogs = statusSystems.getHandler(effect.type)?.onUseCard(this);
+          enemyLog = slogs + "\n" + enemyLog;
+          context.logs = [slogs as string, ...context.logs];
+        }
+      });
       return enemyLog;
     }
     return null;
@@ -1067,10 +1082,11 @@ export const CardClassMap: Record<CardType, new () => RougueCard> = {
   specialattack: BaseSpecialAttackCard,
   defense: BaseArmorCard,
   armorBreak: ArmorBreakCard,
-  event: EventCard,
+  // event: EventCard,
   health: HealCard,
   skill: SkillCard,
   poison: PoisonCard,
+  bossTicket: null,
 };
 
 function removeFirstOccurrence<T>(arr: T[], value: T): T[] {

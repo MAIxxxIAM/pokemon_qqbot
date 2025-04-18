@@ -1,5 +1,6 @@
 import { PokemonPower } from "../battle";
 import { Robot } from "../utils/robot";
+import { ShopItem } from "./shop";
 import {
   CardCharacter,
   CardPlayer,
@@ -24,6 +25,7 @@ export interface RouteNode {
   depth: number;
   enemies?: Enemy;
   children: RouteNode[];
+  shopItem?: ShopItem[];
   isCompleted: boolean;
   isExplored: boolean;
 }

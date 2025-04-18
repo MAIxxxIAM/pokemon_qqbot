@@ -24,6 +24,7 @@ import {
   exporeEventRecord,
   pickBuff,
 } from "./buff";
+import { getShop, getShopItem, itemMenu, ShopItem } from "./shop";
 
 export async function apply(ctx: Context) {
   // ctx.command("text1").action(async ({ session }) => {
@@ -176,8 +177,103 @@ export async function apply(ctx: Context) {
         return;
       }
       if (cardData.routmap.type !== RouteNodeType.Shop)
-        return `当前地图无法探索事件`;
+        return `当前地图无法探索该事件`;
+      const shop: ShopItem[] =
+        cardData.routmap?.shopItem.length < 3
+          ? [getShop(), getShop(), getShop()]
+          : cardData.routmap?.shopItem;
+      cardData.routmap.shopItem = shop;
+      cardData.routmap?.shopItem.length < 3
+        ? await ctx.database.set("carddata", { id: session.userId }, (row) => ({
+            routmap: cardData.routmap,
+          }))
+        : null;
+
+      const md = `你进入了商店,可以购买以下物品：
+---
+
+> <qqbot-cmd-input text="1" show="${itemMenu?.[shop[0]].name}   介绍:${
+        itemMenu?.[shop[0]].description
+      }" reference="false" />
+<qqbot-cmd-input text="2" show="${itemMenu?.[shop[1]].name}   介绍:${
+        itemMenu?.[shop[1]].description
+      }" reference="false" />
+<qqbot-cmd-input text="3" show="${itemMenu?.[shop[2]].name}   介绍:${
+        itemMenu?.[shop[2]].description
+      }" reference="false" />`;
+      const keybord = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [
+                  button(
+                    0,
+                    `购买${itemMenu?.[shop[0]].name}`,
+                    `1`,
+                    session.userId,
+                    `购买物品`
+                  ),
+                  button(
+                    0,
+                    `购买${itemMenu?.[shop[1]].name}`,
+                    `2`,
+                    session.userId,
+                    `购买物品`
+                  ),
+                  button(
+                    0,
+                    `购买${itemMenu?.[shop[2]].name}`,
+                    `3`,
+                    session.userId,
+                    `购买物品`
+                  ),
+                ],
+              },
+            ],
+          },
+        },
+      };
+      await sendMarkdown(ctx, md, session, keybord);
+      const item = await session.prompt(
+        (ses: Session) => {
+          const branch = Number(ses.content);
+          if (!branch || branch > 3 || branch < 1) return undefined;
+          const item = shop[branch - 1];
+          if (!item) return undefined;
+          const bugLog = getShopItem(item, player, cardData.player);
+          if (!bugLog) {
+            return undefined;
+          }
+          return bugLog;
+        },
+        { timeout: 20000 }
+      );
+      if (!item) return `购买失败重新购买`;
+      cardData.routmap.isExplored = true;
+      await ctx.database.set(
+        "carddata",
+        { id: session.userId },
+        {
+          player: cardData.player,
+          routmap: cardData.routmap,
+          combatcontext: cardData.combatcontext,
+        }
+      );
+      await session.send(item);
+      await session.execute(`cardgoon`);
     });
+
+  // ctx.command("tss").action(async ({ session }) => {
+  //   await session.send(`aaaaaa`);
+  //   const item = await session.prompt(
+  //     async (ses: Session) => {
+  //       if (ses.content !== "aaa") return;
+  //       await ses.send(`1`);
+  //     },
+  //     { timeout: 20000 }
+  //   );
+  // });
   ctx
     .command("cardgoon [cho:number]")
     .alias("继续探索")

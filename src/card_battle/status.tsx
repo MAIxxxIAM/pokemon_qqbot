@@ -7,6 +7,7 @@ export interface StatusHandler {
   applyEffect(target: CardCharacter, stacks: number): string | undefined;
   processTurnStart(target: CardCharacter): string | undefined;
   processTurnEnd(target: CardCharacter): string | undefined;
+  onUseCard?(target: CardCharacter): string | undefined;
   onReceiveDamage?(target: CardCharacter): string | undefined;
   restor(data: Partial<StatusHandler>): StatusHandler;
 }

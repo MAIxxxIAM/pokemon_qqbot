@@ -429,20 +429,22 @@ export async function apply(ctx, conf: Config) {
       const resource = new PrivateResource(b.resource.goldLimit);
       await resource.addGold(ctx, a, op_member_openid);
     }
-    //     const md = `![img #408px #456px](${await toUrl(
-    //       ctx,
-    //       session,
-    //       fs.readFileSync("./friendlink.png")
-    //     )})
-    // 我是麦麦！(*/ω＼*)。
-    // 是博士做出来帮助训练师们的机器人少女噢~
-    // ✨我有好多好玩的功能！✨
+    const md = `![img #408px #456px](${await toUrl(
+      ctx,
+      session,
+      fs.readFileSync("./friendlink.png")
+    )})
+我是麦麦！(*/ω＼*)。
+是博士做出来帮助训练师们的机器人少女噢~
+✨我有好多好玩的功能！✨
 
-    // ---
-    // > @麦麦后回复关闭宝可梦 可以关闭宝可梦功能
-    // 可以点我头像看 **使用文档**`;
-    //     session.isDirect = false;
-    //     await sendMarkdown(ctx, md, session, null, id);
+---
+> @麦麦后回复关闭宝可梦 可以关闭宝可梦功能
+可以点我头像看 **使用文档**`;
+    session.isDirect = false;
+    try {
+      await sendMarkdown(ctx, md, session, null, id);
+    } catch (e) {}
     let [channel] = await ctx.database.get("pokemon.isPokemon", {
       id: group_openid,
     });
