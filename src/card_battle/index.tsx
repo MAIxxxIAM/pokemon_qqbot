@@ -163,7 +163,6 @@ export async function apply(ctx: Context) {
     .command("cardshop")
     .alias("进入商店")
     .action(async ({ session }) => {
-      await session.execute(`cardexpore`);
       let [cardData] = await ctx.database.get("carddata", {
         id: session.userId,
       });
@@ -178,12 +177,12 @@ export async function apply(ctx: Context) {
       }
       if (cardData.routmap.type !== RouteNodeType.Shop)
         return `当前地图无法探索该事件`;
-      const shop: ShopItem[] =
-        cardData.routmap?.shopItem.length < 3
-          ? [getShop(), getShop(), getShop()]
-          : cardData.routmap?.shopItem;
+      const shop: ShopItem[] = !cardData.routmap?.shopItem?.length
+        ? [getShop(), getShop(), getShop()]
+        : cardData.routmap?.shopItem;
+      console.log(shop);
       cardData.routmap.shopItem = shop;
-      cardData.routmap?.shopItem.length < 3
+      cardData.routmap?.shopItem?.length < 3
         ? await ctx.database.set("carddata", { id: session.userId }, (row) => ({
             routmap: cardData.routmap,
           }))
@@ -209,25 +208,44 @@ export async function apply(ctx: Context) {
                 buttons: [
                   button(
                     0,
-                    `购买${itemMenu?.[shop[0]].name}`,
+                    `购买${itemMenu?.[shop[0]].name}  费用${
+                      itemMenu?.[shop[0]].cost
+                    }扭蛋币`,
                     `1`,
                     session.userId,
                     `购买物品`
                   ),
+                ],
+              },
+              {
+                buttons: [
                   button(
                     0,
-                    `购买${itemMenu?.[shop[1]].name}`,
-                    `2`,
+                    `购买${itemMenu?.[shop[1]].name}  费用${
+                      itemMenu?.[shop[1]].cost
+                    }扭蛋币`,
+                    `1`,
                     session.userId,
                     `购买物品`
                   ),
+                ],
+              },
+              {
+                buttons: [
                   button(
                     0,
-                    `购买${itemMenu?.[shop[2]].name}`,
-                    `3`,
+                    `购买${itemMenu?.[shop[2]].name}  费用${
+                      itemMenu?.[shop[2]].cost
+                    }扭蛋币`,
+                    `1`,
                     session.userId,
                     `购买物品`
                   ),
+                ],
+              },
+              {
+                buttons: [
+                  button(0, `进入下一层`, `4`, session.userId, `购买物品`),
                 ],
               },
             ],
@@ -235,21 +253,34 @@ export async function apply(ctx: Context) {
         },
       };
       await sendMarkdown(ctx, md, session, keybord);
-      const item = await session.prompt(
-        (ses: Session) => {
-          const branch = Number(ses.content);
-          if (!branch || branch > 3 || branch < 1) return undefined;
-          const item = shop[branch - 1];
-          if (!item) return undefined;
-          const bugLog = getShopItem(item, player, cardData.player);
-          if (!bugLog) {
-            return undefined;
+      const item = await session.prompt(20000);
+      const itemIndex = Number(item) - 1;
+      if (![0, 1, 2].includes(itemIndex)) {
+        if (itemIndex == 3) {
+          cardData.routmap.isExplored = true;
+          await ctx.database.set(
+            "carddata",
+            { id: session.userId },
+            {
+              routmap: cardData.routmap,
+            }
+          );
+          await session.execute(`cardgoon`);
+          return;
+        }
+        await ctx.database.set(
+          "carddata",
+          { id: session.userId },
+          {
+            routmap: cardData.routmap,
           }
-          return bugLog;
-        },
-        { timeout: 20000 }
-      );
-      if (!item) return `购买失败重新购买`;
+        );
+        return `购买失败重新购买`;
+      }
+      const bugLog = getShopItem(shop[itemIndex], player, cardData.player);
+      if (!bugLog) {
+        return `购买失败,扭蛋币不足`;
+      }
       cardData.routmap.isExplored = true;
       await ctx.database.set(
         "carddata",
@@ -260,7 +291,7 @@ export async function apply(ctx: Context) {
           combatcontext: cardData.combatcontext,
         }
       );
-      await session.send(item);
+      await session.send(bugLog);
       await session.execute(`cardgoon`);
     });
 

@@ -51,7 +51,7 @@ export type CardType =
   | "bossTicket"
   | "armorBreak";
 
-export type StatusType = "poison" | "strength" | "weak";
+export type StatusType = "poison";
 
 export interface CardCharacter {
   name: string;

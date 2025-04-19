@@ -10,8 +10,8 @@ export enum ShopItem {
 }
 
 const shopItemConfig: Record<ShopItem, number> = {
-  [ShopItem.addItemHealth]: 20,
-  [ShopItem.addItemPoison]: 20,
+  [ShopItem.addItemHealth]: 300,
+  [ShopItem.addItemPoison]: 300,
   [ShopItem.levelUpCard]: 5,
   [ShopItem.bossTicket]: 1,
 };
@@ -25,18 +25,22 @@ export const itemMenu = {
   [ShopItem.addItemHealth]: {
     name: "伤药",
     description: "添加一张伤药卡到你的牌组中",
+    cost: 10000 / shopItemConfig[ShopItem.addItemHealth],
   },
   [ShopItem.addItemPoison]: {
     name: "毒药",
     description: "添加一张毒药卡到你的牌组中",
+    cost: 10000 / shopItemConfig[ShopItem.addItemPoison],
   },
   [ShopItem.levelUpCard]: {
     name: "升级道具卡",
     description: "升级道具卡的等级,仅在本次游戏中生效",
+    cost: 10000 / shopItemConfig[ShopItem.levelUpCard],
   },
   [ShopItem.bossTicket]: {
     name: "首领券",
     description: "增加1张首领券,最多20张,可在最后挑战最终首领",
+    cost: 10000 / shopItemConfig[ShopItem.bossTicket],
   },
 };
 
