@@ -158,7 +158,13 @@ export async function apply(ctx: Context) {
             rows: [
               {
                 buttons: [
-                  button(0, `继续探索`, `cardgoon`, session.userId, `探索`),
+                  button(
+                    session.isDirect ? 2 : 0,
+                    `继续探索`,
+                    `cardgoon`,
+                    session.userId,
+                    `探索`
+                  ),
                 ],
               },
             ],
@@ -218,7 +224,7 @@ export async function apply(ctx: Context) {
               {
                 buttons: [
                   button(
-                    0,
+                    session.isDirect ? 2 : 0,
                     `购买${itemMenu?.[shop[0]].name}  费用${
                       itemMenu?.[shop[0]].cost
                     }扭蛋币`,
@@ -231,7 +237,7 @@ export async function apply(ctx: Context) {
               {
                 buttons: [
                   button(
-                    0,
+                    session.isDirect ? 2 : 0,
                     `购买${itemMenu?.[shop[1]].name}  费用${
                       itemMenu?.[shop[1]].cost
                     }扭蛋币`,
@@ -244,7 +250,7 @@ export async function apply(ctx: Context) {
               {
                 buttons: [
                   button(
-                    0,
+                    session.isDirect ? 2 : 0,
                     `购买${itemMenu?.[shop[2]].name}  费用${
                       itemMenu?.[shop[2]].cost
                     }扭蛋币`,
@@ -256,7 +262,13 @@ export async function apply(ctx: Context) {
               },
               {
                 buttons: [
-                  button(0, `进入下一层`, `4`, session.userId, `购买物品`),
+                  button(
+                    session.isDirect ? 2 : 0,
+                    `进入下一层`,
+                    `4`,
+                    session.userId,
+                    `购买物品`
+                  ),
                 ],
               },
             ],
@@ -336,7 +348,7 @@ export async function apply(ctx: Context) {
           const chooseRout = await drawPortal(cardData.routmap);
           const buttons = cardData.routmap.children.map((item, index) => {
             return button(
-              0,
+              session.isDirect ? 2 : 0,
               `选择${item.type}`,
               `继续探索 ${index + 1}`,
               session.userId,
@@ -378,12 +390,48 @@ export async function apply(ctx: Context) {
       RouteGenerator.exploreNode(selectedNode, cardData.player);
       cardData.routmap = selectedNode;
       const chooseButton = {
-        战斗: button(0, "开始战斗", "cardbattle", session.userId, "战斗"),
-        精英: button(0, "开始战斗", "cardbattle", session.userId, "精英"),
-        首领: button(0, "开始战斗", "cardbattle", session.userId, "首领"),
-        事件: button(0, "探索该事件", "cardexpore", session.userId, "事件"),
-        商店: button(0, "进入商店", "cardshop", session.userId, "商店"),
-        营地: button(0, "休息一下", "cardrest", session.userId, "营地"),
+        战斗: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "战斗"
+        ),
+        精英: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "精英"
+        ),
+        首领: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "首领"
+        ),
+        事件: button(
+          session.isDirect ? 2 : 0,
+          "探索该事件",
+          "cardexpore",
+          session.userId,
+          "事件"
+        ),
+        商店: button(
+          session.isDirect ? 2 : 0,
+          "进入商店",
+          "cardshop",
+          session.userId,
+          "商店"
+        ),
+        营地: button(
+          session.isDirect ? 2 : 0,
+          "休息一下",
+          "cardrest",
+          session.userId,
+          "营地"
+        ),
       };
       const kybd = {
         keyboard: {
@@ -469,12 +517,48 @@ ${"```"}`;
       // console.log(newRoutMap.enemies);
 
       const chooseButton = {
-        战斗: button(0, "开始战斗", "cardbattle", session.userId, "战斗"),
-        精英: button(0, "开始战斗", "cardbattle", session.userId, "精英"),
-        首领: button(0, "开始战斗", "cardbattle", session.userId, "首领"),
-        事件: button(0, "探索该事件", "cardexpore", session.userId, "事件"),
-        商店: button(0, "进入商店", "cardshop", session.userId, "商店"),
-        营地: button(0, "休息一下", "cardrest", session.userId, "营地"),
+        战斗: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "战斗"
+        ),
+        精英: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "精英"
+        ),
+        首领: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "首领"
+        ),
+        事件: button(
+          session.isDirect ? 2 : 0,
+          "探索该事件",
+          "cardexpore",
+          session.userId,
+          "事件"
+        ),
+        商店: button(
+          session.isDirect ? 2 : 0,
+          "进入商店",
+          "cardshop",
+          session.userId,
+          "商店"
+        ),
+        营地: button(
+          session.isDirect ? 2 : 0,
+          "休息一下",
+          "cardrest",
+          session.userId,
+          "营地"
+        ),
       };
       const kybd = {
         keyboard: {
@@ -522,7 +606,13 @@ ${"```"}`;
             rows: [
               {
                 buttons: [
-                  button(0, `继续探索`, `cardbattle`, session.userId, `探索`),
+                  button(
+                    session.isDirect ? 2 : 0,
+                    `继续探索`,
+                    `cardbattle`,
+                    session.userId,
+                    `探索`
+                  ),
                 ],
               },
             ],
@@ -706,7 +796,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
 `)}`;
           const buttons = rarityBuff.map((item, i) => {
             return button(
-              0,
+              session.isDirect ? 2 : 0,
               item.name,
               String(i),
               session.userId,
@@ -800,7 +890,15 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         },
       };
       keybord.keyboard.content.rows.push({
-        buttons: [button(0, `跳过`, "卡牌战斗 跳过", session.userId, `跳过`)],
+        buttons: [
+          button(
+            session.isDirect ? 2 : 0,
+            `跳过`,
+            "卡牌战斗 跳过",
+            session.userId,
+            `跳过`
+          ),
+        ],
       });
       // {
       //   keyboard: {
@@ -843,7 +941,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
 `)}`;
           const buttons = rarityBuff.map((item, i) => {
             return button(
-              0,
+              session.isDirect ? 2 : 0,
               item.name,
               String(i),
               session.userId,
@@ -1074,7 +1172,7 @@ ${code}
     for (let i = 0; i < length; i++) {
       buttonList.push(
         button(
-          0,
+          2,
           cards[i].name,
           "卡牌战斗 " + cards[i].name,
           serId,
