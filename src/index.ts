@@ -1588,7 +1588,7 @@ ${
                       buttons: [
                         button(2, "签到", "签到", session.userId, "qd"),
                         button(2, "面板", "查看信息", session.userId, "xx"),
-                        button(2, "树果农场", "树果农场", session.userId, "bt"),
+                        button(2, "卡牌测试", "开始卡牌", session.userId, "bt"),
                       ],
                     },
                   ],
