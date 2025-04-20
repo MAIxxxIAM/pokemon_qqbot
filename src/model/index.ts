@@ -393,6 +393,7 @@ export async function model(ctx: Context) {
         children: [],
         isCompleted: true,
         isExplored: false,
+        shopItem: [],
       },
       nullable: false,
     },

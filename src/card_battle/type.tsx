@@ -37,9 +37,9 @@ const cardColor = {
 };
 
 export enum WildPokemonType {
-  NormalWild = 5,
-  UncommonPokemon = 6,
-  Legendary = 7,
+  NormalWild = 3,
+  UncommonPokemon = 4,
+  Legendary = 5,
 }
 
 export type CardType =
@@ -169,6 +169,7 @@ export class CardPlayer implements CardCharacter {
   }
 
   takeDamage(damage: number): void {
+    damage = damage ? damage : 0;
     this.currentHp = Math.max(this.currentHp - damage, 0);
     this.statusEffects.forEach((effect) => {
       if (statusSystems.getHandler(effect.type)?.onReceiveDamage) {
@@ -369,10 +370,11 @@ export class BaseArmorCard extends RougueCard {
     super("护甲卡", "defense", "获得一定量的护甲", 3, CardRarity.Common);
   }
   effect(user: CardCharacter, target: CardCharacter): void | string {
-    user.armor += Math.floor(
+    const armors = Math.floor(
       (0.3 * (user.power.defense + user.power.specialDefense)) / 4 +
         0.1 * user.power.speed
     );
+    user.armor += armors ? armors : 0;
     user.energy -= this.cost;
     return `${user.name}使用了[${this.name}],获得了${Math.floor(
       (0.3 * (user.power.defense + user.power.specialDefense)) / 4 +
@@ -657,7 +659,7 @@ export class SkillCard extends RougueCard {
     if (damage >= target.armor) {
       const realDamage = damage - target.armor;
       target.armor = 0;
-      target.currentHp = Math.max(target.currentHp - realDamage, 0);
+      target.takeDamage(realDamage);
     } else {
       target.armor -= damage;
     }
@@ -985,6 +987,7 @@ export class Enemy implements CardCharacter {
   }
 
   takeDamage(damage: number): void {
+    damage = damage ? damage : 0;
     this.currentHp = Math.max(this.currentHp - damage, 0);
     this.statusEffects.forEach((effect) => {
       if (statusSystems.getHandler(effect.type)?.onReceiveDamage) {

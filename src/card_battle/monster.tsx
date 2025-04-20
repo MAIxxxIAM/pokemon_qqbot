@@ -43,20 +43,20 @@ for (const p of pokemonBase) {
   if (legendaryPokemonList.includes(p.id)) {
     Legendary.push(p);
   } else if (baseSum >= 500) {
-    p.att = p.att * 1.2;
-    p.def = p.def * 1.2;
-    p.hp = p.hp * 1.2;
-    p.spa = p.spa * 1.2;
-    p.spd = p.spd * 1.2;
-    p.spe = p.spe * 1.2;
+    p.att = p.att * 1.1;
+    p.def = p.def * 1.1;
+    p.hp = p.hp * 1.1;
+    p.spa = p.spa * 1.1;
+    p.spd = p.spd * 1.1;
+    p.spe = p.spe * 1.1;
     UncommonPokemon.push(p);
   } else {
-    p.att = p.att * 1.6;
-    p.def = p.def * 1.6;
-    p.hp = p.hp * 1.6;
-    p.spa = p.spa * 1.6;
-    p.spd = p.spd * 1.6;
-    p.spe = p.spe * 1.6;
+    p.att = p.att * 1.5;
+    p.def = p.def * 1.5;
+    p.hp = p.hp * 1.5;
+    p.spa = p.spa * 1.5;
+    p.spd = p.spd * 1.5;
+    p.spe = p.spe * 1.5;
     NormalWild.push(p);
   }
 }

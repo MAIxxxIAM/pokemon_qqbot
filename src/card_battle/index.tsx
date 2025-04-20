@@ -35,10 +35,17 @@ export async function apply(ctx: Context) {
   // });
   ctx.command("清空测试数据", { authority: 4 }).action(async ({ session }) => {
     const a = await ctx.database.remove("carddata", {});
-    await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
+    await ctx.database.set("pokebattle", {}, (row) => ({
       itemBag: [],
     }));
     return `清空成功,总计${a}条数据`;
+  });
+  ctx.command("结束游戏").action(async ({ session }) => {
+    const a = await ctx.database.remove("carddata", { id: session.userId });
+    await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
+      itemBag: [],
+    }));
+    return `你已结束当前游戏测试,如有遇到bug,点击面板的反馈按钮进群联系群主`;
   });
 
   ctx
@@ -107,7 +114,16 @@ export async function apply(ctx: Context) {
         default:
           return `探索事件错误,请稍后尝试`;
       }
-      await ctx.database.upsert("carddata", (row) => [cardData]);
+      cardData.combatcontext.player = cardPlay;
+      await ctx.database.set(
+        "carddata",
+        { id: session.userId },
+        {
+          player: cardPlay,
+          routmap: cardData.routmap,
+          combatcontext: cardData.combatcontext,
+        }
+      );
       await session.send(logs.join("\n"));
       await session.execute(nextCommand);
     });
@@ -497,22 +513,19 @@ ${"```"}`;
       }
       const newPlayer = new CardPlayer(player);
       const newRoutMap = RouteGenerator.createInitialRoute();
-      await ctx.database.upsert("carddata", (row) => [
-        {
-          id: session.userId,
+      await ctx.database.set("carddata", { id: session.userId }, (row) => ({
+        player: newPlayer,
+        routmap: newRoutMap,
+        combatcontext: {
           player: newPlayer,
-          routmap: newRoutMap,
-          combatcontext: {
-            player: newPlayer,
-            self: newRoutMap.enemies,
-            currentEnergy: newRoutMap?.enemies?.energy
-              ? newRoutMap?.enemies?.energy
-              : 0,
-            turnCount: 0,
-            logs: [],
-          },
+          self: newRoutMap.enemies,
+          currentEnergy: newRoutMap?.enemies?.energy
+            ? newRoutMap?.enemies?.energy
+            : 0,
+          turnCount: 0,
+          logs: [],
         },
-      ]);
+      }));
 
       // console.log(newRoutMap.enemies);
 
@@ -612,6 +625,17 @@ ${"```"}`;
                     `cardbattle`,
                     session.userId,
                     `探索`
+                  ),
+                ],
+              },
+              {
+                buttons: [
+                  button(
+                    session.isDirect ? 2 : 0,
+                    `清空测试数据`,
+                    `清空测试数据`,
+                    session.userId,
+                    `清空测试数据`
                   ),
                 ],
               },
