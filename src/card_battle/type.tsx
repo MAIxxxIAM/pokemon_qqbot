@@ -569,9 +569,11 @@ export class HealCard extends RougueCard {
   }
   effect(user: CardCharacter, target: CardCharacter): void | string {
     if (this.cost > user.energy) return null;
-    user.currentHp = Math.min(
-      user.currentHp + (user.maxHp + user.bonus.Hp) * this.cost * 0.1,
-      user.maxHp + user.bonus.Hp
+    user.currentHp = Math.floor(
+      Math.min(
+        user.currentHp + (user.maxHp + user.bonus.Hp) * this.cost * 0.1,
+        user.maxHp + user.bonus.Hp
+      )
     );
     user.energy -= this.cost;
     return `${user.name}使用了[${this.name}],恢复了${this.cost * 10}%生命值`;
