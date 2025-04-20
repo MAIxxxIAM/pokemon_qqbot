@@ -36,6 +36,8 @@ export class PoisonStatusHandler implements StatusHandler {
       return `${target.name}身上的毒药正在生效...`;
     }
   }
+  onUseCard: () => undefined;
+  onReceiveDamage: () => undefined;
 
   processTurnEnd(target: CardCharacter): string | undefined {
     const effect = target.statusEffects.get(this.type);
