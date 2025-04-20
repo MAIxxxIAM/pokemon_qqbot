@@ -12,6 +12,8 @@ import { Telegram } from "@koishijs/plugin-adapter-telegram";
 import { markdownMessage } from "../utils/message";
 import { dirname } from "../dirname";
 import sharp from "sharp";
+import { fileURLToPath } from "url";
+import * as fs from "fs/promises";
 
 export function mudPath(a: string) {
   return `${testcanvas}${resolve(
@@ -854,11 +856,24 @@ export async function sendNoticeMarkdown(
 export async function toUrl(ctx, session, img_base64) {
   let img = img_base64;
   try {
-    const base64Data = img.replace(/^data:image\/\w+;base64,/, "");
-    const imgBuffer = Buffer.from(base64Data, "base64");
-    const webpBuffer = await sharp(imgBuffer).webp().toBuffer();
-    img = webpBuffer;
-  } catch (e) {}
+    if (img.startsWith("file://")) {
+      img = fileURLToPath(img);
+      const imgBuffer = await fs.readFile(img);
+      const webpBuffer = await sharp(imgBuffer).webp().toBuffer();
+      img = webpBuffer;
+    } else if (img.startsWith("http")) {
+      const response = await ctx.http.get(img);
+      const webpBuffer = await sharp(response).webp().toBuffer();
+      img = webpBuffer;
+    } else {
+      const base64Data = img.replace(/^data:image\/\w+;base64,/, "");
+      const imgBuffer = Buffer.from(base64Data, "base64");
+      const webpBuffer = await sharp(imgBuffer).webp().toBuffer();
+      img = webpBuffer;
+    }
+  } catch (e) {
+    console.log(e);
+  }
   // if(ctx.get('server.temp')?.upload){
   //   const url = await ctx.get('server.temp').upload(img)
   //   return url.replace(/_/g, "%5F")

@@ -7,7 +7,6 @@ export enum BuffType {
   EnergyBoost = "能量提升",
   DrawBoost = "抽卡提升",
   CategoryChange = "属性改变",
-  CardLevelUp = "卡牌升级",
 }
 
 export interface BuffConfig {
@@ -25,6 +24,23 @@ export interface BuffConfig {
   levelUp?: (target: CardPlayer) => string | undefined;
   restor?: (data: any) => BuffConfig;
 }
+
+export enum CardExporeEvent {
+  AddBuff = "addBuff",
+  ChangeHp = "changedHp",
+  UpHpMax = "upHpMax",
+  Battle = "battle",
+  Relax = "relax",
+  LevelUp = "levelUp",
+}
+export const exporeEventRecord: Record<CardExporeEvent, number> = {
+  addBuff: 10,
+  changedHp: 10,
+  battle: 1,
+  relax: 2,
+  levelUp: 3,
+  upHpMax: 1,
+};
 
 const buffLiblary: BuffConfig[] = [
   //能力

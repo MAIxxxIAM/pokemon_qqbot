@@ -65,6 +65,13 @@ export interface CardCharacter {
   pokemonCategory: string[];
   skill: Skill[];
   statusEffects: StatusEffectMap;
+  bonus?: {
+    energy: number;
+    damage: number;
+    Hp: number;
+    handsize: number;
+    category: string[];
+  };
   addStatusEffect(type: StatusType, stacks: number): string;
   processTurnStart(): string;
   processTurnEnd(): string;
@@ -552,7 +559,7 @@ export class HealCard extends RougueCard {
     if (this.cost > user.energy) return null;
     user.currentHp = Math.min(
       user.currentHp + user.currentHp * this.cost * 0.1,
-      user.maxHp
+      user.maxHp + user.bonus.Hp
     );
     user.energy -= this.cost;
     return `${user.name}使用了[${this.name}],恢复了20点生命值`;
@@ -910,6 +917,13 @@ export class Enemy implements CardCharacter {
   currentHand: RougueCard[];
   statusEffects = new StatusEffectMap();
   takeCard: RougueCard[];
+  bonus: {
+    energy: number;
+    damage: number;
+    Hp: number;
+    handsize: number;
+    category: string[];
+  };
   constructor(
     wildPokemon: Pokebattle,
     public readonly name: string = wildPokemon.battlename,
@@ -923,6 +937,13 @@ export class Enemy implements CardCharacter {
     public skill: Skill[] = new PVP(wildPokemon).skill,
     public pokemonCategory: string[] = getType(new PVP(wildPokemon).monster_1) // private statusSystem: StatusSystem = statusSystems
   ) {
+    this.bonus = {
+      energy: 0,
+      damage: 0,
+      Hp: 0,
+      handsize: 0,
+      category: [],
+    };
     const powerSum = wildPokemon.power.reduce(
       (sum, curr) => sum + Number(curr),
       0

@@ -1,4 +1,4 @@
-import { $, Context, Element, h, Session } from "koishi";
+import { $, Context, Element, h, Random, Session } from "koishi";
 import {
   CardCharacter,
   CardPlayer,
@@ -18,7 +18,12 @@ import {
   RouteNodeType,
 } from "./route";
 import { testcanvas } from "..";
-import { BuffConfig, pickBuff } from "./buff";
+import {
+  BuffConfig,
+  CardExporeEvent,
+  exporeEventRecord,
+  pickBuff,
+} from "./buff";
 
 export async function apply(ctx: Context) {
   // ctx.command("text1").action(async ({ session }) => {
@@ -39,9 +44,63 @@ export async function apply(ctx: Context) {
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted)
         return `你还未参与到卡牌游戏中`;
-      if (!cardData.routmap.isExplored) {
-        return `当前地图未探索完成`;
+      if (cardData.routmap.type !== RouteNodeType.Event)
+        return `当前地图无法探索事件`;
+      const cardPlay: CardPlayer = await initType(
+        cardData.player,
+        CardPlayer,
+        player
+      );
+      if (cardData.routmap.isExplored) {
+        await session.execute(`cardgoon`);
+        return;
       }
+      const thisEvent = Random.weightedPick(exporeEventRecord);
+      let logs: string[] = [];
+      let nextCommand = `cardgoon`;
+      switch (thisEvent) {
+        case CardExporeEvent.AddBuff:
+          const rarityBuff = pickBuff(1);
+          logs = [cardPlay.addBuff(rarityBuff[0], true), ...logs];
+          cardData.routmap.isExplored = true;
+          break;
+        case CardExporeEvent.UpHpMax:
+        case CardExporeEvent.ChangeHp:
+          thisEvent === CardExporeEvent.UpHpMax
+            ? (cardPlay.bonus.Hp += 50)
+            : null;
+          const changeHp = Math.floor(Math.random() * 250 - 100);
+          cardPlay.currentHp = Math.min(
+            changeHp + cardPlay.currentHp,
+            cardPlay.maxHp + cardPlay.bonus.Hp
+          );
+          logs = [
+            `当前血量${
+              thisEvent === CardExporeEvent.UpHpMax ? `上限提升50 并` : ``
+            }${changeHp <= 0 ? `扣除` : `增加`}:${changeHp}`,
+            ...logs,
+          ];
+          cardData.routmap.isExplored = true;
+          break;
+        case CardExporeEvent.Battle:
+          logs = [`遭遇陷阱,是善于伪装的敌人`, ...logs];
+          cardData.routmap = RouteGenerator.createNode(
+            cardData.routmap.depth,
+            RouteNodeType.Combat
+          );
+          nextCommand = `cardbattle`;
+          break;
+        case CardExporeEvent.LevelUp:
+          break;
+        case CardExporeEvent.Relax:
+          break;
+
+        default:
+          return `探索事件错误,请稍后尝试`;
+      }
+      await ctx.database.upsert("carddata", (row) => [cardData]);
+      await session.send(logs.join("\n"));
+      await session.execute(nextCommand);
     });
   ctx
     .command("cardrest")
@@ -58,12 +117,15 @@ export async function apply(ctx: Context) {
       if (!cardData.routmap.isExplored) {
         return `当前地图未探索完成`;
       }
+      if (cardData.routmap.type !== RouteNodeType.Rest)
+        return `当前地图无法探索事件`;
       cardData.player = initType(cardData.player, CardPlayer, player);
     });
   ctx
     .command("cardshop")
     .alias("进入商店")
     .action(async ({ session }) => {
+      await session.execute(`cardexpore`);
       let [cardData] = await ctx.database.get("carddata", {
         id: session.userId,
       });
@@ -75,12 +137,13 @@ export async function apply(ctx: Context) {
       if (!cardData.routmap.isExplored) {
         return `当前地图未探索完成`;
       }
+      if (cardData.routmap.type !== RouteNodeType.Shop)
+        return `当前地图无法探索事件`;
     });
   ctx
-    .command("cardgoon <cho:number>")
+    .command("cardgoon [cho:number]")
     .alias("继续探索")
     .action(async ({ session }, cho) => {
-      if (!cho) return `请选择探索的地图`;
       let [cardData] = await ctx.database.get("carddata", {
         id: session.userId,
       });
@@ -92,6 +155,42 @@ export async function apply(ctx: Context) {
       if (!cardData.routmap.isExplored) {
         return `当前地图未探索完成`;
       }
+      if (!cho) {
+        if (cardData.routmap.isExplored) {
+          const chooseRout = await drawPortal(cardData.routmap);
+          const buttons = cardData.routmap.children.map((item, index) => {
+            return button(
+              0,
+              `选择${item.type}`,
+              `继续探索 ${index + 1}`,
+              session.userId,
+              `${item.type}`
+            );
+          });
+
+          const md = `你当前的地图已经探索结束，是否继续探索？
+  ![img#500px #333px](${await toUrl(ctx, session, chooseRout.attrs.src)})
+  
+  ---
+  > <qqbot-cmd-input text="卡牌地图" show="地图" reference="false" />`;
+          const keybord = {
+            keyboard: {
+              content: {
+                rows: [
+                  {
+                    buttons: [...buttons],
+                  },
+                ],
+              },
+            },
+          };
+          await sendMarkdown(ctx, md, session, keybord);
+          return;
+        } else {
+          return `当前地图未探索完成`;
+        }
+      }
+
       cardData.player = initType(cardData.player, CardPlayer, player);
       cardData.routmap.enemies = initType(
         cardData.routmap.enemies,
@@ -270,34 +369,7 @@ ${"```"}`;
       if (!cardData || !player || cardData?.routmap?.isCompleted)
         return `你还未参与到卡牌游戏中`;
       if (cardData.routmap.isExplored) {
-        const chooseRout = await drawPortal(cardData.routmap);
-        const buttons = cardData.routmap.children.map((item, index) => {
-          return button(
-            0,
-            `选择${item.type}`,
-            `继续探索 ${index + 1}`,
-            session.userId,
-            `${item.type}`
-          );
-        });
-
-        const md = `你当前的地图已经探索结束，是否继续探索？
-![img#500px #333px](${await toUrl(ctx, session, chooseRout.attrs.src)})
-
----
-> <qqbot-cmd-input text="卡牌地图" show="地图" reference="false" />`;
-        const keybord = {
-          keyboard: {
-            content: {
-              rows: [
-                {
-                  buttons: [...buttons],
-                },
-              ],
-            },
-          },
-        };
-        await sendMarkdown(ctx, md, session, keybord);
+        await session.execute(`cardgoon`);
         return;
       }
       if (
@@ -484,6 +556,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           const thisBuff = rarityBuff[chooseBuff];
           const logs = cardData.player.addBuff(thisBuff);
           cardData.routmap.isExplored = true;
+          cardplayer.refresh();
           await ctx.database.set(
             "carddata",
             { id: session.userId },
@@ -493,7 +566,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
               combatcontext: context,
             }
           );
-          await session.execute(`cardbattle`);
+          await session.execute(`cardgoon`);
           return logs;
         case "enemy":
           cardData.routmap.isCompleted = true;
