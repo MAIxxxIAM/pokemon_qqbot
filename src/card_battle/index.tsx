@@ -34,15 +34,11 @@ export async function apply(ctx: Context) {
   //   return await drawPortal(gameMap);
   // });
   ctx.command("清空测试数据", { authority: 4 }).action(async ({ session }) => {
-    await ctx.database.set(
-      "carddata",
-      {},
-      {
-        player: {},
-        combatcontext: {},
-        routmap: {},
-      }
-    );
+    const a = await ctx.database.remove("carddata", {});
+    await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
+      itemBag: [],
+    }));
+    return `清空成功,总计${a}条数据`;
   });
 
   ctx
