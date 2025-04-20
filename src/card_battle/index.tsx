@@ -495,7 +495,7 @@ ${"```"}`;
       const [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (cardData && cardData?.routmap?.isCompleted == false)
+      if (cardData || cardData?.routmap?.isCompleted == false)
         return `你已经在一场游戏中，请勿重复进入`;
       if (!player) {
         try {
