@@ -25,22 +25,26 @@ export const itemMenu = {
   [ShopItem.addItemHealth]: {
     name: "伤药",
     description: "添加一张伤药卡到你的牌组中",
-    cost: 10000 / shopItemConfig[ShopItem.addItemHealth],
+    // cost: 10000 / shopItemConfig[ShopItem.addItemHealth],
+    cost: 0,
   },
   [ShopItem.addItemPoison]: {
     name: "毒药",
     description: "添加一张毒药卡到你的牌组中",
-    cost: 10000 / shopItemConfig[ShopItem.addItemPoison],
+    // cost: 10000 / shopItemConfig[ShopItem.addItemPoison],
+    cost: 0,
   },
   [ShopItem.levelUpCard]: {
     name: "升级道具卡",
     description: "升级道具卡的等级,仅在本次游戏中生效",
-    cost: 10000 / shopItemConfig[ShopItem.levelUpCard],
+    // cost: 10000 / shopItemConfig[ShopItem.levelUpCard],
+    cost: 0,
   },
   [ShopItem.bossTicket]: {
     name: "首领券",
     description: "增加1张首领券,最多20张,可在最后挑战最终首领",
-    cost: 10000 / shopItemConfig[ShopItem.bossTicket],
+    // cost: 10000 / shopItemConfig[ShopItem.bossTicket],
+    cost: 0,
   },
 };
 
@@ -64,6 +68,7 @@ export function getShopItem(
         ...cardPlayer.deck,
         new HealCard(playerHealth ? playerHealth.level : 1),
       ];
+      cardPlayer.deck = Random.shuffle(cardPlayer.deck);
       return `你为你的卡牌中添加了一张伤药卡,仅在本次游戏中生效`;
     case ShopItem.addItemPoison:
       const [playerPoison] = player.itemBag.filter(
@@ -74,6 +79,7 @@ export function getShopItem(
         ...cardPlayer.deck,
         new PoisonCard(playerPoison ? playerPoison.level : 1),
       ];
+      cardPlayer.deck = Random.shuffle(cardPlayer.deck);
       return `你为你的卡牌中添加了一张毒药卡,仅在本次游戏中生效`;
     case ShopItem.levelUpCard:
       const inEvent = Math.ceil(Math.random()) == 0 ? "伤药" : "毒药";

@@ -15,6 +15,7 @@ import {
   statusSystems,
 } from "./status";
 import { BuffConfig, BuffFactory } from "./buff";
+import { RouteNodeType } from "./route";
 
 const cardFaceDir = () =>
   `${testcanvas}${resolve(dirname, `./assets/img/card`, `cardface.png`)}`;
@@ -36,9 +37,9 @@ const cardColor = {
 };
 
 export enum WildPokemonType {
-  NormalWild = 2,
-  UncommonPokemon = 3,
-  Legendary = 4,
+  NormalWild = 5,
+  UncommonPokemon = 6,
+  Legendary = 7,
 }
 
 export type CardType =
@@ -938,6 +939,7 @@ export class Enemy implements CardCharacter {
   };
   constructor(
     wildPokemon: Pokebattle,
+    pokemonType: RouteNodeType = RouteNodeType.Combat,
     public readonly name: string = wildPokemon.battlename,
     public readonly maxHp: number = new PVP(wildPokemon).maxHp,
     public readonly maxEnergy: number = Math.floor(
@@ -956,13 +958,20 @@ export class Enemy implements CardCharacter {
       handsize: 0,
       category: [],
     };
-    const powerSum = wildPokemon.power.reduce(
-      (sum, curr) => sum + Number(curr),
-      0
-    );
-    if (powerSum > 1200) this.enymyType = WildPokemonType.Legendary;
-    else if (powerSum > 800) this.enymyType = WildPokemonType.UncommonPokemon;
-    else this.enymyType = WildPokemonType.NormalWild;
+
+    switch (pokemonType) {
+      case RouteNodeType.Combat:
+        this.enymyType = WildPokemonType.NormalWild;
+        break;
+      case RouteNodeType.Elite:
+        this.enymyType = WildPokemonType.UncommonPokemon;
+        break;
+      case RouteNodeType.Boss:
+        this.enymyType = WildPokemonType.Legendary;
+        break;
+      default:
+        this.enymyType = WildPokemonType.NormalWild;
+    }
     maxHp = Math.floor(this.enymyType * this.power.hp); //敌对角色血量补正
     this.maxHp = Math.max(maxHp, 1);
     this.currentHp = maxHp;
@@ -1024,7 +1033,6 @@ export class Enemy implements CardCharacter {
     this.energy = this.maxEnergy;
   }
   act(context: CombatContext): string | void {
-    console.log(this.energy);
     context.currentEnergy = this.energy;
     const selectedCard = this.aiStrategy.selectCard(this.currentHand, context);
     if (selectedCard) {

@@ -10,13 +10,17 @@ import { Trainer } from "../trainer/type";
 import { Farm, Food, PlantTree } from "../farm/berryTreeFarm";
 import { Cry_info } from "../guess_cry/type";
 import {
+  CardCharacter,
   CardItem,
   CardPlayer,
   CombatContext,
   Enemy,
+  RougueCard,
+  StatusType,
 } from "../card_battle/type";
-import { RouteNode } from "../card_battle/route";
+import { RouteNode, RouteNodeType } from "../card_battle/route";
 import { Robot } from "../utils/robot";
+import { BuffConfig } from "../card_battle/buff";
 
 //智能体兼容
 
@@ -341,9 +345,69 @@ export async function model(ctx: Context) {
   });
   ctx.model.extend("carddata", {
     id: "string",
-    player: "json",
-    routmap: "json",
-    combatcontext: "json",
+    player: {
+      type: "json",
+      initial: {
+        currentHp: 0,
+        armor: 0,
+        energy: 0,
+        bonus: {
+          energy: 0,
+          damage: 0,
+          Hp: 0,
+          handsize: 0,
+          category: [],
+        },
+        currentHand: [],
+        statusEffects: undefined,
+        activeBuffs: [],
+        rewardBuffs: [],
+        name: "",
+        maxHp: 0,
+        maxEnergy: 0,
+        power: undefined,
+        deck: [],
+        discardPile: [],
+        skill: [],
+        pokemonCategory: [],
+        useCard: () => "",
+        takeDamage: () => {},
+        relax: () => {},
+        refresh: () => {},
+        drawHand: () => [],
+        discardCard: () => {},
+        addStatusEffect: () => "",
+        processTurnStart: () => "",
+        processTurnEnd: () => "",
+        addBuff: () => "",
+        removeBuff: () => "",
+        restor: () => {},
+      },
+      nullable: false,
+    },
+    routmap: {
+      type: "json",
+      initial: {
+        type: RouteNodeType.Combat,
+        depth: 0,
+        children: [],
+        isCompleted: true,
+        isExplored: false,
+      },
+      nullable: false,
+    },
+    combatcontext: {
+      type: "json",
+      initial: {
+        player: undefined,
+        self: undefined,
+        enemyturn: false,
+        currentEnergy: 0,
+        turnCount: 0,
+        logs: [],
+      },
+      nullable: false,
+    },
   });
 
   ctx.model.extend(

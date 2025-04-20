@@ -1,5 +1,7 @@
 import { PokemonPower } from "../battle";
-import { Robot } from "../utils/robot";
+import { PokemonBase } from "../utils/method";
+import { CardRobot, Robot } from "../utils/robot";
+import { getRandomPokemon } from "./monster";
 import { ShopItem } from "./shop";
 import {
   CardCharacter,
@@ -128,9 +130,10 @@ export class RouteGenerator {
 
   private static generateEnemies(type: RouteNodeType, depth: number): Enemy {
     let enemies: Enemy;
+    const enemyPower: PokemonBase = getRandomPokemon(type);
 
-    const enemy = new Robot(100);
-    enemies = new Enemy(enemy);
+    const enemy = new CardRobot(100, enemyPower);
+    enemies = new Enemy(enemy, type);
 
     return enemies;
   }

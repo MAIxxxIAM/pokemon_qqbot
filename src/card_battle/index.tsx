@@ -33,6 +33,18 @@ export async function apply(ctx: Context) {
   //   let gameMap = RouteGenerator.createInitialRoute();
   //   return await drawPortal(gameMap);
   // });
+  ctx.command("清空测试数据", { authority: 4 }).action(async ({ session }) => {
+    await ctx.database.set(
+      "carddata",
+      {},
+      {
+        player: {},
+        combatcontext: {},
+        routmap: {},
+      }
+    );
+  });
+
   ctx
     .command("cardexpore")
     .alias("探索事件")
@@ -189,6 +201,9 @@ export async function apply(ctx: Context) {
         : null;
 
       const md = `你进入了商店,可以购买以下物品：
+
+> PS:当前为测试,所有道具都价格为0,正式上线后会会对数据进行清空
+
 ---
 
 > <qqbot-cmd-input text="1" show="${itemMenu?.[shop[0]].name}   介绍:${
