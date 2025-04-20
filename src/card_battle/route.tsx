@@ -132,7 +132,7 @@ export class RouteGenerator {
     let enemies: Enemy;
     const enemyPower: PokemonBase = getRandomPokemon(type);
 
-    const enemy = new CardRobot(100, enemyPower);
+    const enemy = new CardRobot(100, enemyPower, depth);
     enemies = new Enemy(enemy, type);
 
     return enemies;

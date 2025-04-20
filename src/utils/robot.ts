@@ -98,7 +98,7 @@ export class CardRobot implements Pokebattle {
   trainer_list?: Trainer[];
   relex: Date;
 
-  constructor(level: number, cardMonster: PokemonBase) {
+  constructor(level: number, cardMonster: PokemonBase, depth: number) {
     this.level = level >= 98 ? 100 : level + Math.floor(Math.random() * 5) - 2;
     this.id = "robot" + "-" + Math.random().toString(36).substring(2, 10);
     this.name = pokemonCal.pokemonlist(`${cardMonster.id}.${cardMonster.id}`);
@@ -106,12 +106,12 @@ export class CardRobot implements Pokebattle {
     this.monster_1 = `${cardMonster.id}.${cardMonster.id}`;
     this.battlename = pokemonCal.pokemonlist(this.monster_1);
     this.base = [
-      cardMonster.hp.toString(),
-      cardMonster.att.toString(),
-      cardMonster.def.toString(),
-      cardMonster.spa.toString(),
-      cardMonster.spd.toString(),
-      cardMonster.spe.toString(),
+      (cardMonster.hp * (1 + 0.1 * Math.ceil(depth / 5))).toString(),
+      (cardMonster.att * (1 + 0.1 * Math.ceil(depth / 5))).toString(),
+      (cardMonster.def * (1 + 0.1 * Math.ceil(depth / 5))).toString(),
+      (cardMonster.spa * (1 + 0.1 * Math.ceil(depth / 5))).toString(),
+      (cardMonster.spd * (1 + 0.1 * Math.ceil(depth / 5))).toString(),
+      (cardMonster.spe * (1 + 0.1 * Math.ceil(depth / 5))).toString(),
     ];
     const botpoke: PokemonList = {
       id: this.id,
