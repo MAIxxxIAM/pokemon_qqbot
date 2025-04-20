@@ -831,7 +831,9 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
 ---
 > ${rarityBuff.map(
             (item, i) =>
-              `<qqbot-cmd-input text="${i}" show="${item.name}" reference="false" /> ${item.description}`
+              `<qqbot-cmd-input text="${i + 1}" show="${
+                item.name
+              }" reference="false" /> ${item.description}`
           ).join(`
 `)}`;
           const buttons = rarityBuff.map((item, i) => {
@@ -859,7 +861,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           chooseBuff = chooseBuff
             ? chooseBuff
             : Math.floor(Math.random() * rarityBuff.length);
-          const thisBuff = rarityBuff[chooseBuff];
+          const thisBuff = rarityBuff[chooseBuff - 1];
           const logs = cardData.player.addBuff(thisBuff);
           cardData.routmap.isExplored = true;
           await ctx.database.set(
