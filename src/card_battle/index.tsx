@@ -495,8 +495,9 @@ ${"```"}`;
       const [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (cardData || cardData?.routmap?.isCompleted == false)
+      if (cardData && cardData.routmap?.isCompleted === false) {
         return `你已经在一场游戏中，请勿重复进入`;
+      }
       if (!player) {
         try {
           await session.execute(`签到`);
@@ -513,19 +514,34 @@ ${"```"}`;
       }
       const newPlayer = new CardPlayer(player);
       const newRoutMap = RouteGenerator.createInitialRoute();
-      await ctx.database.set("carddata", { id: session.userId }, (row) => ({
-        player: newPlayer,
-        routmap: newRoutMap,
-        combatcontext: {
-          player: newPlayer,
-          self: newRoutMap.enemies,
-          currentEnergy: newRoutMap?.enemies?.energy
-            ? newRoutMap?.enemies?.energy
-            : 0,
-          turnCount: 0,
-          logs: [],
-        },
-      }));
+      cardData
+        ? await ctx.database.set("carddata", { id: session.userId }, (row) => ({
+            player: newPlayer,
+            routmap: newRoutMap,
+            combatcontext: {
+              player: newPlayer,
+              self: newRoutMap.enemies,
+              currentEnergy: newRoutMap?.enemies?.energy
+                ? newRoutMap?.enemies?.energy
+                : 0,
+              turnCount: 0,
+              logs: [],
+            },
+          }))
+        : await ctx.database.create("carddata", {
+            id: session.userId,
+            player: newPlayer,
+            routmap: newRoutMap,
+            combatcontext: {
+              player: newPlayer,
+              self: newRoutMap.enemies,
+              currentEnergy: newRoutMap?.enemies?.energy
+                ? newRoutMap?.enemies?.energy
+                : 0,
+              turnCount: 0,
+              logs: [],
+            },
+          });
 
       // console.log(newRoutMap.enemies);
 
