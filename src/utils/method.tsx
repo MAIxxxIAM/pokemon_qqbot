@@ -882,17 +882,13 @@ export async function toUrl(ctx, session, img_base64) {
     return url.replace(/_/g, "%5F");
   }
   let url = `http://212.64.28.102:5020/i/errorimg/error.png`;
-  for (let i = 0; i < 3; i++) {
-    try {
-      const tempUrl = await ctx.get("server.temp").create(img);
-      if (tempUrl) {
-        url = tempUrl;
-        break;
-      }
-    } catch (e) {
-      continue;
+  try {
+    const tempUrl = await ctx.get("server.temp").create(img);
+    if (tempUrl) {
+      url = tempUrl;
     }
-  }
+  } catch (e) {}
+
   return url;
   // }
 }
