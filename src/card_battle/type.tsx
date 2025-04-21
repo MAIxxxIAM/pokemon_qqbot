@@ -258,6 +258,10 @@ export class CardPlayer implements CardCharacter {
   }
 }
 
+//卡面缓存变量
+
+let drawCardCache: Map<string, Promise<Element>> = new Map();
+
 //基础战斗卡
 export class BaseAttckCard extends RougueCard {
   constructor() {
@@ -280,32 +284,38 @@ export class BaseAttckCard extends RougueCard {
     return Object.assign(new BaseAttckCard(), data);
   }
   async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        dirname,
-        `./assets/img/card`,
-        `${this.type}.png`
-      )}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const attackIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          dirname,
+          `./assets/img/card`,
+          `${this.type}.png`
+        )}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 
@@ -336,32 +346,38 @@ export class BaseSpecialAttackCard extends RougueCard {
     return Object.assign(new BaseSpecialAttackCard(), data);
   }
   async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        dirname,
-        `./assets/img/card`,
-        `${this.type}.png`
-      )}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const attackIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          dirname,
+          `./assets/img/card`,
+          `${this.type}.png`
+        )}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 
@@ -385,32 +401,38 @@ export class BaseArmorCard extends RougueCard {
     return Object.assign(new BaseArmorCard(), data);
   }
   async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        dirname,
-        `./assets/img/card`,
-        `${this.type}.png`
-      )}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const attackIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          dirname,
+          `./assets/img/card`,
+          `${this.type}.png`
+        )}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 
@@ -428,32 +450,38 @@ export class ArmorBreakCard extends RougueCard {
     return Object.assign(new ArmorBreakCard(), data);
   }
   async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        dirname,
-        `./assets/img/card`,
-        `${this.type}.png`
-      )}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const attackIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          dirname,
+          `./assets/img/card`,
+          `${this.type}.png`
+        )}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 
@@ -512,32 +540,38 @@ export class PoisonCard extends RougueCard {
     return Object.assign(new PoisonCard(1), data);
   }
   async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        dirname,
-        `./assets/img/card`,
-        `${this.type}.png`
-      )}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const attackIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          dirname,
+          `./assets/img/card`,
+          `${this.type}.png`
+        )}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 
@@ -584,32 +618,38 @@ export class HealCard extends RougueCard {
     return Object.assign(new HealCard(1), data);
   }
   async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const attackIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(
-        dirname,
-        `./assets/img/card`,
-        `${this.type}.png`
-      )}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const attackIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          dirname,
+          `./assets/img/card`,
+          `${this.type}.png`
+        )}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 
@@ -670,31 +710,37 @@ export class SkillCard extends RougueCard {
     return Object.assign(new SkillCard(new Skill(1)), data);
   }
   async drawCard(ctx: Context): Promise<any> {
-    const icondir = typeDirname(this.cardCategory);
-    const icon = await ctx.canvas.loadImage(icondir);
-    const cardFace = await ctx.canvas.loadImage(cardFaceDir());
-    const swardIcon = await ctx.canvas.loadImage(
-      `${testcanvas}${resolve(dirname, `./assets/img/card`, `sword.png`)}`
-    );
-    return ctx.canvas.render(445, 670, (c) => {
-      c.fillStyle = cardColor[this.rarity];
-      c.fillRect(0, 0, 445, 670);
-      c.drawImage(cardFace, 10, 10, 425, 650);
-      c.globalAlpha = 0.3;
-      c.drawImage(icon, 85, 125, 250, 250);
-      c.globalAlpha = 1;
-      c.drawImage(swardIcon, 85, 125, 250, 250);
-      c.drawImage(icon, 45, 545, 80, 80);
-      c.font = "bold 30px";
-      c.fillStyle = "#000000";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      wrapText(c, this.description, 220, 480, 300, 30);
-      wrapText(c, this.name, 220, 415, 300, 30);
-      c.font = "bold 80px";
-      c.fillStyle = "#ab8818";
-      c.fillText(this.cost.toString(), 360, 585);
-    });
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const swardIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(dirname, `./assets/img/card`, `sword.png`)}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.globalAlpha = 0.3;
+        c.drawImage(icon, 85, 125, 250, 250);
+        c.globalAlpha = 1;
+        c.drawImage(swardIcon, 85, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 

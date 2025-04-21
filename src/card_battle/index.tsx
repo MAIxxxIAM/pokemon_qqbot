@@ -257,7 +257,7 @@ export async function apply(ctx: Context) {
                     `购买${itemMenu?.[shop[1]].name}  费用${
                       itemMenu?.[shop[1]].cost
                     }扭蛋币`,
-                    `1`,
+                    `2`,
                     session.userId,
                     `购买物品`
                   ),
@@ -270,7 +270,7 @@ export async function apply(ctx: Context) {
                     `购买${itemMenu?.[shop[2]].name}  费用${
                       itemMenu?.[shop[2]].cost
                     }扭蛋币`,
-                    `1`,
+                    `3`,
                     session.userId,
                     `购买物品`
                   ),
@@ -816,6 +816,31 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           : `other`;
       switch (whoseWin) {
         case "player":
+          if (cardData.routmap.type == RouteNodeType.Boss) {
+            cardplayer.relax();
+            const bossMd = `你在boss战中获得了胜利,点亮了此处的迷雾
+🌟你的血量恢复了🌟
+---
+![img#500px #500px](${await toUrl(
+              ctx,
+              session,
+              `file://${resolve(dirname, `./assets/img/card/篝火.png`)}`
+            )})`;
+            await sendMarkdown(ctx, bossMd, session);
+          } else {
+            cardplayer.currentHp = Math.floor(
+              Math.min(
+                cardplayer.maxHp + cardplayer.bonus.Hp,
+                cardplayer.currentHp +
+                  cardplayer.power.speed *
+                    (0.0005 + cardData.routmap.depth * 0.0001) *
+                    (cardplayer.maxHp + cardplayer.bonus.Hp)
+              )
+            );
+            await session.send(
+              `你击败了迷雾中的宝可梦,迷雾散去,血量恢复至${cardplayer.currentHp}`
+            );
+          }
           const rarityBuff = pickBuff(3);
           const rarityImage = await toUrl(
             ctx,
@@ -824,7 +849,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
               await drawPortal(undefined, rarityBuff)
             ).attrs.src
           );
-          const md = `你获得了胜利！成功探索了这一层地图
+          const md = `成功探索了这一层地图
 领取你的奖励：
 ![img#500px #333px](${rarityImage})
 
@@ -840,7 +865,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
             return button(
               session.isDirect ? 2 : 0,
               item.name,
-              String(i),
+              String(i + 1),
               session.userId,
               `${item.name}`
             );

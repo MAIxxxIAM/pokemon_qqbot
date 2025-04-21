@@ -556,6 +556,25 @@ export function toKeyMarkdown(
   return data;
 }
 
+export async function sendMarkdownRetry(
+  sendFun: () => Promise<any>,
+  session: Session,
+  retry = 3
+) {
+  for (let i = 0; i < retry; i++) {
+    try {
+      return await sendFun();
+    } catch (e) {
+      if (i < retry - 1) {
+        continue;
+      }
+    }
+  }
+  if (session) {
+    await session.send("消息发送失败，请稍后再试。");
+  }
+}
+
 export async function sendMarkdown(
   ctx: Context,
   a: string,
@@ -582,124 +601,47 @@ export async function sendMarkdown(
     .replace(/\|\|/g, "");
   const { platform } = session;
 
-  //去除@用户,用作markdown转图片
-  const mdToImg = a.replace(`<qqbot-at-user id="${session.userId}" />`, "你");
-
   //转换为key-value格式数组，发送通用markdown消息
   //提取图片url
-  const url = a.match(/https?:\/\/[^\s)]+/g);
+  // const url = a.match(/https?:\/\/[^\s)]+/g);
   //判断是否纯在图片
 
-  //提取图片大小
-  const img_size = a.match(/\!\[(.*?)\s*#(\d+)px #(\d+)px\]/);
   //判断是否为短文本且单图片
-  let onepic = true;
+  // let onepic = true;
   let kvMarkdown: markdownMessage = {
     title: "",
     content: "",
   };
 
   //判断是否存在代码块
-  if (a.match(/```([^`]+)```/s)) {
-    if (
-      a
-        .match(/```([^`]+)```/s)[0]
-        ?.split("\n")
-        ?.filter((part) => part.replace(/```/g, "") !== "")?.length > 6
-    ) {
-      onepic = false;
-    }
-  }
+  // if (a.match(/```([^`]+)```/s)) {
+  //   if (
+  //     a
+  //       .match(/```([^`]+)```/s)[0]
+  //       ?.split("\n")
+  //       ?.filter((part) => part.replace(/```/g, "") !== "")?.length > 6
+  //   ) {
+  //     onepic = false;
+  //   }
+  // }
   kvMarkdown.title = splitText(outUrlMarkdown, mdModel.title.length, false)[0];
 
   let c: any;
   switch (platform) {
     case "qq":
-    case "qqguild":
       try {
-        c = await session.bot.internal[
-          isDirect ? "sendPrivateMessage" : "sendMessage"
-        ](
-          session.channelId,
-          Object.assign(
-            {
-              content: "111",
-              msg_type: 2,
-              markdown: {
-                custom_template_id: "102072441_1711377105",
-                params: b,
-              },
-              timestamp: session.timestamp,
-              msg_seq: Math.floor(Math.random() * 1000000),
-            },
-            platform == "qq" ? button : null,
-            eventId ? { event_id: eventId } : { msg_id: session.messageId }
-          )
-        );
-      } catch (e) {
-        console.log(e);
-        if (url === null) {
-          mdModel = command
-            ? md_ky?.[command]
-              ? md_ky?.[command]
-              : md_ky.textMarkdown
-            : md_ky.textMarkdown;
-          const Markdown = splitText(outUrlMarkdown, mdModel.title.length);
-          Markdown.shift();
-          outUrlMarkdown = Markdown.join("\n");
-          kvMarkdown.content = outUrlMarkdown;
-        } else if (url.length == 1 && onepic) {
-          const Markdown = outUrlMarkdown.split("\n");
-          Markdown.shift();
-          outUrlMarkdown = Markdown.join("\n");
-          kvMarkdown.content = outUrlMarkdown;
-          kvMarkdown.image = {
-            width: Number(img_size[2]),
-            height: Number(img_size[3]),
-            url: url[0],
-          };
-        } else {
-          const d = await ctx.markdownToImage.convertToImage(mdToImg);
-          const size = imageSize(d);
-          const imgSrc = await toUrl(ctx, session, d);
-          kvMarkdown.image = {
-            width: size.width,
-            height: size.height,
-            url: imgSrc,
-          };
-        }
-        //markdown百插值失效
-        //按钮转换为文本
-        let buttons = button
-          ? button.keyboard.content.rows.map((row) => row.buttons)
-          : [];
-        buttons = buttons.flat();
-        let canUse = "»";
-        const buttonName = buttons
-          .map((button) => {
-            if (button.action.type == 2) {
-              return `${button.action.data}➣${button.render_data.label}`;
-            }
-          })
-          .filter((a) => a !== undefined);
-        for (let i = 0; i < buttonName.length; i++) {
-          if ((i + 1) % 3 == 0 && i != buttonName.length - 1) {
-            canUse += buttonName[i] + "\n»";
-          } else {
-            canUse += buttonName[i] + (i == buttonName.length - 1 ? "" : "||");
-          }
-        }
-        const data = toKeyMarkdown(kvMarkdown);
-        try {
-          c = await session.bot.internal.sendMessage(
+        c = await sendMarkdownRetry(
+          await session.bot.internal[
+            isDirect ? "sendPrivateMessage" : "sendMessage"
+          ](
             session.channelId,
             Object.assign(
               {
                 content: "111",
                 msg_type: 2,
                 markdown: {
-                  custom_template_id: mdModel.id,
-                  params: data,
+                  custom_template_id: "102072441_1711377105",
+                  params: b,
                 },
                 timestamp: session.timestamp,
                 msg_seq: Math.floor(Math.random() * 1000000),
@@ -707,88 +649,155 @@ export async function sendMarkdown(
               platform == "qq" ? button : null,
               eventId ? { event_id: eventId } : { msg_id: session.messageId }
             )
-          );
-        } catch (e) {
-          //发送失败则发送标准图片消息
-          const content = splitText(outUrlMarkdown, mdModel.text.length, false);
-          c = await session.send(
-            <message>
-              {url ? <img src={url[0]} /> : ""}
-              {content.join("\n") + "\n" + buttonName.join("\n")}
-            </message>
-          );
-        }
+          ),
+          session
+        );
+        // c = await session.bot.internal[
+        //   isDirect ? "sendPrivateMessage" : "sendMessage"
+        // ](
+        //   session.channelId,
+        //   Object.assign(
+        //     {
+        //       content: "111",
+        //       msg_type: 2,
+        //       markdown: {
+        //         custom_template_id: "102072441_1711377105",
+        //         params: b,
+        //       },
+        //       timestamp: session.timestamp,
+        //       msg_seq: Math.floor(Math.random() * 1000000),
+        //     },
+        //     platform == "qq" ? button : null,
+        //     eventId ? { event_id: eventId } : { msg_id: session.messageId }
+        //   )
+        // );
+      } catch (e) {
+        c = await session.send(`消息发送失败,请再试一次`);
       }
+      break;
+    case "qqguild":
+      await session.send(
+        `麦麦已经停止了频道讨论组的支持,需要转移数据的可以进qq群联系群主`
+      );
+      // let buttons = button
+      //     ? button.keyboard.content.rows.map((row) => row.buttons)
+      //     : [];
+      //   buttons = buttons.flat();
+      //   let canUse = "»";
+      //   const buttonName = buttons
+      //     .map((button) => {
+      //       if (button.action.type == 2) {
+      //         return `${button.action.data}➣${button.render_data.label}`;
+      //       }
+      //     })
+      //     .filter((a) => a !== undefined);
+      //   for (let i = 0; i < buttonName.length; i++) {
+      //     if ((i + 1) % 3 == 0 && i != buttonName.length - 1) {
+      //       canUse += buttonName[i] + "\n»";
+      //     } else {
+      //       canUse += buttonName[i] + (i == buttonName.length - 1 ? "" : "||");
+      //     }
+      //   }
+      //   const data = toKeyMarkdown(kvMarkdown);
+      //   try {
+      //     c = await session.bot.internal.sendMessage(
+      //       session.channelId,
+      //       Object.assign(
+      //         {
+      //           content: "111",
+      //           msg_type: 2,
+      //           markdown: {
+      //             custom_template_id: mdModel.id,
+      //             params: data,
+      //           },
+      //           timestamp: session.timestamp,
+      //           msg_seq: Math.floor(Math.random() * 1000000),
+      //         },
+      //         platform == "qq" ? button : null,
+      //         eventId ? { event_id: eventId } : { msg_id: session.messageId }
+      //       )
+      //     );
+      //   } catch (e) {
+      //     //发送失败则发送标准图片消息
+      //     const content = splitText(outUrlMarkdown, mdModel.text.length, false);
+      //     c = await session.send(
+      //       <message>
+      //         {url ? <img src={url[0]} /> : ""}
+      //         {content.join("\n") + "\n" + buttonName.join("\n")}
+      //       </message>
+      //     );
+      //   }
       break;
     //telegram兼容
-    case "telegram":
-      outUrlMarkdown = outUrlMarkdown
-        .replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, "\\$1")
-        .replace(/(.)(>)/g, "$1\\$2");
-      const urlText = outUrlMarkdown.split("\n")[0];
-      const Markdown = outUrlMarkdown.split("\n");
-      Markdown.shift();
-      outUrlMarkdown = Markdown.filter((a) => a.replace(/\s/g, "") != "").join(
-        "\n"
-      );
-      let buttons = button
-        ? button.keyboard.content.rows.map((row) => row.buttons)
-        : [];
-      buttons = buttons.flat();
-      const buttonName: Telegram.InlineKeyboardButton[][] = [];
-      let temp = [];
 
-      buttons.forEach((button, index) => {
-        if (button.action.type == 2) {
-          const buttonElement = (
-            <button
-              id={button.id}
-              type="input"
-              text={button.action.data}
-              theme="primary"
-            >
-              {button.render_data.label}
-            </button>
-          );
-          temp.push(
-            decodeButton(buttonElement.attrs, button.render_data.label)
-          );
+    // case "telegram":
+    //   outUrlMarkdown = outUrlMarkdown
+    //     .replace(/([#*_~()\[\]`#+\-={}|{}.!])/g, "\\$1")
+    //     .replace(/(.)(>)/g, "$1\\$2");
+    //   const urlText = outUrlMarkdown.split("\n")[0];
+    //   const Markdown = outUrlMarkdown.split("\n");
+    //   Markdown.shift();
+    //   outUrlMarkdown = Markdown.filter((a) => a.replace(/\s/g, "") != "").join(
+    //     "\n"
+    //   );
+    //   let buttons = button
+    //     ? button.keyboard.content.rows.map((row) => row.buttons)
+    //     : [];
+    //   buttons = buttons.flat();
+    //   const buttonName: Telegram.InlineKeyboardButton[][] = [];
+    //   let temp = [];
 
-          // 当 temp 数组中有两个元素时，将它们作为一个子数组推入结果数组中，并清空 temp 数组
-          if (temp.length === 3) {
-            buttonName.push(temp);
-            temp = [];
-          }
-        }
-      });
+    //   buttons.forEach((button, index) => {
+    //     if (button.action.type == 2) {
+    //       const buttonElement = (
+    //         <button
+    //           id={button.id}
+    //           type="input"
+    //           text={button.action.data}
+    //           theme="primary"
+    //         >
+    //           {button.render_data.label}
+    //         </button>
+    //       );
+    //       temp.push(
+    //         decodeButton(buttonElement.attrs, button.render_data.label)
+    //       );
 
-      // 如果在循环结束后 temp 数组中还有元素，将它们作为一个子数组推入结果数组中
-      if (temp.length > 0) {
-        buttonName.push(temp);
-      }
-      try {
-        c = await session["telegram"].sendMessage({
-          chat_id: session.channelId,
-          text: (url ? `[${urlText}](${url[0]})\n\n` : "") + outUrlMarkdown,
-          parse_mode: "MarkdownV2",
-          reply_markup: {
-            inline_keyboard: buttonName,
-          },
-        });
-      } catch (e) {
-        console.log(e);
-      }
-      break;
+    //       // 当 temp 数组中有两个元素时，将它们作为一个子数组推入结果数组中，并清空 temp 数组
+    //       if (temp.length === 3) {
+    //         buttonName.push(temp);
+    //         temp = [];
+    //       }
+    //     }
+    //   });
 
-    //其他平台
-    default:
-      const content = splitText(outUrlMarkdown, mdModel.text.length, false);
-      c = await session.send(
-        <message>
-          {url ? <img src={url[0]} /> : ""}
-          {content.join("\n")}
-        </message>
-      );
+    //   // 如果在循环结束后 temp 数组中还有元素，将它们作为一个子数组推入结果数组中
+    //   if (temp.length > 0) {
+    //     buttonName.push(temp);
+    //   }
+    //   try {
+    //     c = await session["telegram"].sendMessage({
+    //       chat_id: session.channelId,
+    //       text: (url ? `[${urlText}](${url[0]})\n\n` : "") + outUrlMarkdown,
+    //       parse_mode: "MarkdownV2",
+    //       reply_markup: {
+    //         inline_keyboard: buttonName,
+    //       },
+    //     });
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    //   break;
+
+    // //其他平台
+    // default:
+    //   const content = splitText(outUrlMarkdown, mdModel.text.length, false);
+    //   c = await session.send(
+    //     <message>
+    //       {url ? <img src={url[0]} /> : ""}
+    //       {content.join("\n")}
+    //     </message>
+    //   );
   }
   return c;
 }
