@@ -570,9 +570,6 @@ export async function sendMarkdownRetry(
       }
     }
   }
-  if (session) {
-    await session.send("消息发送失败，请稍后再试。");
-  }
 }
 
 export async function sendMarkdown(
