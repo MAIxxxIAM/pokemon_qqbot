@@ -881,7 +881,15 @@ export async function toUrl(ctx, session, img_base64) {
     const url = await ctx.get("server.temp").upload(img);
     return url.replace(/_/g, "%5F");
   }
-  const { url } = await ctx.get("server.temp").create(img);
+  let url = `${config.图片源}/errorimg/error.png`;
+  for (let i = 0; i < 5; i++) {
+    try {
+      url = await ctx.get("server.temp").create(img);
+      break;
+    } catch (e) {
+      continue;
+    }
+  }
   return url;
   // }
 }
