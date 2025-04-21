@@ -556,22 +556,6 @@ export function toKeyMarkdown(
   return data;
 }
 
-export async function sendMarkdownRetry(
-  sendFun: () => Promise<any>,
-  session: Session,
-  retry = 3
-) {
-  for (let i = 0; i < retry; i++) {
-    try {
-      return await sendFun();
-    } catch (e) {
-      if (i < retry - 1) {
-        continue;
-      }
-    }
-  }
-}
-
 export async function sendMarkdown(
   ctx: Context,
   a: string,
@@ -627,27 +611,24 @@ export async function sendMarkdown(
   switch (platform) {
     case "qq":
       try {
-        c = await sendMarkdownRetry(
-          await session.bot.internal[
-            isDirect ? "sendPrivateMessage" : "sendMessage"
-          ](
-            session.channelId,
-            Object.assign(
-              {
-                content: "111",
-                msg_type: 2,
-                markdown: {
-                  custom_template_id: "102072441_1711377105",
-                  params: b,
-                },
-                timestamp: session.timestamp,
-                msg_seq: Math.floor(Math.random() * 1000000),
+        c = await session.bot.internal[
+          isDirect ? "sendPrivateMessage" : "sendMessage"
+        ](
+          session.channelId,
+          Object.assign(
+            {
+              content: "111",
+              msg_type: 2,
+              markdown: {
+                custom_template_id: "102072441_1711377105",
+                params: b,
               },
-              platform == "qq" ? button : null,
-              eventId ? { event_id: eventId } : { msg_id: session.messageId }
-            )
-          ),
-          session
+              timestamp: session.timestamp,
+              msg_seq: Math.floor(Math.random() * 1000000),
+            },
+            platform == "qq" ? button : null,
+            eventId ? { event_id: eventId } : { msg_id: session.messageId }
+          )
         );
         // c = await session.bot.internal[
         //   isDirect ? "sendPrivateMessage" : "sendMessage"
