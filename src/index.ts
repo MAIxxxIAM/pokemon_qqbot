@@ -117,6 +117,11 @@ export interface Config {
   key9: string;
   key10: string;
   bot邀请链接: string;
+  Bucket: string;
+  Region: string;
+  SecretId: string;
+  SecretKey: string;
+  GroupID: string;
 }
 
 export const Config = Schema.intersect([
@@ -196,85 +201,12 @@ export const Config = Schema.intersect([
     Schema.object({}),
   ]),
   Schema.object({
-    isDarkThemeEnabled: Schema.boolean()
-      .default(false)
-      .description(`是否开启黑暗主题。`),
-    isHighContrastThemeEnabled: Schema.boolean()
-      .default(false)
-      .description(`是否开启高对比度（色盲）主题。`),
-    // shouldAddBorderInHandleMode: Schema.boolean().default(true).description(`是否为块添加边框，仅在汉兜模式下生效。`),
-  }).description("主题设置"),
-
-  Schema.object({
-    maxSimultaneousGuesses: Schema.number()
-      .min(1)
-      .default(4)
-      .description(`最多同时猜测单词的数量。`),
-    compositeImagePageWidth: Schema.number()
-      .min(1)
-      .default(800)
-      .description(`合成图片页面宽度。`),
-    compositeImagePageHeight: Schema.number()
-      .min(1)
-      .default(100)
-      .description(`合成图片页面高度。`),
-  }).description("游戏设置"),
-
-  Schema.intersect([
-    Schema.object({
-      enableWordGuessTimeLimit: Schema.boolean()
-        .default(false)
-        .description(`是否开启猜单词游戏作答时间限制功能。`),
-    }),
-    Schema.union([
-      Schema.object({
-        enableWordGuessTimeLimit: Schema.const(true).required(),
-        wordGuessTimeLimitInSeconds: Schema.number()
-          .min(0)
-          .default(120)
-          .description(`猜单词游戏作答时间，单位是秒。`),
-      }),
-      Schema.object({}),
-    ]),
-    Schema.object({
-      retractDelay: Schema.number()
-        .min(0)
-        .default(0)
-        .description(
-          `自动撤回等待的时间，单位是秒。值为 0 时不启用自动撤回功能。`
-        ),
-      imageType: Schema.union(["png", "jpeg", "webp"])
-        .default("png")
-        .description(`发送的图片类型。`),
-      isTextToImageConversionEnabled: Schema.boolean()
-        .default(false)
-        .description(
-          `是否开启将文本转为图片的功能（可选），如需启用，需要启用 \`markdownToImage\` 服务。`
-        ),
-      isEnableQQOfficialRobotMarkdownTemplate: Schema.boolean()
-        .default(false)
-        .description(`是否启用 QQ 官方机器人的 Markdown 模板，带消息按钮。`),
-    }),
-    Schema.union([
-      Schema.object({
-        isEnableQQOfficialRobotMarkdownTemplate: Schema.const(true).required(),
-        customTemplateId: Schema.string()
-          .default("111")
-          .description(`自定义模板 ID。`),
-        key: Schema.string()
-          .default("")
-          .description(
-            `文本内容中特定插值的 key，用于存放文本。如果你的插值为 {{.info}}，那么请在这里填 info。`
-          ),
-        numberOfMessageButtonsPerRow: Schema.number()
-          .min(4)
-          .max(5)
-          .default(4)
-          .description(`每行消息按钮的数量。`),
-      }),
-      Schema.object({}),
-    ]),
-  ]),
+    Bucket: Schema.string().required(),
+    Region: Schema.string().default("ap-guangzhou"),
+    SecretId: Schema.string().role("secret").required(),
+    SecretKey: Schema.string().role("secret").required(),
+    GroupID: Schema.string().required().description("任意群的GroupID"),
+  }),
 ]);
 
 export let testcanvas: string;

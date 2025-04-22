@@ -1,12 +1,10 @@
-import { parse, resolve } from "path";
-import { Pokebattle, logger, config, shop, testcanvas, Config } from "..";
+import { resolve } from "path";
+import { Pokebattle, logger, config, shop, testcanvas } from "..";
 import { type, battleType, md_ky } from "./data";
-import { Context, Session, Element, h, Dict } from "koishi";
-import { WildPokemon } from "../battle";
+import { Context, Session, Element, Dict } from "koishi";
 import {} from "koishi-plugin-cron";
-import { FusionPokemon, Natures, PokemonList } from "../model";
+import { FusionPokemon, PokemonList } from "../model";
 import { DigMine, StoneType } from "../dig_game/type";
-import imageSize from "image-size";
 import {} from "koishi-plugin-text-censor";
 import { Telegram } from "@koishijs/plugin-adapter-telegram";
 import { markdownMessage } from "../utils/message";
@@ -14,6 +12,9 @@ import { dirname } from "../dirname";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
 import * as fs from "fs/promises";
+import COS from "cos-nodejs-sdk-v5";
+import { promises } from "fs";
+import { randomUUID } from "crypto";
 
 export function mudPath(a: string) {
   return `${testcanvas}${resolve(
@@ -31,6 +32,31 @@ export interface PokemonBase {
   spa: number;
   spd: number;
   spe: number;
+}
+
+async function imgCreate(ctx, data) {
+  const cos = new COS({
+    SecretId: config.SecretId,
+    SecretKey: config.SecretKey,
+  });
+  const bucket = config.Bucket;
+  const region = config.Region;
+  if (typeof data === "string") {
+    if (new URL(data).protocol === "file:") {
+      data = await promises.readFile(fileURLToPath(data));
+    } else {
+      data = await ctx.http.get(data, { responseType: "arraybuffer" });
+      data = Buffer.from(data);
+    }
+  }
+  const { Location } = await cos.putObject({
+    Bucket: bucket,
+    Region: region,
+    Key: randomUUID(),
+    Body: data,
+    ContentType: "image/webp",
+  });
+  return { url: `https://${Location}` };
 }
 
 export function calculateDistance(x1, y1, x2, y2) {
@@ -650,13 +676,12 @@ export async function sendMarkdown(
         //   )
         // );
       } catch (e) {
-        c = await session.send(`消息发送失败,请再试一次`);
+        c = await session.send(<markdown>{a}</markdown>);
       }
       break;
     case "qqguild":
-      await session.send(
-        `麦麦已经停止了频道讨论组的支持,需要转移数据的可以进qq群联系群主`
-      );
+      c = await session.send(<markdown>{a}</markdown>);
+
       // let buttons = button
       //     ? button.keyboard.content.rows.map((row) => row.buttons)
       //     : [];
@@ -768,14 +793,17 @@ export async function sendMarkdown(
     //   break;
 
     // //其他平台
-    // default:
+    default:
+      c = await session.send(<markdown>{a}</markdown>);
+
+      break;
     //   const content = splitText(outUrlMarkdown, mdModel.text.length, false);
     //   c = await session.send(
     //     <message>
     //       {url ? <img src={url[0]} /> : ""}
     //       {content.join("\n")}
     //     </message>
-    //   );
+    // );
   }
   return c;
 }
@@ -881,17 +909,28 @@ export async function toUrl(ctx, session, img_base64) {
     const url = await ctx.get("server.temp").upload(img);
     return url.replace(/_/g, "%5F");
   }
-  let urls = `${config.图片源}/errorimg/error.png`;
+  let urls = `${config.图片源}/errorimg/error.webp`;
+  let iscos = false;
   for (let i = 0; i < 5; i++) {
     try {
       const { url } = await ctx.get("server.temp").create(img);
       if (url) {
         urls = url;
+        iscos = false;
         break;
       }
     } catch (e) {
       // 可选：console.log(e);
+      iscos = true;
       continue;
+    }
+  }
+  if (iscos) {
+    try {
+      const { url } = await imgCreate(ctx, img);
+      urls = url.replace(/_/g, "%5F");
+    } catch (e) {
+      logger.error(e);
     }
   }
   return urls;

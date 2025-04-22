@@ -1,4 +1,4 @@
-import { CardCharacter, StatusEffect, StatusType } from "./type";
+import { CardCharacter, CombatContext, StatusEffect, StatusType } from "./type";
 
 //
 
@@ -7,9 +7,71 @@ export interface StatusHandler {
   applyEffect(target: CardCharacter, stacks: number): string | undefined;
   processTurnStart(target: CardCharacter): string | undefined;
   processTurnEnd(target: CardCharacter): string | undefined;
-  onUseCard?(target: CardCharacter): string | undefined;
+  onUseCard?(
+    target: CardCharacter,
+    context?: CombatContext
+  ): string | undefined;
   onReceiveDamage?(target: CardCharacter): string | undefined;
   restor(data: Partial<StatusHandler>): StatusHandler;
+}
+
+export class NumbStatusHandler implements StatusHandler {
+  type: StatusType = "numb";
+
+  applyEffect(target: CardCharacter, stacks: number): string | undefined {
+    if (target.pokemonCategory.includes("电"))
+      return `麻痹无法对电属性宝可梦生效`;
+    const existing = target.statusEffects.get(this.type);
+    if (existing) {
+      existing.stacks += stacks;
+      existing.duration = Math.max(existing.duration, 3);
+    } else {
+      target.statusEffects.set(this.type, {
+        type: this.type,
+        stacks,
+        duration: 3,
+      });
+      target.power.speed = Math.floor(target.power.speed / 2);
+      target.energy = Math.max(target.energy - 2, 3);
+      target.maxEnergy = Math.max(target.maxEnergy - 2, 3);
+    }
+    return `,${target.name}麻痹了！${
+      existing ? "" : `${target.name}速度减半,能量减少2点(最低3点)`
+    }`;
+  }
+  processTurnStart(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+  onUseCard(target: CardCharacter, context: CombatContext): string | undefined {
+    const effect = target.statusEffects.get(this.type);
+    if (!effect) return;
+    const randomNumb = Math.random() <= 0.25;
+    if (!randomNumb) return;
+    effect.duration--;
+    let log = `${target.name}麻痹了,本回合无法使用技能`;
+    context.enemyturn = false;
+    if (effect.duration <= 0) {
+      target.statusEffects.delete(this.type);
+      log += `${target.name}麻痹效果消失了`;
+      target.power.speed = Math.floor(target.power.speed * 2);
+      target.energy = Math.min(target.energy + 2, target.maxEnergy);
+      target.maxEnergy = Math.min(
+        target.maxEnergy + 2,
+        Math.floor(target.power.speed / 45)
+      );
+    }
+
+    return log;
+  }
+  processTurnEnd(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+  onReceiveDamage?(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+  restor(data: Partial<StatusHandler>): StatusHandler {
+    return Object.assign(new NumbStatusHandler(), data);
+  }
 }
 
 export class PoisonStatusHandler implements StatusHandler {
@@ -180,3 +242,4 @@ export class StatusEffectMap {
 
 export const statusSystems = new StatusSystem();
 statusSystems.registerHandler(new PoisonStatusHandler());
+statusSystems.registerHandler(new NumbStatusHandler());

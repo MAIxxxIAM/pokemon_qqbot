@@ -17,7 +17,7 @@ import {
   RouteNode,
   RouteNodeType,
 } from "./route";
-import { testcanvas } from "..";
+import { config, testcanvas } from "..";
 import {
   BuffConfig,
   CardExporeEvent,
@@ -58,8 +58,31 @@ export async function apply(ctx: Context) {
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardData || !player || cardData?.routmap?.isCompleted)
-        return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player || cardData?.routmap?.isCompleted) {
+        const md = `你还未深入迷雾,是否进入？
+![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      session.isDirect ? 2 : 0,
+                      `开始游戏`,
+                      `cardstard`,
+                      session.userId,
+                      `开始游戏`
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
+      }
       if (cardData.routmap.type !== RouteNodeType.Event)
         return `当前地图无法探索事件`;
       const cardPlay: CardPlayer = await initType(
@@ -100,10 +123,12 @@ export async function apply(ctx: Context) {
           break;
         case CardExporeEvent.Battle:
           logs = [`遭遇陷阱,是善于伪装的敌人`, ...logs];
+          const childRoute = cardData.routmap.children || [];
           cardData.routmap = RouteGenerator.createNode(
             cardData.routmap.depth,
             RouteNodeType.Combat
           );
+          cardData.routmap.children = childRoute;
           nextCommand = `cardbattle`;
           break;
         case CardExporeEvent.LevelUp:
@@ -137,8 +162,31 @@ export async function apply(ctx: Context) {
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardData || !player || cardData?.routmap?.isCompleted)
-        return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player || cardData?.routmap?.isCompleted) {
+        const md = `你还未深入迷雾,是否进入？
+![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      session.isDirect ? 2 : 0,
+                      `开始游戏`,
+                      `cardstard`,
+                      session.userId,
+                      `开始游戏`
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
+      }
       if (cardData.routmap.type !== RouteNodeType.Rest)
         return `当前地图无法探索事件`;
       if (cardData.routmap.isExplored) {
@@ -199,8 +247,31 @@ export async function apply(ctx: Context) {
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardData || !player || cardData?.routmap?.isCompleted)
-        return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player || cardData?.routmap?.isCompleted) {
+        const md = `你还未深入迷雾,是否进入？
+![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      session.isDirect ? 2 : 0,
+                      `开始游戏`,
+                      `cardstard`,
+                      session.userId,
+                      `开始游戏`
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
+      }
       if (cardData.routmap.isExplored) {
         await session.execute(`cardgoon`);
         return;
@@ -354,8 +425,31 @@ export async function apply(ctx: Context) {
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardData || !player || cardData?.routmap?.isCompleted)
-        return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player || cardData?.routmap?.isCompleted) {
+        const md = `你还未深入迷雾,是否进入？
+![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      session.isDirect ? 2 : 0,
+                      `开始游戏`,
+                      `cardstard`,
+                      session.userId,
+                      `开始游戏`
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
+      }
       if (!cardData.routmap.isExplored) {
         return `当前地图未探索完成`;
       }
@@ -496,7 +590,7 @@ ${"```"}`;
         id: session.userId,
       });
       if (cardData && cardData.routmap?.isCompleted === false) {
-        return `你已经在一场游戏中，请勿重复进入`;
+        return `你已经在一片未知的迷雾中,请努力探索`;
       }
       if (!player) {
         try {
@@ -507,7 +601,7 @@ ${"```"}`;
         }
       }
       if (player.skillSlot.length < 4) {
-        return `技能装备数量不足，请先装备技能`;
+        return `技能装备数量不足，请先装备4技能`;
       }
       if (player.level < 100) {
         return `等级不足，无法进入该游戏`;
@@ -600,7 +694,10 @@ ${"```"}`;
           },
         },
       };
-      const md = `你即将和你的宝可梦进入一场随机的卡牌游戏中
+      const md = `迷雾袭来,你即将和你的宝可梦进入其中
+![img#500px #333px](${config.图片源}/errorimg/unknowtown.webp)
+---
+
 当前地图:${newRoutMap.type} 
 
 ${"```"}
@@ -614,14 +711,82 @@ ${"```"}`;
     .command("cardmap")
     .alias("卡牌地图")
     .action(async ({ session }) => {
+      const chooseButton = {
+        战斗: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "战斗"
+        ),
+        精英: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "精英"
+        ),
+        首领: button(
+          session.isDirect ? 2 : 0,
+          "开始战斗",
+          "cardbattle",
+          session.userId,
+          "首领"
+        ),
+        事件: button(
+          session.isDirect ? 2 : 0,
+          "探索该事件",
+          "cardexpore",
+          session.userId,
+          "事件"
+        ),
+        商店: button(
+          session.isDirect ? 2 : 0,
+          "进入商店",
+          "cardshop",
+          session.userId,
+          "商店"
+        ),
+        营地: button(
+          session.isDirect ? 2 : 0,
+          "休息一下",
+          "cardrest",
+          session.userId,
+          "营地"
+        ),
+      };
       let [cardData] = await ctx.database.get("carddata", {
         id: session.userId,
       });
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardData || !player || cardData?.routmap?.isCompleted)
-        return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player || cardData?.routmap?.isCompleted) {
+        const md = `你还未深入迷雾,是否进入？
+![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      session.isDirect ? 2 : 0,
+                      `开始游戏`,
+                      `cardstard`,
+                      session.userId,
+                      `开始游戏`
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
+      }
+
       const cardmap = displayRoute(cardData.routmap);
       const md = `你当前的地图是：
 ---
@@ -634,15 +799,7 @@ ${"```"}`;
           content: {
             rows: [
               {
-                buttons: [
-                  button(
-                    session.isDirect ? 2 : 0,
-                    `继续探索`,
-                    `cardbattle`,
-                    session.userId,
-                    `探索`
-                  ),
-                ],
+                buttons: [chooseButton[cardData.routmap.type]],
               },
               {
                 buttons: [
@@ -672,8 +829,31 @@ ${"```"}`;
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
-      if (!cardData || !player || cardData?.routmap?.isCompleted)
-        return `你还未参与到卡牌游戏中`;
+      if (!cardData || !player || cardData?.routmap?.isCompleted) {
+        const md = `你还未深入迷雾,是否进入？
+![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      session.isDirect ? 2 : 0,
+                      `开始游戏`,
+                      `cardstard`,
+                      session.userId,
+                      `开始游戏`
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
+      }
       if (cardData.routmap.isExplored) {
         await session.execute(`cardgoon`);
         return;
@@ -833,7 +1013,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
                 cardplayer.maxHp + cardplayer.bonus.Hp,
                 cardplayer.currentHp +
                   cardplayer.power.speed *
-                    (0.0005 + cardData.routmap.depth * 0.0001) *
+                    (0.0005 + cardData.routmap.depth * 0.00005) *
                     (cardplayer.maxHp + cardplayer.bonus.Hp)
               )
             );

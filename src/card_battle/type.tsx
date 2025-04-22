@@ -50,9 +50,10 @@ export type CardType =
   | "poison"
   | "health"
   | "bossTicket"
-  | "armorBreak";
+  | "armorBreak"
+  | "numb";
 
-export type StatusType = "poison";
+export type StatusType = "poison" | "numb";
 
 export interface CardCharacter {
   name: string;
@@ -98,7 +99,7 @@ export abstract class RougueCard {
     public readonly description: string,
     public readonly cost: number,
     public readonly rarity: CardRarity,
-    public readonly cardCategory: string = "一般"
+    public cardCategory: string = "一般"
   ) {}
   abstract effect(user: CardCharacter, target?: CardCharacter): void | string;
   abstract restor(data: any): RougueCard;
@@ -158,8 +159,10 @@ export class CardPlayer implements CardCharacter {
     if (!playerLog) return null;
     context.logs = [playerLog as string, ...context.logs];
     this.statusEffects.forEach((effect) => {
-      if (statusSystems.getHandler(effect.type)?.onUseCard(this)) {
-        const slogs = statusSystems.getHandler(effect.type)?.onUseCard(this);
+      if (statusSystems.getHandler(effect.type)?.onUseCard(this, context)) {
+        const slogs = statusSystems
+          .getHandler(effect.type)
+          ?.onUseCard(this, context);
         context.logs = [slogs as string, ...context.logs];
         playerLog = slogs + "\n" + playerLog;
       }
@@ -200,7 +203,7 @@ export class CardPlayer implements CardCharacter {
   discardCard(): void {
     this.discardPile.push(...this.currentHand);
     this.currentHand = [];
-    this.energy = this.maxEnergy;
+    this.energy = this.maxEnergy + this.bonus.energy;
     this.drawHand(5);
   }
   addStatusEffect(type: StatusType, stacks: number) {
@@ -438,13 +441,26 @@ export class BaseArmorCard extends RougueCard {
 
 export class ArmorBreakCard extends RougueCard {
   constructor() {
-    super("破甲卡", "armorBreak", "破除目标一半护甲", 3, CardRarity.Common);
+    super(
+      "破甲卡",
+      "armorBreak",
+      "造成伤害破除目标一半护甲,并生成护甲",
+      3,
+      CardRarity.Epic
+    );
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
     if (!target || this.cost > user.energy) return null;
     target.armor = Math.floor(target.armor / 2);
+    const damage = Math.floor(
+      ((user.power.defense + user.power.specialDefense) / 2) * 0.15
+    );
+    target.takeDamage(damage);
+    user.armor += Math.floor(damage / 2);
     user.energy -= this.cost;
-    return `${user.name}使用了[${this.name}],对${target.name}造成了破甲`;
+    return `${user.name}使用了[${this.name}],对${
+      target.name
+    }造成了破甲,造成${damage}伤害,并获得${Math.floor(damage / 2)}护甲`;
   }
   restor(data: any): ArmorBreakCard {
     return Object.assign(new ArmorBreakCard(), data);
@@ -572,6 +588,28 @@ export class PoisonCard extends RougueCard {
     })();
     drawCardCache.set(this.name, picCard);
     return picCard;
+  }
+}
+
+export class NumbCard extends RougueCard {
+  constructor() {
+    super("麻痹卡", "numb", "使对手麻痹", 3, CardRarity.Epic);
+  }
+  restor(data: any): RougueCard {
+    return Object.assign(new NumbCard(), data);
+  }
+  effect(user: CardCharacter, target?: CardCharacter): void | string {
+    if (this.cost > user.energy) return null;
+    let statusLog = `,${target.name}麻痹了`;
+
+    statusLog = target.addStatusEffect("numb", this.cost);
+
+    user.energy -= this.cost;
+
+    return `${user.name}使用了[${this.name}]${statusLog}`;
+  }
+  drawCard(ctx: Context): Promise<Element> {
+    return;
   }
 }
 
@@ -1099,8 +1137,10 @@ export class Enemy implements CardCharacter {
       context.self = this;
       context.player = context.player;
       this.statusEffects.forEach((effect) => {
-        if (statusSystems.getHandler(effect.type)?.onUseCard(this)) {
-          const slogs = statusSystems.getHandler(effect.type)?.onUseCard(this);
+        if (statusSystems.getHandler(effect.type)?.onUseCard(this, context)) {
+          const slogs = statusSystems
+            .getHandler(effect.type)
+            ?.onUseCard(this, context);
           enemyLog = slogs + "\n" + enemyLog;
           context.logs = [slogs as string, ...context.logs];
         }
@@ -1145,6 +1185,7 @@ export const CardClassMap: Record<CardType, new () => RougueCard> = {
   health: HealCard,
   skill: SkillCard,
   poison: PoisonCard,
+  numb: NumbCard,
   bossTicket: null,
 };
 

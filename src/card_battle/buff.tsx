@@ -373,66 +373,114 @@ const buffLiblary: BuffConfig[] = [
     },
   },
 ].concat(
-  [
-    "一般",
-    "虫",
-    "火",
-    "水",
-    "电",
-    "草",
-    "冰",
-    "格斗",
-    "毒",
-    "地面",
-    "飞行",
-    "超能",
-    "妖精",
-    "岩石",
-    "幽灵",
-    "龙",
-    "恶",
-    "钢铁",
-  ].map((type, i) => {
-    return {
-      name: "属性改变-" + type,
-      type: BuffType.CategoryChange,
-      description: "改变当前玩家属性",
-      id: "buff_category_change_" + i,
-      rarity: Rarity.Exotic,
-      duration: 4,
-      maxDuration: 4,
-      stacks: 1,
-      baseValue: 1,
-      restor(data) {
-        return {
-          ...data,
-          applyBuff: this.applyBuff,
-          removeBuff: this.removeBuff,
-          levelUp: this.levelUp,
-          restor: this.restor,
-        };
-      },
-      applyBuff(target: CardPlayer, isReward?) {
-        if (target.pokemonCategory.includes(type)) {
-          return `${target.name}已经是${type}属性了！`;
-        }
-        if (target.pokemonCategory[1] == "") {
-          target.pokemonCategory[1] = type;
-        } else {
-          target.pokemonCategory[Math.floor(Math.random() * 2)] = type;
-        }
-        this.duration = isReward ? -1 : this.maxDuration;
-        return `${target.name}的属性改为了${type}！`;
-      },
-      removeBuff(target: CardPlayer) {
-        target.pokemonCategory = target.bonus.category;
-        return `${target.name}的属性恢复原状！`;
-      },
-      levelUp() {
-        return undefined;
-      },
-    };
-  })
+  {
+    name: "神秘力量",
+    type: BuffType.CategoryChange,
+    description: "基础攻击卡牌均变为自身属性",
+    id: "buff_draw_boost_1",
+    rarity: Rarity.Uncommon,
+    duration: 4,
+    maxDuration: 4,
+    stacks: 1,
+    baseValue: 1,
+    restor(data) {
+      return {
+        ...data,
+        applyBuff: this.applyBuff,
+        removeBuff: this.removeBuff,
+        levelUp: this.levelUp,
+        restor: this.restor,
+      };
+    },
+    applyBuff(target: CardPlayer, isReward?) {
+      target.deck = [target.currentHand, target.discardPile, target.deck]
+        .flat()
+        .map((card) => {
+          if (["attack", "specialattack"].includes(card.type)) {
+            card.cardCategory = target.pokemonCategory[0];
+          }
+          return card;
+        });
+      Random.shuffle(target.deck);
+      this.duration = isReward ? -1 : this.maxDuration;
+      return `${target.name}所有基础攻击卡,属性转为 **${target.pokemonCategory[0]}**`;
+    },
+    removeBuff(target) {
+      target.deck = [target.currentHand, target.discardPile, target.deck]
+        .flat()
+        .map((card) => {
+          if (["attack", "specialattack"].includes(card.type)) {
+            card.cardCategory = "一般";
+          }
+          return card;
+        });
+      Random.shuffle(target.deck);
+      return `${target.name}的所有基础攻击卡恢复原状！`;
+    },
+    levelUp(target) {
+      return undefined;
+    },
+  }
+  //   [
+  //     "一般",
+  //     "虫",
+  //     "火",
+  //     "水",
+  //     "电",
+  //     "草",
+  //     "冰",
+  //     "格斗",
+  //     "毒",
+  //     "地面",
+  //     "飞行",
+  //     "超能",
+  //     "妖精",
+  //     "岩石",
+  //     "幽灵",
+  //     "龙",
+  //     "恶",
+  //     "钢铁",
+  //   ].map((type, i) => {
+  //     return {
+  //       name: "属性改变-" + type,
+  //       type: BuffType.CategoryChange,
+  //       description: "改变当前玩家属性",
+  //       id: "buff_category_change_" + i,
+  //       rarity: Rarity.Exotic,
+  //       duration: 4,
+  //       maxDuration: 4,
+  //       stacks: 1,
+  //       baseValue: 1,
+  //       restor(data) {
+  //         return {
+  //           ...data,
+  //           applyBuff: this.applyBuff,
+  //           removeBuff: this.removeBuff,
+  //           levelUp: this.levelUp,
+  //           restor: this.restor,
+  //         };
+  //       },
+  //       applyBuff(target: CardPlayer, isReward?) {
+  //         if (target.pokemonCategory.includes(type)) {
+  //           return `${target.name}已经是${type}属性了！`;
+  //         }
+  //         if (target.pokemonCategory[1] == "") {
+  //           target.pokemonCategory[1] = type;
+  //         } else {
+  //           target.pokemonCategory[Math.floor(Math.random() * 2)] = type;
+  //         }
+  //         this.duration = isReward ? -1 : this.maxDuration;
+  //         return `${target.name}的属性改为了${type}！`;
+  //       },
+  //       removeBuff(target: CardPlayer) {
+  //         target.pokemonCategory = target.bonus.category;
+  //         return `${target.name}的属性恢复原状！`;
+  //       },
+  //       levelUp() {
+  //         return undefined;
+  //       },
+  //     };
+  //   })
 );
 
 export class BuffFactory {
