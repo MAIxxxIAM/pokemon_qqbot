@@ -1,16 +1,16 @@
-import { $, Context, h, noop, Schema } from "koishi";
+import { Context } from "koishi";
 import fs from "fs";
-import path, { resolve } from "path";
+import path from "path";
 import { load } from "cheerio";
 import {} from "koishi-plugin-puppeteer";
-import imageSize from "image-size";
+// import imageSize from "image-size";
 import { Buffer } from "buffer";
-import { Ot as compareStrokes } from "./assets/宝可影/main.js";
-import { getUknowns } from "./utils/motheds";
+// import { Ot as compareStrokes } from "./assets/宝可影/main.js";
+// import { getUknowns } from "./utils/motheds";
 import { config, legendaryPokemonId, Pokebattle } from "../../index";
-import crypto from "crypto";
-import { isResourceLimit, sendMarkdown, toUrl } from "../../utils/method";
-import { PrivateResource } from "../../model";
+// import crypto from "crypto";
+import { sendMarkdown, toUrl } from "../../utils/method";
+// import { PrivateResource } from "../../model";
 import { Pokedex } from "../../pokedex/pokedex";
 import pokemonCal from "../../utils/pokemon";
 import { dirname } from "../../dirname";
@@ -213,10 +213,10 @@ export async function apply(ctx: Context) {
     x4: 4,
   };
   const exams = ["宝可兜", "宝可影"];
-  const isQQOfficialRobotMarkdownTemplateEnabled =
-    config.isEnableQQOfficialRobotMarkdownTemplate &&
-    config.key !== "" &&
-    config.customTemplateId !== "";
+  // const isQQOfficialRobotMarkdownTemplateEnabled =
+  //   config.isEnableQQOfficialRobotMarkdownTemplate &&
+  //   config.key !== "" &&
+  //   config.customTemplateId !== "";
   // 谜底 需要在 ./assets/宝可兜/idioms.json 文件中为其设置 拼音和含义
   const commonIdiomsList = [
     "妙蛙种子",
@@ -1405,252 +1405,252 @@ export async function apply(ctx: Context) {
     }
   );
   // zl*
-  exams.forEach((exam) => {
-    // ks*
-    ctx
-      .command(`开始猜名/${exam}`, `${exam}`)
-      .option("free", "--free 自由模式", { fallback: false })
-      .option("hard", "--hard 困难模式", { fallback: false })
-      .option("ultraHardMode", "--uhard 超困难模式", { fallback: false })
-      .option("wordles", "--wordles <value:number> 同时猜测多个", {
-        fallback: 1,
-      })
-      .action(async ({ session, options }) => {
-        let { channelId, userId, username, timestamp, platform } = session;
-        const [player]: Pokebattle[] = await ctx.database.get(
-          "pokebattle",
-          userId
-        );
-        if (!player) {
-          await session.execute("签到");
-        }
-        username = await getSessionUserName(session);
-        await updateNameInPlayerRecord(session, userId, username);
-        if (
-          isQQOfficialRobotMarkdownTemplateEnabled &&
-          session.platform === "qq"
-        ) {
-          await sendMessage(
-            session,
-            `<@${session.userId}>\n附加游戏模式（可多选）：`,
-            `困难 超困难 x1 x2 x3 x4 自由 跳过`,
-            2
-          );
+  //   exams.forEach((exam) => {
+  //     // ks*
+  //     ctx
+  //       .command(`开始猜名/${exam}`, `${exam}`)
+  //       .option("free", "--free 自由模式", { fallback: false })
+  //       .option("hard", "--hard 困难模式", { fallback: false })
+  //       .option("ultraHardMode", "--uhard 超困难模式", { fallback: false })
+  //       .option("wordles", "--wordles <value:number> 同时猜测多个", {
+  //         fallback: 1,
+  //       })
+  //       .action(async ({ session, options }) => {
+  //         let { channelId, userId, username, timestamp, platform } = session;
+  //         const [player]: Pokebattle[] = await ctx.database.get(
+  //           "pokebattle",
+  //           userId
+  //         );
+  //         if (!player) {
+  //           await session.execute("签到");
+  //         }
+  //         username = await getSessionUserName(session);
+  //         await updateNameInPlayerRecord(session, userId, username);
+  //         if (
+  //           isQQOfficialRobotMarkdownTemplateEnabled &&
+  //           session.platform === "qq"
+  //         ) {
+  //           await sendMessage(
+  //             session,
+  //             `<@${session.userId}>\n附加游戏模式（可多选）：`,
+  //             `困难 超困难 x1 x2 x3 x4 自由 跳过`,
+  //             2
+  //           );
 
-          const userInput = await session.prompt();
+  //           const userInput = await session.prompt();
 
-          if (!userInput) {
-            return await sendMessage(
-              session,
-              `<@${session.userId}>\n输入无效或超时。`,
-              `改名 开始游戏 查看信息`
-            );
-          }
+  //           if (!userInput) {
+  //             return await sendMessage(
+  //               session,
+  //               `<@${session.userId}>\n输入无效或超时。`,
+  //               `改名 开始游戏 查看信息`
+  //             );
+  //           }
 
-          options.free = userInput.includes(`自由`);
+  //           options.free = userInput.includes(`自由`);
 
-          for (const mode of Object.keys(modes)) {
-            if (userInput.includes(mode)) {
-              options[modes[mode]] = true;
-            }
-          }
+  //           for (const mode of Object.keys(modes)) {
+  //             if (userInput.includes(mode)) {
+  //               options[modes[mode]] = true;
+  //             }
+  //           }
 
-          for (const wordle of Object.keys(wordlesMap)) {
-            if (userInput.includes(wordle)) {
-              options.wordles = wordlesMap[wordle];
-            }
-          }
+  //           for (const wordle of Object.keys(wordlesMap)) {
+  //             if (userInput.includes(wordle)) {
+  //               options.wordles = wordlesMap[wordle];
+  //             }
+  //           }
 
-          if (userInput.includes(`跳过`)) {
-            noop();
-          }
-        }
+  //           if (userInput.includes(`跳过`)) {
+  //             noop();
+  //           }
+  //         }
 
-        if (
-          typeof options.wordles !== "number" ||
-          options.wordles < 1 ||
-          options.wordles > config.maxSimultaneousGuesses
-        ) {
-          return await sendMessage(
-            session,
-            `<@${session.userId}>\n您输入的参数值无效！\n如果您想同时猜测多个的话~\n输入范围应在 1 ~ ${config.maxSimultaneousGuesses} 之间！`,
-            `改名 开始游戏`
-          );
-        }
+  //         if (
+  //           typeof options.wordles !== "number" ||
+  //           options.wordles < 1 ||
+  //           options.wordles > config.maxSimultaneousGuesses
+  //         ) {
+  //           return await sendMessage(
+  //             session,
+  //             `<@${session.userId}>\n您输入的参数值无效！\n如果您想同时猜测多个的话~\n输入范围应在 1 ~ ${config.maxSimultaneousGuesses} 之间！`,
+  //             `改名 开始游戏`
+  //           );
+  //         }
 
-        // 游戏状态
-        const gameInfo = await getGameInfo(channelId);
-        if (gameInfo.isStarted) {
-          return await sendMessage(
-            session,
-            `<@${session.userId}>\n游戏已经开始了哦~`,
-            `猜测`
-          );
-        }
+  //         // 游戏状态
+  //         const gameInfo = await getGameInfo(channelId);
+  //         if (gameInfo.isStarted) {
+  //           return await sendMessage(
+  //             session,
+  //             `<@${session.userId}>\n游戏已经开始了哦~`,
+  //             `猜测`
+  //           );
+  //         }
 
-        const selectedWords: string[] = [];
+  //         const selectedWords: string[] = [];
 
-        let guessWordLength: number;
-        let randomWord: string;
-        let translation: string;
-        let pinyin: string;
-        const randomIdiom = getRandomFromStringList(commonIdiomsList);
-        let selectedIdiom;
+  //         let guessWordLength: number;
+  //         let randomWord: string;
+  //         let translation: string;
+  //         let pinyin: string;
+  //         const randomIdiom = getRandomFromStringList(commonIdiomsList);
+  //         let selectedIdiom;
 
-        selectedIdiom = await getSelectedIdiom(randomIdiom);
+  //         selectedIdiom = await getSelectedIdiom(randomIdiom);
 
-        guessWordLength = selectedIdiom.idiom.length;
-        pinyin = selectedIdiom.pinyin;
-        randomWord = randomIdiom;
-        translation = selectedIdiom.explanation;
-        selectedWords.push(randomWord);
-        let isFreeMode = options.free;
-        let isHardMode = options.hard;
-        let isUltraHardMode = options.ultraHardMode;
-        const wordlesNum = options.wordles;
-        if (isUltraHardMode) {
-          isHardMode = true;
-        }
+  //         guessWordLength = selectedIdiom.idiom.length;
+  //         pinyin = selectedIdiom.pinyin;
+  //         randomWord = randomIdiom;
+  //         translation = selectedIdiom.explanation;
+  //         selectedWords.push(randomWord);
+  //         let isFreeMode = options.free;
+  //         let isHardMode = options.hard;
+  //         let isUltraHardMode = options.ultraHardMode;
+  //         const wordlesNum = options.wordles;
+  //         if (isUltraHardMode) {
+  //           isHardMode = true;
+  //         }
 
-        const correctLetters: string[] = new Array(guessWordLength).fill("*");
+  //         const correctLetters: string[] = new Array(guessWordLength).fill("*");
 
-        await ctx.database.set(
-          "p_wordle_game_records",
-          { channelId },
-          {
-            isStarted: true,
-            wordGuess: randomWord,
-            wordAnswerChineseDefinition: replaceEscapeCharacters(translation),
-            remainingGuessesCount:
-              exam === "宝可兜" ? 10 + wordlesNum - 1 : 6 + wordlesNum - 1,
-            guessWordLength,
-            gameMode: exam,
-            timestamp: String(timestamp),
-            isHardMode: isHardMode,
-            isUltraHardMode,
-            correctLetters: correctLetters,
-            presentLetters: "",
-            absentLetters: "",
-            targetWord: randomWord,
-            wordlesNum: wordlesNum,
-            wordleIndex: 1,
-            pinyin,
-            isFreeMode,
-          }
-        );
+  //         await ctx.database.set(
+  //           "p_wordle_game_records",
+  //           { channelId },
+  //           {
+  //             isStarted: true,
+  //             wordGuess: randomWord,
+  //             wordAnswerChineseDefinition: replaceEscapeCharacters(translation),
+  //             remainingGuessesCount:
+  //               exam === "宝可兜" ? 10 + wordlesNum - 1 : 6 + wordlesNum - 1,
+  //             guessWordLength,
+  //             gameMode: exam,
+  //             timestamp: String(timestamp),
+  //             isHardMode: isHardMode,
+  //             isUltraHardMode,
+  //             correctLetters: correctLetters,
+  //             presentLetters: "",
+  //             absentLetters: "",
+  //             targetWord: randomWord,
+  //             wordlesNum: wordlesNum,
+  //             wordleIndex: 1,
+  //             pinyin,
+  //             isFreeMode,
+  //           }
+  //         );
 
-        if (wordlesNum > 1) {
-          let randomWordExtra: string = "";
-          let translation: string = "";
-          let pinyin: string = "";
-          for (
-            let wordleIndex = 2;
-            wordleIndex < wordlesNum + 1;
-            wordleIndex++
-          ) {
-            while (selectedWords.length < wordleIndex) {
-              let randomIdiom = getRandomFromStringList(commonIdiomsList);
-              let selectedIdiom;
+  //         if (wordlesNum > 1) {
+  //           let randomWordExtra: string = "";
+  //           let translation: string = "";
+  //           let pinyin: string = "";
+  //           for (
+  //             let wordleIndex = 2;
+  //             wordleIndex < wordlesNum + 1;
+  //             wordleIndex++
+  //           ) {
+  //             while (selectedWords.length < wordleIndex) {
+  //               let randomIdiom = getRandomFromStringList(commonIdiomsList);
+  //               let selectedIdiom;
 
-              selectedIdiom = await getSelectedIdiom(randomIdiom);
-              while (selectedIdiom.idiom.length !== guessWordLength) {
-                randomIdiom = getRandomFromStringList(commonIdiomsList);
-                selectedIdiom = await getSelectedIdiom(randomIdiom);
-              }
+  //               selectedIdiom = await getSelectedIdiom(randomIdiom);
+  //               while (selectedIdiom.idiom.length !== guessWordLength) {
+  //                 randomIdiom = getRandomFromStringList(commonIdiomsList);
+  //                 selectedIdiom = await getSelectedIdiom(randomIdiom);
+  //               }
 
-              pinyin = selectedIdiom.pinyin;
-              randomWordExtra = randomIdiom;
-              translation = selectedIdiom.explanation;
+  //               pinyin = selectedIdiom.pinyin;
+  //               randomWordExtra = randomIdiom;
+  //               translation = selectedIdiom.explanation;
 
-              if (!selectedWords.includes(randomWordExtra)) {
-                selectedWords.push(randomWordExtra);
-              }
-            }
-            await ctx.database.create("p_extra_wordle_game_records", {
-              channelId,
-              remainingGuessesCount:
-                exam === "宝可兜" ? 10 + wordlesNum - 1 : 6 + wordlesNum - 1,
-              guessWordLength,
-              wordGuess: randomWordExtra,
-              wordAnswerChineseDefinition: replaceEscapeCharacters(translation),
-              gameMode: exam,
-              timestamp: String(timestamp),
-              correctLetters: correctLetters,
-              presentLetters: "",
-              absentLetters: "",
-              wordlesNum: wordlesNum,
-              wordleIndex,
-              pinyin,
-            });
-          }
-        }
+  //               if (!selectedWords.includes(randomWordExtra)) {
+  //                 selectedWords.push(randomWordExtra);
+  //               }
+  //             }
+  //             await ctx.database.create("p_extra_wordle_game_records", {
+  //               channelId,
+  //               remainingGuessesCount:
+  //                 exam === "宝可兜" ? 10 + wordlesNum - 1 : 6 + wordlesNum - 1,
+  //               guessWordLength,
+  //               wordGuess: randomWordExtra,
+  //               wordAnswerChineseDefinition: replaceEscapeCharacters(translation),
+  //               gameMode: exam,
+  //               timestamp: String(timestamp),
+  //               correctLetters: correctLetters,
+  //               presentLetters: "",
+  //               absentLetters: "",
+  //               wordlesNum: wordlesNum,
+  //               wordleIndex,
+  //               pinyin,
+  //             });
+  //           }
+  //         }
 
-        let imageBuffer: Buffer = Buffer.from("initial value", "utf-8");
-        if (exam === "宝可兜") {
-          const emptyGridHtml = generateEmptyGridHtmlForHandle(
-            1,
-            guessWordLength
-          );
-          imageBuffer = await generateImageForHandle(emptyGridHtml);
-        } else if (exam === "宝可影") {
-          const emptyGridHtmlWithBorder = generateEmptyGridHtmlForCiying(
-            1,
-            guessWordLength,
-            true
-          );
-          const emptyGridHtml = generateEmptyGridHtmlForCiying(
-            6 + wordlesNum - 1 - 1,
-            guessWordLength,
-            false
-          );
-          imageBuffer = await generateImageForCiying(
-            emptyGridHtmlWithBorder + emptyGridHtml,
-            6 + wordlesNum - 1
-          );
-        }
+  //         let imageBuffer: Buffer = Buffer.from("initial value", "utf-8");
+  //         if (exam === "宝可兜") {
+  //           const emptyGridHtml = generateEmptyGridHtmlForHandle(
+  //             1,
+  //             guessWordLength
+  //           );
+  //           imageBuffer = await generateImageForHandle(emptyGridHtml);
+  //         } else if (exam === "宝可影") {
+  //           const emptyGridHtmlWithBorder = generateEmptyGridHtmlForCiying(
+  //             1,
+  //             guessWordLength,
+  //             true
+  //           );
+  //           const emptyGridHtml = generateEmptyGridHtmlForCiying(
+  //             6 + wordlesNum - 1 - 1,
+  //             guessWordLength,
+  //             false
+  //           );
+  //           imageBuffer = await generateImageForCiying(
+  //             emptyGridHtmlWithBorder + emptyGridHtml,
+  //             6 + wordlesNum - 1
+  //           );
+  //         }
 
-        let imageBuffers: Buffer[] = [];
-        if (wordlesNum > 1) {
-          for (let wordleIndex = 0; wordleIndex < wordlesNum; wordleIndex++) {
-            imageBuffers.push(imageBuffer);
-          }
-          const htmlImgString = generateImageTags(imageBuffers);
-          imageBuffer = await generateWordlesImage(htmlImgString);
-        }
+  //         let imageBuffers: Buffer[] = [];
+  //         if (wordlesNum > 1) {
+  //           for (let wordleIndex = 0; wordleIndex < wordlesNum; wordleIndex++) {
+  //             imageBuffers.push(imageBuffer);
+  //           }
+  //           const htmlImgString = generateImageTags(imageBuffers);
+  //           imageBuffer = await generateWordlesImage(htmlImgString);
+  //         }
 
-        const gameMode = `游戏开始！\n当前游戏模式为：【${exam}${
-          wordlesNum > 1 ? `（x${wordlesNum}）` : ""
-        }${isFreeMode ? `（自由）` : ""}${
-          isHardMode ? `（${isUltraHardMode ? "超" : ""}困难）` : ""
-        }】`;
-        const guessChance = `猜测机会为：【${10 + wordlesNum - 1}】`;
-        const wordCount2 = `待猜数量为：【${commonIdiomsList.length}】`;
-        const timeLimit = config.enableWordGuessTimeLimit
-          ? `\n作答时间为：【${config.wordGuessTimeLimitInSeconds}】秒`
-          : "";
-        const image = h.image(imageBuffer, `image/${config.imageType}`);
+  //         const gameMode = `游戏开始！\n当前游戏模式为：【${exam}${
+  //           wordlesNum > 1 ? `（x${wordlesNum}）` : ""
+  //         }${isFreeMode ? `（自由）` : ""}${
+  //           isHardMode ? `（${isUltraHardMode ? "超" : ""}困难）` : ""
+  //         }】`;
+  //         const guessChance = `猜测机会为：【${10 + wordlesNum - 1}】`;
+  //         const wordCount2 = `待猜数量为：【${commonIdiomsList.length}】`;
+  //         const timeLimit = config.enableWordGuessTimeLimit
+  //           ? `\n作答时间为：【${config.wordGuessTimeLimitInSeconds}】秒`
+  //           : "";
+  //         const image = h.image(imageBuffer, `image/${config.imageType}`);
 
-        if (
-          !config.isTextToImageConversionEnabled &&
-          isQQOfficialRobotMarkdownTemplateEnabled &&
-          session.platform === "qq"
-        ) {
-          let dimensions = imageSize(imageBuffer);
-          const url = await toUrl(ctx, session, imageBuffer);
-          const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})
-${gameMode}
-${guessChance}
-${wordCount2}${timeLimit}`;
-          return await sendMessage(session, md, `结束游戏 猜测`, 2);
-        } else {
-          return await sendMessage(
-            session,
-            `${gameMode}\n${guessChance}\n${wordCount2}${timeLimit}\n${image}`,
-            `结束游戏 猜测`
-          );
-        }
-      });
-  });
+  //         if (
+  //           !config.isTextToImageConversionEnabled &&
+  //           isQQOfficialRobotMarkdownTemplateEnabled &&
+  //           session.platform === "qq"
+  //         ) {
+  //           let dimensions = imageSize(imageBuffer);
+  //           const url = await toUrl(ctx, session, imageBuffer);
+  //           const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})
+  // ${gameMode}
+  // ${guessChance}
+  // ${wordCount2}${timeLimit}`;
+  //           return await sendMessage(session, md, `结束游戏 猜测`, 2);
+  //         } else {
+  //           return await sendMessage(
+  //             session,
+  //             `${gameMode}\n${guessChance}\n${wordCount2}${timeLimit}\n${image}`,
+  //             `结束游戏 猜测`
+  //           );
+  //         }
+  //       });
+  //   });
 
   ctx.command("未知图腾").action(async ({ session }) => {
     const [player]: Pokebattle[] = await ctx.database.get(
@@ -1730,948 +1730,948 @@ ${unknowns.map((u) => `${u.name}`).join("\n")}
       );
       await session.execute("宝可问答");
       return;
-      const [player]: Pokebattle[] = await ctx.database.get(
-        "pokebattle",
-        session.userId
-      );
-      const resource = await isResourceLimit(session.userId, ctx);
-      const rLimit = new PrivateResource(resource.resource.goldLimit);
-      if (!player) {
-        await session.execute("签到");
-        return;
-      }
-      let { channelId, userId, username, platform, timestamp } = session;
-      // 游戏状态
-      let gameInfo: any = await getGameInfo(channelId);
-      inputWord = inputWord?.trim();
+      //       const [player]: Pokebattle[] = await ctx.database.get(
+      //         "pokebattle",
+      //         session.userId
+      //       );
+      //       const resource = await isResourceLimit(session.userId, ctx);
+      //       const rLimit = new PrivateResource(resource.resource.goldLimit);
+      //       if (!player) {
+      //         await session.execute("签到");
+      //         return;
+      //       }
+      //       let { channelId, userId, username, platform, timestamp } = session;
+      //       // 游戏状态
+      //       let gameInfo: any = await getGameInfo(channelId);
+      //       inputWord = inputWord?.trim();
 
-      // 操作太快
-      if (gameInfo.isRunning === true) {
-        await setGuessRunningStatus(channelId, false);
-        return await sendMessage(
-          session,
-          `<@${session.userId}>\n操作太快了哦~\n再试一次吧！`,
-          `猜测`
-        );
-      }
+      //       // 操作太快
+      //       if (gameInfo.isRunning === true) {
+      //         await setGuessRunningStatus(channelId, false);
+      //         return await sendMessage(
+      //           session,
+      //           `<@${session.userId}>\n操作太快了哦~\n再试一次吧！`,
+      //           `猜测`
+      //         );
+      //       }
 
-      // 运行状态
-      await setGuessRunningStatus(channelId, true);
-      // 更新玩家记录表中的用户名
-      username = await getSessionUserName(session);
-      await updateNameInPlayerRecord(session, userId, username);
+      //       // 运行状态
+      //       await setGuessRunningStatus(channelId, true);
+      //       // 更新玩家记录表中的用户名
+      //       username = await getSessionUserName(session);
+      //       await updateNameInPlayerRecord(session, userId, username);
 
-      if (!gameInfo.isStarted) {
-        await setGuessRunningStatus(channelId, false);
-        return await sendMessage(
-          session,
-          `<@${session.userId}>\n游戏还没开始呢！`,
-          `改名 开始游戏`
-        );
-      }
+      //       if (!gameInfo.isStarted) {
+      //         await setGuessRunningStatus(channelId, false);
+      //         return await sendMessage(
+      //           session,
+      //           `<@${session.userId}>\n游戏还没开始呢！`,
+      //           `改名 开始游戏`
+      //         );
+      //       }
 
-      if (options.random) {
-        inputWord = getRandomIdiom(idiomsList).idiom;
-      }
+      //       if (options.random) {
+      //         inputWord = getRandomIdiom(idiomsList).idiom;
+      //       }
 
-      if (!inputWord) {
-        await sendMessage(
-          session,
-          `<@${session.userId}>\n请输入【猜测词】或【取消】：`,
-          `取消 输入`
-        );
-        const userInput = await session.prompt();
-        if (!userInput)
-          return await sendMessage(
-            session,
-            `【${username}】\n输入无效或超时。`,
-            `猜测`
-          );
-        if (userInput === "取消")
-          return await sendMessage(
-            session,
-            `【${username}】\n猜测操作已取消！`,
-            `猜测`
-          );
-        inputWord = userInput.trim();
-      }
+      //       if (!inputWord) {
+      //         await sendMessage(
+      //           session,
+      //           `<@${session.userId}>\n请输入【猜测词】或【取消】：`,
+      //           `取消 输入`
+      //         );
+      //         const userInput = await session.prompt();
+      //         if (!userInput)
+      //           return await sendMessage(
+      //             session,
+      //             `【${username}】\n输入无效或超时。`,
+      //             `猜测`
+      //           );
+      //         if (userInput === "取消")
+      //           return await sendMessage(
+      //             session,
+      //             `【${username}】\n猜测操作已取消！`,
+      //             `猜测`
+      //           );
+      //         inputWord = userInput.trim();
+      //       }
 
-      // 作答时间限制
-      const timeDifferenceInSeconds =
-        (timestamp - Number(gameInfo.timestamp)) / 1000; // 将时间戳转换为秒
-      if (config.enableWordGuessTimeLimit) {
-        if (timeDifferenceInSeconds > config.wordGuessTimeLimitInSeconds) {
-          // // 生成 html 字符串
-          // const emptyGridHtml = gameInfo.isAbsurd ? generateEmptyGridHtml(1, gameInfo.guessWordLength) : generateEmptyGridHtml(gameInfo.remainingGuessesCount, gameInfo.guessWordLength);
-          // const styledHtml = generateStyledHtml(gameInfo.guessWordLength + 1);
-          // // 图
-          // const imageBuffer = await generateImage(styledHtml, `${gameInfo.wordGuessHtmlCache}\n${emptyGridHtml}`);
-          // 玩家记录输
-          await updatePlayerRecordsLose(channelId, gameInfo);
-          await endGame(channelId);
-          return await sendMessage(
-            session,
-            `<@${session.userId}>\n作答时间超过【${config.wordGuessTimeLimitInSeconds}】秒！\n很遗憾，你们输了!\n下次猜快点吧~`,
-            `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode}`,
-            2
-          );
-          // return await sendMessage(session, `<@${session.userId}>\n作答时间超过【${config.wordGuessTimeLimitInSeconds}】秒！\n很遗憾，你们输了!\n下次猜快点吧~\n${h.image(imageBuffer, `image/${config.imageType}`)}`)
-        }
-      }
-      // 玩家不在游戏中
-      const isInGame = await isPlayerInGame(channelId, userId);
-      if (!isInGame) {
-        await ctx.database.create("p_wordle_gaming_player_records", {
-          channelId,
-          userId,
-          username,
-          money: 0,
-        });
-      }
-      let {
-        correctLetters,
-        presentLetters,
-        isHardMode,
-        absentLetters,
-        isAbsurd,
-        remainingWordsList,
-        gameMode,
-        guessWordLength,
-        isChallengeMode,
-        targetWord,
-        wordlesNum,
-        isUltraHardMode,
-        presentLettersWithIndex,
-        isFreeMode,
-      } = gameInfo;
-      if (!isLengthCharacterIdiom(inputWord, guessWordLength)) {
-        await setGuessRunningStatus(channelId, false);
-        return await sendMessage(
-          session,
-          `<@${session.userId}>\n您确定您输入的是**${guessWordLength}**个字名称吗？`,
-          `猜测`
-        );
-      }
-      // 小写化
-      const lowercaseInputWord = inputWord;
-      let userInputPinyin: string = "";
-      if (gameMode === "宝可影") {
-        if (!checkStrokesData(inputWord)) {
-          await setGuessRunningStatus(channelId, false);
-          return await sendMessage(
-            session,
-            `<@${session.userId}>\n不好意思啊...\n我还没学会这个（`,
-            `猜测`
-          );
-        }
-        if (!isIdiomInList(inputWord, idiomsList) && !isFreeMode) {
-          const idiomInfo = await getIdiomInfo(inputWord);
-          if (idiomInfo.pinyin === "未找到拼音") {
-            await setGuessRunningStatus(channelId, false);
-            return await sendMessage(
-              session,
-              `<@${session.userId}>\n你确定存在这样的宝可梦吗？`,
-              `猜测`
-            );
-          } else {
-            userInputPinyin = idiomInfo.pinyin;
-          }
-        }
-      }
-      if (gameMode === "宝可兜") {
-        if (!isIdiomInList(inputWord, idiomsList)) {
-          if (isFreeMode) {
-            const foundItem = pinyinData.find(
-              (item) => item.term === inputWord
-            );
+      //       // 作答时间限制
+      //       const timeDifferenceInSeconds =
+      //         (timestamp - Number(gameInfo.timestamp)) / 1000; // 将时间戳转换为秒
+      //       if (config.enableWordGuessTimeLimit) {
+      //         if (timeDifferenceInSeconds > config.wordGuessTimeLimitInSeconds) {
+      //           // // 生成 html 字符串
+      //           // const emptyGridHtml = gameInfo.isAbsurd ? generateEmptyGridHtml(1, gameInfo.guessWordLength) : generateEmptyGridHtml(gameInfo.remainingGuessesCount, gameInfo.guessWordLength);
+      //           // const styledHtml = generateStyledHtml(gameInfo.guessWordLength + 1);
+      //           // // 图
+      //           // const imageBuffer = await generateImage(styledHtml, `${gameInfo.wordGuessHtmlCache}\n${emptyGridHtml}`);
+      //           // 玩家记录输
+      //           await updatePlayerRecordsLose(channelId, gameInfo);
+      //           await endGame(channelId);
+      //           return await sendMessage(
+      //             session,
+      //             `<@${session.userId}>\n作答时间超过【${config.wordGuessTimeLimitInSeconds}】秒！\n很遗憾，你们输了!\n下次猜快点吧~`,
+      //             `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode}`,
+      //             2
+      //           );
+      //           // return await sendMessage(session, `<@${session.userId}>\n作答时间超过【${config.wordGuessTimeLimitInSeconds}】秒！\n很遗憾，你们输了!\n下次猜快点吧~\n${h.image(imageBuffer, `image/${config.imageType}`)}`)
+      //         }
+      //       }
+      //       // 玩家不在游戏中
+      //       const isInGame = await isPlayerInGame(channelId, userId);
+      //       if (!isInGame) {
+      //         await ctx.database.create("p_wordle_gaming_player_records", {
+      //           channelId,
+      //           userId,
+      //           username,
+      //           money: 0,
+      //         });
+      //       }
+      //       let {
+      //         correctLetters,
+      //         presentLetters,
+      //         isHardMode,
+      //         absentLetters,
+      //         isAbsurd,
+      //         remainingWordsList,
+      //         gameMode,
+      //         guessWordLength,
+      //         isChallengeMode,
+      //         targetWord,
+      //         wordlesNum,
+      //         isUltraHardMode,
+      //         presentLettersWithIndex,
+      //         isFreeMode,
+      //       } = gameInfo;
+      //       if (!isLengthCharacterIdiom(inputWord, guessWordLength)) {
+      //         await setGuessRunningStatus(channelId, false);
+      //         return await sendMessage(
+      //           session,
+      //           `<@${session.userId}>\n您确定您输入的是**${guessWordLength}**个字名称吗？`,
+      //           `猜测`
+      //         );
+      //       }
+      //       // 小写化
+      //       const lowercaseInputWord = inputWord;
+      //       let userInputPinyin: string = "";
+      //       if (gameMode === "宝可影") {
+      //         if (!checkStrokesData(inputWord)) {
+      //           await setGuessRunningStatus(channelId, false);
+      //           return await sendMessage(
+      //             session,
+      //             `<@${session.userId}>\n不好意思啊...\n我还没学会这个（`,
+      //             `猜测`
+      //           );
+      //         }
+      //         if (!isIdiomInList(inputWord, idiomsList) && !isFreeMode) {
+      //           const idiomInfo = await getIdiomInfo(inputWord);
+      //           if (idiomInfo.pinyin === "未找到拼音") {
+      //             await setGuessRunningStatus(channelId, false);
+      //             return await sendMessage(
+      //               session,
+      //               `<@${session.userId}>\n你确定存在这样的宝可梦吗？`,
+      //               `猜测`
+      //             );
+      //           } else {
+      //             userInputPinyin = idiomInfo.pinyin;
+      //           }
+      //         }
+      //       }
+      //       if (gameMode === "宝可兜") {
+      //         if (!isIdiomInList(inputWord, idiomsList)) {
+      //           if (isFreeMode) {
+      //             const foundItem = pinyinData.find(
+      //               (item) => item.term === inputWord
+      //             );
 
-            if (foundItem) {
-              userInputPinyin = foundItem.pinyin;
-            } else {
-              userInputPinyin = await sendPostRequestForGPT1106(inputWord);
-              if (userInputPinyin !== "") {
-                const newItem: PinyinItem2 = {
-                  term: inputWord,
-                  pinyin: userInputPinyin,
-                };
-                pinyinData.push(newItem);
+      //             if (foundItem) {
+      //               userInputPinyin = foundItem.pinyin;
+      //             } else {
+      //               userInputPinyin = await sendPostRequestForGPT1106(inputWord);
+      //               if (userInputPinyin !== "") {
+      //                 const newItem: PinyinItem2 = {
+      //                   term: inputWord,
+      //                   pinyin: userInputPinyin,
+      //                 };
+      //                 pinyinData.push(newItem);
 
-                fs.writeFileSync(
-                  pinyinKoishiFilePath,
-                  JSON.stringify(pinyinData, null, 2),
-                  "utf8"
-                );
-              } else {
-                userInputPinyin = "wǒ chū cuò le";
-              }
-            }
-          } else {
-            const idiomInfo = await getIdiomInfo(inputWord);
-            if (idiomInfo.pinyin === "未找到拼音") {
-              await setGuessRunningStatus(channelId, false);
-              return await sendMessage(
-                session,
-                `<@${session.userId}>\n你确定存在这样的宝可梦吗？`,
-                `猜测`
-              );
-            } else {
-              userInputPinyin = idiomInfo.pinyin;
-            }
-          }
-        }
-      }
-      const foundIdiom = findIdiomByIdiom(inputWord, idiomsList);
-      if (!userInputPinyin && foundIdiom) {
-        userInputPinyin = foundIdiom.pinyin;
-      }
-      // 困难模式
-      if (isHardMode && gameMode !== "宝可影") {
-        let isInputWordWrong = false;
-        // 包含
-        const containsAllLetters = lowercaseInputWord
-          .split("")
-          .filter(
-            (letter) => presentLetters.includes(letter) && letter !== "*"
-          );
-        if (
-          mergeSameLetters(containsAllLetters).length !==
-            presentLetters.length &&
-          presentLetters.length !== 0
-        ) {
-          isInputWordWrong = true;
-        }
-        // 正确
-        for (let i = 0; i < lowercaseInputWord.length; i++) {
-          if (
-            correctLetters[i] !== "*" &&
-            correctLetters[i] !== lowercaseInputWord[i] &&
-            correctLetters.some((letter) => letter !== "*")
-          ) {
-            isInputWordWrong = true;
-            break;
-          }
-        }
-        // 不包含 灰色的线索必须被遵守  超困难
-        if (
-          isUltraHardMode &&
-          absentLetters.length !== 0 &&
-          checkAbsentLetters(lowercaseInputWord, absentLetters)
-        ) {
-          isInputWordWrong = true;
-        }
-        // 黄色字母必须远离它们被线索的地方 超困难
-        if (
-          isUltraHardMode &&
-          presentLettersWithIndex.length !== 0 &&
-          checkPresentLettersWithIndex(
-            lowercaseInputWord,
-            presentLettersWithIndex
-          )
-        ) {
-          isInputWordWrong = true;
-        }
-        if (isInputWordWrong) {
-          await setGuessRunningStatus(channelId, false);
-          const difficulty = isUltraHardMode ? "超困难" : "困难";
-          const rule = `绿色线索必须保特固定，黄色线索必须重复使用。${
-            isUltraHardMode
-              ? `\n黄色线索必须远离它们被线索的地方，灰色的线索必须被遵守。`
-              : ""
-          }`;
+      //                 fs.writeFileSync(
+      //                   pinyinKoishiFilePath,
+      //                   JSON.stringify(pinyinData, null, 2),
+      //                   "utf8"
+      //                 );
+      //               } else {
+      //                 userInputPinyin = "wǒ chū cuò le";
+      //               }
+      //             }
+      //           } else {
+      //             const idiomInfo = await getIdiomInfo(inputWord);
+      //             if (idiomInfo.pinyin === "未找到拼音") {
+      //               await setGuessRunningStatus(channelId, false);
+      //               return await sendMessage(
+      //                 session,
+      //                 `<@${session.userId}>\n你确定存在这样的宝可梦吗？`,
+      //                 `猜测`
+      //               );
+      //             } else {
+      //               userInputPinyin = idiomInfo.pinyin;
+      //             }
+      //           }
+      //         }
+      //       }
+      //       const foundIdiom = findIdiomByIdiom(inputWord, idiomsList);
+      //       if (!userInputPinyin && foundIdiom) {
+      //         userInputPinyin = foundIdiom.pinyin;
+      //       }
+      //       // 困难模式
+      //       if (isHardMode && gameMode !== "宝可影") {
+      //         let isInputWordWrong = false;
+      //         // 包含
+      //         const containsAllLetters = lowercaseInputWord
+      //           .split("")
+      //           .filter(
+      //             (letter) => presentLetters.includes(letter) && letter !== "*"
+      //           );
+      //         if (
+      //           mergeSameLetters(containsAllLetters).length !==
+      //             presentLetters.length &&
+      //           presentLetters.length !== 0
+      //         ) {
+      //           isInputWordWrong = true;
+      //         }
+      //         // 正确
+      //         for (let i = 0; i < lowercaseInputWord.length; i++) {
+      //           if (
+      //             correctLetters[i] !== "*" &&
+      //             correctLetters[i] !== lowercaseInputWord[i] &&
+      //             correctLetters.some((letter) => letter !== "*")
+      //           ) {
+      //             isInputWordWrong = true;
+      //             break;
+      //           }
+      //         }
+      //         // 不包含 灰色的线索必须被遵守  超困难
+      //         if (
+      //           isUltraHardMode &&
+      //           absentLetters.length !== 0 &&
+      //           checkAbsentLetters(lowercaseInputWord, absentLetters)
+      //         ) {
+      //           isInputWordWrong = true;
+      //         }
+      //         // 黄色字母必须远离它们被线索的地方 超困难
+      //         if (
+      //           isUltraHardMode &&
+      //           presentLettersWithIndex.length !== 0 &&
+      //           checkPresentLettersWithIndex(
+      //             lowercaseInputWord,
+      //             presentLettersWithIndex
+      //           )
+      //         ) {
+      //           isInputWordWrong = true;
+      //         }
+      //         if (isInputWordWrong) {
+      //           await setGuessRunningStatus(channelId, false);
+      //           const difficulty = isUltraHardMode ? "超困难" : "困难";
+      //           const rule = `绿色线索必须保特固定，黄色线索必须重复使用。${
+      //             isUltraHardMode
+      //               ? `\n黄色线索必须远离它们被线索的地方，灰色的线索必须被遵守。`
+      //               : ""
+      //           }`;
 
-          const message = `<@${
-            session.userId
-          }>\n当前难度为：【${difficulty}】\n【${difficulty}】：${rule}\n您输入的词不符合要求！\n您的输入为：【${inputWord}】\n要求：【${correctLetters.join(
-            ""
-          )}】${
-            presentLetters.length === 0 ? `` : `\n包含：【${presentLetters}】`
-          }${
-            absentLetters.length === 0 || !isUltraHardMode
-              ? ``
-              : `\n不包含：【${absentLetters}】`
-          }${
-            presentLettersWithIndex.length === 0 || !isUltraHardMode
-              ? ``
-              : `\n远离黄色线索：【${presentLettersWithIndex.join(", ")}】`
-          }`;
+      //           const message = `<@${
+      //             session.userId
+      //           }>\n当前难度为：【${difficulty}】\n【${difficulty}】：${rule}\n您输入的词不符合要求！\n您的输入为：【${inputWord}】\n要求：【${correctLetters.join(
+      //             ""
+      //           )}】${
+      //             presentLetters.length === 0 ? `` : `\n包含：【${presentLetters}】`
+      //           }${
+      //             absentLetters.length === 0 || !isUltraHardMode
+      //               ? ``
+      //               : `\n不包含：【${absentLetters}】`
+      //           }${
+      //             presentLettersWithIndex.length === 0 || !isUltraHardMode
+      //               ? ``
+      //               : `\n远离黄色线索：【${presentLettersWithIndex.join(", ")}】`
+      //           }`;
 
-          return await sendMessage(session, message, `猜测`);
-        }
-      }
-      // 初始化输
-      let isLose = false;
-      // 胜
-      let isWin = false;
-      if (wordlesNum === 1 && lowercaseInputWord === gameInfo.wordGuess) {
-        isWin = true;
-      }
-      let isWinNum = 0;
-      // 生成 html 字符串
-      let imageBuffers: Buffer[] = [];
-      let imageBuffer: Buffer = Buffer.from("initial value", "utf-8");
-      for (let wordleIndex = 1; wordleIndex < wordlesNum + 1; wordleIndex++) {
-        if (wordleIndex > 1) {
-          gameInfo = await getGameInfo2(channelId, wordleIndex);
-        }
-        const isWin = lowercaseInputWord === gameInfo.wordGuess;
-        if (isWin || gameInfo.isWin) {
-          ++isWinNum;
-        }
-        // 负
-        if (!isWin && gameInfo.remainingGuessesCount - 1 === 0 && !isAbsurd) {
-          isLose = true;
-        }
-        let letterTilesHtml: string;
+      //           return await sendMessage(session, message, `猜测`);
+      //         }
+      //       }
+      //       // 初始化输
+      //       let isLose = false;
+      //       // 胜
+      //       let isWin = false;
+      //       if (wordlesNum === 1 && lowercaseInputWord === gameInfo.wordGuess) {
+      //         isWin = true;
+      //       }
+      //       let isWinNum = 0;
+      //       // 生成 html 字符串
+      //       let imageBuffers: Buffer[] = [];
+      //       let imageBuffer: Buffer = Buffer.from("initial value", "utf-8");
+      //       for (let wordleIndex = 1; wordleIndex < wordlesNum + 1; wordleIndex++) {
+      //         if (wordleIndex > 1) {
+      //           gameInfo = await getGameInfo2(channelId, wordleIndex);
+      //         }
+      //         const isWin = lowercaseInputWord === gameInfo.wordGuess;
+      //         if (isWin || gameInfo.isWin) {
+      //           ++isWinNum;
+      //         }
+      //         // 负
+      //         if (!isWin && gameInfo.remainingGuessesCount - 1 === 0 && !isAbsurd) {
+      //           isLose = true;
+      //         }
+      //         let letterTilesHtml: string;
 
-        if (gameInfo.isWin) {
-          letterTilesHtml = "";
-        } else {
-          if (gameMode === "宝可兜") {
-            letterTilesHtml = await generateLetterTilesHtmlForHandle(
-              gameInfo.wordGuess,
-              inputWord,
-              channelId,
-              wordleIndex,
-              gameInfo,
-              gameInfo.pinyin,
-              userInputPinyin
-            );
-          } else if (gameMode === "宝可影") {
-            letterTilesHtml = await generateLetterTilesHtmlForCiying(
-              gameInfo.wordGuess,
-              inputWord,
-              channelId,
-              wordleIndex,
-              gameInfo,
-              isHardMode
-            );
-          } else {
-            const generatedHtml = await generateLetterTilesHtml(
-              gameInfo.wordGuess,
-              inputWord,
-              channelId,
-              wordleIndex,
-              gameInfo
-            );
-            letterTilesHtml =
-              '<div class="Row-module_row__pwpBq">' + generatedHtml + "</div>";
-          }
-        }
-        let emptyGridHtml;
-        if (isAbsurd) {
-          emptyGridHtml = generateEmptyGridHtml(
-            isWin ? 0 : 1,
-            gameInfo.guessWordLength
-          );
-        } else {
-          if (gameMode === "宝可兜") {
-            emptyGridHtml = generateEmptyGridHtmlForHandle(
-              gameInfo.isWin || isWin ? 0 : isLose ? 0 : 1,
-              guessWordLength
-            );
-          } else if (gameMode === "宝可影") {
-            emptyGridHtml =
-              generateEmptyGridHtmlForCiying(
-                gameInfo.isWin || isWin ? 0 : isLose ? 0 : 1,
-                guessWordLength,
-                true
-              ) +
-              generateEmptyGridHtmlForCiying(
-                gameInfo.isWin || isWin
-                  ? gameInfo.remainingGuessesCount - 1
-                  : gameInfo.remainingGuessesCount - 1 - 1,
-                guessWordLength,
-                false
-              );
-          } else {
-            emptyGridHtml = generateEmptyGridHtml(
-              gameInfo.isWin
-                ? gameInfo.remainingGuessesCount
-                : gameInfo.remainingGuessesCount - 1,
-              gameInfo.guessWordLength
-            );
-          }
-        }
-        const styledHtml = generateStyledHtml(gameInfo.guessWordLength + 1);
-        // 图
-        if (gameMode === "宝可兜") {
-          imageBuffer = await generateImageForHandle(
-            `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n${emptyGridHtml}`
-          );
-        } else if (gameMode === "宝可影") {
-          imageBuffer = await generateImageForCiying(
-            `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n${emptyGridHtml}`,
-            6 + wordlesNum - 1
-          );
-        }
-        imageBuffers.push(imageBuffer);
-        // 更新游戏记录
-        const remainingGuessesCount =
-          isAbsurd || (gameMode === "宝可影" && (gameInfo.isWin || isWin))
-            ? gameInfo.remainingGuessesCount
-            : gameInfo.remainingGuessesCount - 1;
-        if (wordleIndex === 1 && !gameInfo.isWin) {
-          await ctx.database.set(
-            "p_wordle_game_records",
-            { channelId },
-            {
-              isWin,
-              remainingGuessesCount: remainingGuessesCount,
-              wordGuessHtmlCache: `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n`,
-            }
-          );
-        } else if (wordleIndex > 1 && !gameInfo.isWin) {
-          await ctx.database.set(
-            "p_extra_wordle_game_records",
-            { channelId, wordleIndex },
-            {
-              isWin,
-              remainingGuessesCount: remainingGuessesCount,
-              wordGuessHtmlCache: `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n`,
-            }
-          );
-        }
-      }
-      if (wordlesNum > 1) {
-        const htmlImgString = generateImageTags(imageBuffers);
-        imageBuffer = await generateWordlesImage(htmlImgString);
-        if (isWinNum === wordlesNum) {
-          isWin = true;
-        }
-      }
-      gameInfo = await getGameInfo(channelId);
-      // 处理赢
-      if (isWin) {
-        const order = "abcdefghijklmnopqrstuvwxyz?!";
-        const getUnknown = getUknowns();
-        const isUnknown = player.unknowns_bag.some(
-          (item) => item.id === getUnknown.id
-        );
-        const hasUnknown = isUnknown || player.lap !== 3;
-        hasUnknown ? null : player.unknowns_bag.push(getUnknown);
-        player.vip > 0 ? await rLimit.addGold(ctx, 0.5, session.userId) : null;
-        const legendaryPokemonRandom = Math.random() * 100;
-        const addMerits =
-          player.cyberMerit > 95
-            ? 100 - player.cyberMerit <= 0
-              ? 0
-              : 100 - player.cyberMerit
-            : 5;
-        const isEvent = player.lap < 3 || player.level < 90;
-        await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
-          unknowns_bag: player.unknowns_bag.sort(
-            (a, b) => order.indexOf(a.id) - order.indexOf(b.id)
-          ),
-          gold: $.if(
-            $.lt(row.lap, 3),
-            $.add(row.gold, 750 * gameInfo.remainingGuessesCount),
-            row.gold
-          ),
-          cyberMerit: $.add(row.cyberMerit, addMerits),
-        }));
-        if (player.lap == 3) {
-          await ctx.database.set(
-            "pokemon.resourceLimit",
-            { id: session.userId },
-            (row) => ({
-              rankScore: $.if(
-                $.eq(player.lap, 3),
-                $.add(row.rankScore, 50 * gameInfo.remainingGuessesCount),
-                row.rankScore
-              ),
-            })
-          );
-        }
-        let finalSettlementString: string = "";
-        // 玩家记录赢
-        await updatePlayerRecordsWin(channelId, gameInfo);
-        // 增加该玩家猜出单词的次数
-        const [playerRecord] = await ctx.database.get(
-          "p_wordle_player_records",
-          { userId }
-        );
-        // 更新最快用时
-        if (
-          timeDifferenceInSeconds <
-            playerRecord.fastestGuessTime[gameInfo.gameMode] ||
-          playerRecord.fastestGuessTime[gameInfo.gameMode] === 0
-        ) {
-          playerRecord.fastestGuessTime[gameInfo.gameMode] = Math.floor(
-            timeDifferenceInSeconds
-          );
-        }
+      //         if (gameInfo.isWin) {
+      //           letterTilesHtml = "";
+      //         } else {
+      //           if (gameMode === "宝可兜") {
+      //             letterTilesHtml = await generateLetterTilesHtmlForHandle(
+      //               gameInfo.wordGuess,
+      //               inputWord,
+      //               channelId,
+      //               wordleIndex,
+      //               gameInfo,
+      //               gameInfo.pinyin,
+      //               userInputPinyin
+      //             );
+      //           } else if (gameMode === "宝可影") {
+      //             letterTilesHtml = await generateLetterTilesHtmlForCiying(
+      //               gameInfo.wordGuess,
+      //               inputWord,
+      //               channelId,
+      //               wordleIndex,
+      //               gameInfo,
+      //               isHardMode
+      //             );
+      //           } else {
+      //             const generatedHtml = await generateLetterTilesHtml(
+      //               gameInfo.wordGuess,
+      //               inputWord,
+      //               channelId,
+      //               wordleIndex,
+      //               gameInfo
+      //             );
+      //             letterTilesHtml =
+      //               '<div class="Row-module_row__pwpBq">' + generatedHtml + "</div>";
+      //           }
+      //         }
+      //         let emptyGridHtml;
+      //         if (isAbsurd) {
+      //           emptyGridHtml = generateEmptyGridHtml(
+      //             isWin ? 0 : 1,
+      //             gameInfo.guessWordLength
+      //           );
+      //         } else {
+      //           if (gameMode === "宝可兜") {
+      //             emptyGridHtml = generateEmptyGridHtmlForHandle(
+      //               gameInfo.isWin || isWin ? 0 : isLose ? 0 : 1,
+      //               guessWordLength
+      //             );
+      //           } else if (gameMode === "宝可影") {
+      //             emptyGridHtml =
+      //               generateEmptyGridHtmlForCiying(
+      //                 gameInfo.isWin || isWin ? 0 : isLose ? 0 : 1,
+      //                 guessWordLength,
+      //                 true
+      //               ) +
+      //               generateEmptyGridHtmlForCiying(
+      //                 gameInfo.isWin || isWin
+      //                   ? gameInfo.remainingGuessesCount - 1
+      //                   : gameInfo.remainingGuessesCount - 1 - 1,
+      //                 guessWordLength,
+      //                 false
+      //               );
+      //           } else {
+      //             emptyGridHtml = generateEmptyGridHtml(
+      //               gameInfo.isWin
+      //                 ? gameInfo.remainingGuessesCount
+      //                 : gameInfo.remainingGuessesCount - 1,
+      //               gameInfo.guessWordLength
+      //             );
+      //           }
+      //         }
+      //         const styledHtml = generateStyledHtml(gameInfo.guessWordLength + 1);
+      //         // 图
+      //         if (gameMode === "宝可兜") {
+      //           imageBuffer = await generateImageForHandle(
+      //             `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n${emptyGridHtml}`
+      //           );
+      //         } else if (gameMode === "宝可影") {
+      //           imageBuffer = await generateImageForCiying(
+      //             `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n${emptyGridHtml}`,
+      //             6 + wordlesNum - 1
+      //           );
+      //         }
+      //         imageBuffers.push(imageBuffer);
+      //         // 更新游戏记录
+      //         const remainingGuessesCount =
+      //           isAbsurd || (gameMode === "宝可影" && (gameInfo.isWin || isWin))
+      //             ? gameInfo.remainingGuessesCount
+      //             : gameInfo.remainingGuessesCount - 1;
+      //         if (wordleIndex === 1 && !gameInfo.isWin) {
+      //           await ctx.database.set(
+      //             "p_wordle_game_records",
+      //             { channelId },
+      //             {
+      //               isWin,
+      //               remainingGuessesCount: remainingGuessesCount,
+      //               wordGuessHtmlCache: `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n`,
+      //             }
+      //           );
+      //         } else if (wordleIndex > 1 && !gameInfo.isWin) {
+      //           await ctx.database.set(
+      //             "p_extra_wordle_game_records",
+      //             { channelId, wordleIndex },
+      //             {
+      //               isWin,
+      //               remainingGuessesCount: remainingGuessesCount,
+      //               wordGuessHtmlCache: `${gameInfo.wordGuessHtmlCache}${letterTilesHtml}\n`,
+      //             }
+      //           );
+      //         }
+      //       }
+      //       if (wordlesNum > 1) {
+      //         const htmlImgString = generateImageTags(imageBuffers);
+      //         imageBuffer = await generateWordlesImage(htmlImgString);
+      //         if (isWinNum === wordlesNum) {
+      //           isWin = true;
+      //         }
+      //       }
+      //       gameInfo = await getGameInfo(channelId);
+      //       // 处理赢
+      //       if (isWin) {
+      //         const order = "abcdefghijklmnopqrstuvwxyz?!";
+      //         const getUnknown = getUknowns();
+      //         const isUnknown = player.unknowns_bag.some(
+      //           (item) => item.id === getUnknown.id
+      //         );
+      //         const hasUnknown = isUnknown || player.lap !== 3;
+      //         hasUnknown ? null : player.unknowns_bag.push(getUnknown);
+      //         player.vip > 0 ? await rLimit.addGold(ctx, 0.5, session.userId) : null;
+      //         const legendaryPokemonRandom = Math.random() * 100;
+      //         const addMerits =
+      //           player.cyberMerit > 95
+      //             ? 100 - player.cyberMerit <= 0
+      //               ? 0
+      //               : 100 - player.cyberMerit
+      //             : 5;
+      //         const isEvent = player.lap < 3 || player.level < 90;
+      //         await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
+      //           unknowns_bag: player.unknowns_bag.sort(
+      //             (a, b) => order.indexOf(a.id) - order.indexOf(b.id)
+      //           ),
+      //           gold: $.if(
+      //             $.lt(row.lap, 3),
+      //             $.add(row.gold, 750 * gameInfo.remainingGuessesCount),
+      //             row.gold
+      //           ),
+      //           cyberMerit: $.add(row.cyberMerit, addMerits),
+      //         }));
+      //         if (player.lap == 3) {
+      //           await ctx.database.set(
+      //             "pokemon.resourceLimit",
+      //             { id: session.userId },
+      //             (row) => ({
+      //               rankScore: $.if(
+      //                 $.eq(player.lap, 3),
+      //                 $.add(row.rankScore, 50 * gameInfo.remainingGuessesCount),
+      //                 row.rankScore
+      //               ),
+      //             })
+      //           );
+      //         }
+      //         let finalSettlementString: string = "";
+      //         // 玩家记录赢
+      //         await updatePlayerRecordsWin(channelId, gameInfo);
+      //         // 增加该玩家猜出单词的次数
+      //         const [playerRecord] = await ctx.database.get(
+      //           "p_wordle_player_records",
+      //           { userId }
+      //         );
+      //         // 更新最快用时
+      //         if (
+      //           timeDifferenceInSeconds <
+      //             playerRecord.fastestGuessTime[gameInfo.gameMode] ||
+      //           playerRecord.fastestGuessTime[gameInfo.gameMode] === 0
+      //         ) {
+      //           playerRecord.fastestGuessTime[gameInfo.gameMode] = Math.floor(
+      //             timeDifferenceInSeconds
+      //           );
+      //         }
 
-        if (gameInfo.gameMode === "宝可影") {
-          if (gameInfo.wordlesNum === 1) {
-            if (gameInfo.isHardMode) {
-              playerRecord.extraCiyingRankInfo.successCountIn1HardMode += 1;
-              if (
-                timeDifferenceInSeconds <
-                  playerRecord.extraCiyingRankInfo
-                    .fastestGuessTimeIn1HardMode ||
-                playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1HardMode ===
-                  0
-              ) {
-                playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1HardMode =
-                  Math.floor(timeDifferenceInSeconds);
-              }
-            } else {
-              playerRecord.extraCiyingRankInfo.successCountIn1Mode += 1;
-              if (
-                timeDifferenceInSeconds <
-                  playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1Mode ||
-                playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1Mode === 0
-              ) {
-                playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1Mode =
-                  Math.floor(timeDifferenceInSeconds);
-              }
-            }
-          } else if (gameInfo.wordlesNum >= 2 && gameInfo.wordlesNum <= 4) {
-            const extraCiyingRankInfoKey = `successCountIn${gameInfo.wordlesNum}Mode`;
-            const extraCiyingRankInfoKeyFastestGuessTimeIn = `fastestGuessTimeIn${gameInfo.wordlesNum}Mode`;
-            playerRecord.extraCiyingRankInfo[extraCiyingRankInfoKey] += 1;
-            if (
-              timeDifferenceInSeconds <
-                playerRecord.extraCiyingRankInfo[
-                  extraCiyingRankInfoKeyFastestGuessTimeIn
-                ] ||
-              playerRecord.extraCiyingRankInfo[
-                extraCiyingRankInfoKeyFastestGuessTimeIn
-              ] === 0
-            ) {
-              playerRecord.extraCiyingRankInfo[
-                extraCiyingRankInfoKeyFastestGuessTimeIn
-              ] = Math.floor(timeDifferenceInSeconds);
-            }
-          }
-        }
+      //         if (gameInfo.gameMode === "宝可影") {
+      //           if (gameInfo.wordlesNum === 1) {
+      //             if (gameInfo.isHardMode) {
+      //               playerRecord.extraCiyingRankInfo.successCountIn1HardMode += 1;
+      //               if (
+      //                 timeDifferenceInSeconds <
+      //                   playerRecord.extraCiyingRankInfo
+      //                     .fastestGuessTimeIn1HardMode ||
+      //                 playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1HardMode ===
+      //                   0
+      //               ) {
+      //                 playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1HardMode =
+      //                   Math.floor(timeDifferenceInSeconds);
+      //               }
+      //             } else {
+      //               playerRecord.extraCiyingRankInfo.successCountIn1Mode += 1;
+      //               if (
+      //                 timeDifferenceInSeconds <
+      //                   playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1Mode ||
+      //                 playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1Mode === 0
+      //               ) {
+      //                 playerRecord.extraCiyingRankInfo.fastestGuessTimeIn1Mode =
+      //                   Math.floor(timeDifferenceInSeconds);
+      //               }
+      //             }
+      //           } else if (gameInfo.wordlesNum >= 2 && gameInfo.wordlesNum <= 4) {
+      //             const extraCiyingRankInfoKey = `successCountIn${gameInfo.wordlesNum}Mode`;
+      //             const extraCiyingRankInfoKeyFastestGuessTimeIn = `fastestGuessTimeIn${gameInfo.wordlesNum}Mode`;
+      //             playerRecord.extraCiyingRankInfo[extraCiyingRankInfoKey] += 1;
+      //             if (
+      //               timeDifferenceInSeconds <
+      //                 playerRecord.extraCiyingRankInfo[
+      //                   extraCiyingRankInfoKeyFastestGuessTimeIn
+      //                 ] ||
+      //               playerRecord.extraCiyingRankInfo[
+      //                 extraCiyingRankInfoKeyFastestGuessTimeIn
+      //               ] === 0
+      //             ) {
+      //               playerRecord.extraCiyingRankInfo[
+      //                 extraCiyingRankInfoKeyFastestGuessTimeIn
+      //               ] = Math.floor(timeDifferenceInSeconds);
+      //             }
+      //           }
+      //         }
 
-        const updateData = {
-          wordGuessCount: playerRecord.wordGuessCount + 1,
-          fastestGuessTime: playerRecord.fastestGuessTime,
-        };
+      //         const updateData = {
+      //           wordGuessCount: playerRecord.wordGuessCount + 1,
+      //           fastestGuessTime: playerRecord.fastestGuessTime,
+      //         };
 
-        if (gameInfo.gameMode === "宝可影") {
-          updateData["extraCiyingRankInfo"] = playerRecord.extraCiyingRankInfo;
-        }
+      //         if (gameInfo.gameMode === "宝可影") {
+      //           updateData["extraCiyingRankInfo"] = playerRecord.extraCiyingRankInfo;
+      //         }
 
-        await ctx.database.set(
-          "p_wordle_player_records",
-          { userId: userId },
-          updateData
-        );
+      //         await ctx.database.set(
+      //           "p_wordle_player_records",
+      //           { userId: userId },
+      //           updateData
+      //         );
 
-        const processedResult: string =
-          wordlesNum > 1 ? `\n${await processExtraGameRecords(channelId)}` : "";
-        await endGame(channelId);
-        const gameDuration = calculateGameDuration(
-          Number(gameInfo.timestamp),
-          timestamp
-        );
-        const imageType = config.imageType;
-        const settlementResult =
-          finalSettlementString === ""
-            ? ""
-            : `最终结算结果如下：\n${finalSettlementString}`;
+      //         const processedResult: string =
+      //           wordlesNum > 1 ? `\n${await processExtraGameRecords(channelId)}` : "";
+      //         await endGame(channelId);
+      //         const gameDuration = calculateGameDuration(
+      //           Number(gameInfo.timestamp),
+      //           timestamp
+      //         );
+      //         const imageType = config.imageType;
+      //         const settlementResult =
+      //           finalSettlementString === ""
+      //             ? ""
+      //             : `最终结算结果如下：\n${finalSettlementString}`;
 
-        const message = `
-<@${session.userId}>
-太棒了，你猜出来了！
-${gameDuration}
-${h.image(imageBuffer, `image/${imageType}`)}
-${generateGameEndMessage(gameInfo)}${processedResult}
-${settlementResult}
-`;
+      //         const message = `
+      // <@${session.userId}>
+      // 太棒了，你猜出来了！
+      // ${gameDuration}
+      // ${h.image(imageBuffer, `image/${imageType}`)}
+      // ${generateGameEndMessage(gameInfo)}${processedResult}
+      // ${settlementResult}
+      // `;
 
-        if (
-          !config.isTextToImageConversionEnabled &&
-          isQQOfficialRobotMarkdownTemplateEnabled &&
-          session.platform === "qq"
-        ) {
-          if (getUnknown.id == "!") {
-            getUnknown.id = "gt";
-          }
-          if (getUnknown.id == "?") {
-            getUnknown.id = "wh";
-          }
-          const unUrl = await toUrl(
-            ctx,
-            session,
-            `file://${resolve(
-              dirname,
-              `./assets/img/unknown/${getUnknown.id}.png`
-            )}`
-          );
-          let dimensions = imageSize(imageBuffer);
-          const url = await toUrl(ctx, session, imageBuffer);
-          const events =
-            `赛博功德+5` +
-            (legendaryPokemonRandom > 99 - player.cyberMerit * 0.02
-              ? `有个身影为你点赞`
-              : ``);
-          const md = `![img#${dimensions.width}px #${
-            dimensions.height
-          }px](${url})
-<@${session.userId}>
-太棒了，你猜出来了！
-${
-  player.lap == 3
-    ? `积分+${50 * gameInfo.remainingGuessesCount}`
-    : `金币+${750 * gameInfo.remainingGuessesCount}`
-} ${player.vip > 0 ? `金币上限+5000` : ``}
-${!isEvent ? events : ""}
-${
-  player.lap == 3
-    ? !isUnknown
-      ? `![img#20px #20px](${unUrl})你获得了${getUnknown.name}`
-      : `你已经有了${getUnknown.name}`
-    : ""
-}
-${gameDuration}
-${generateGameEndMessage(gameInfo)}${processedResult}
-${settlementResult}`;
-          await sendMessage(
-            session,
-            md,
-            `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode} ？？未知图腾`,
-            2
-          );
-          if (
-            legendaryPokemonRandom > 99 - player.cyberMerit * 0.02 &&
-            !isEvent
-          ) {
-            const key = crypto
-              .createHash("md5")
-              .update(session.userId + new Date().getTime())
-              .digest("hex")
-              .toUpperCase();
-            legendaryPokemonId[key] = "347.347";
-            ctx.setTimeout(() => {
-              delete legendaryPokemonId[key];
-            }, 2000);
-            await session.execute(`捕捉宝可梦 ${key}`);
-          }
-          return;
-        }
-        return await sendMessage(
-          session,
-          message,
-          `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode}`,
-          2
-        );
-      }
-      // 处理输
-      if (isLose) {
-        // 玩家记录输
-        await updatePlayerRecordsLose(channelId, gameInfo);
-        const processedResult: string =
-          wordlesNum > 1 ? `\n${await processExtraGameRecords(channelId)}` : "";
-        await endGame(channelId);
-        const challengeMessage = isChallengeMode
-          ? `\n目标单词为：【${targetWord}】\n它不再是可能的秘密单词！`
-          : "";
-        const answerInfo = isChallengeMode
-          ? ""
-          : `\n${generateGameEndMessage(gameInfo)}`;
-        const gameDuration = calculateGameDuration(
-          Number(gameInfo.timestamp),
-          timestamp
-        );
-        const message = `很遗憾，你们没有猜出来！${challengeMessage}\n但没关系~下次加油哇！\n${h.image(
-          imageBuffer,
-          `image/${config.imageType}`
-        )}\n${gameDuration}${answerInfo}${processedResult}`;
+      //         if (
+      //           !config.isTextToImageConversionEnabled &&
+      //           isQQOfficialRobotMarkdownTemplateEnabled &&
+      //           session.platform === "qq"
+      //         ) {
+      //           if (getUnknown.id == "!") {
+      //             getUnknown.id = "gt";
+      //           }
+      //           if (getUnknown.id == "?") {
+      //             getUnknown.id = "wh";
+      //           }
+      //           const unUrl = await toUrl(
+      //             ctx,
+      //             session,
+      //             `file://${resolve(
+      //               dirname,
+      //               `./assets/img/unknown/${getUnknown.id}.png`
+      //             )}`
+      //           );
+      //           let dimensions = imageSize(imageBuffer);
+      //           const url = await toUrl(ctx, session, imageBuffer);
+      //           const events =
+      //             `赛博功德+5` +
+      //             (legendaryPokemonRandom > 99 - player.cyberMerit * 0.02
+      //               ? `有个身影为你点赞`
+      //               : ``);
+      //           const md = `![img#${dimensions.width}px #${
+      //             dimensions.height
+      //           }px](${url})
+      // <@${session.userId}>
+      // 太棒了，你猜出来了！
+      // ${
+      //   player.lap == 3
+      //     ? `积分+${50 * gameInfo.remainingGuessesCount}`
+      //     : `金币+${750 * gameInfo.remainingGuessesCount}`
+      // } ${player.vip > 0 ? `金币上限+5000` : ``}
+      // ${!isEvent ? events : ""}
+      // ${
+      //   player.lap == 3
+      //     ? !isUnknown
+      //       ? `![img#20px #20px](${unUrl})你获得了${getUnknown.name}`
+      //       : `你已经有了${getUnknown.name}`
+      //     : ""
+      // }
+      // ${gameDuration}
+      // ${generateGameEndMessage(gameInfo)}${processedResult}
+      // ${settlementResult}`;
+      //           await sendMessage(
+      //             session,
+      //             md,
+      //             `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode} ？？未知图腾`,
+      //             2
+      //           );
+      //           if (
+      //             legendaryPokemonRandom > 99 - player.cyberMerit * 0.02 &&
+      //             !isEvent
+      //           ) {
+      //             const key = crypto
+      //               .createHash("md5")
+      //               .update(session.userId + new Date().getTime())
+      //               .digest("hex")
+      //               .toUpperCase();
+      //             legendaryPokemonId[key] = "347.347";
+      //             ctx.setTimeout(() => {
+      //               delete legendaryPokemonId[key];
+      //             }, 2000);
+      //             await session.execute(`捕捉宝可梦 ${key}`);
+      //           }
+      //           return;
+      //         }
+      //         return await sendMessage(
+      //           session,
+      //           message,
+      //           `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode}`,
+      //           2
+      //         );
+      //       }
+      //       // 处理输
+      //       if (isLose) {
+      //         // 玩家记录输
+      //         await updatePlayerRecordsLose(channelId, gameInfo);
+      //         const processedResult: string =
+      //           wordlesNum > 1 ? `\n${await processExtraGameRecords(channelId)}` : "";
+      //         await endGame(channelId);
+      //         const challengeMessage = isChallengeMode
+      //           ? `\n目标单词为：【${targetWord}】\n它不再是可能的秘密单词！`
+      //           : "";
+      //         const answerInfo = isChallengeMode
+      //           ? ""
+      //           : `\n${generateGameEndMessage(gameInfo)}`;
+      //         const gameDuration = calculateGameDuration(
+      //           Number(gameInfo.timestamp),
+      //           timestamp
+      //         );
+      //         const message = `很遗憾，你们没有猜出来！${challengeMessage}\n但没关系~下次加油哇！\n${h.image(
+      //           imageBuffer,
+      //           `image/${config.imageType}`
+      //         )}\n${gameDuration}${answerInfo}${processedResult}`;
 
-        if (
-          !config.isTextToImageConversionEnabled &&
-          isQQOfficialRobotMarkdownTemplateEnabled &&
-          session.platform === "qq"
-        ) {
-          let dimensions = imageSize(imageBuffer);
-          const url = await toUrl(ctx, session, imageBuffer);
-          const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})
-很遗憾，你们没有猜出来！${challengeMessage}
-但没关系~下次加油哇！
-${gameDuration}${answerInfo}${processedResult}`;
-          return await sendMessage(
-            session,
-            md,
-            `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode} ？？未知图腾`,
-            2
-          );
-        }
-        return await sendMessage(
-          session,
-          message,
-          `改名 排行榜 查询玩家记录 开始游戏 再来一把`,
-          2
-        );
-      }
-      // 继续
-      await setGuessRunningStatus(channelId, false);
-      let dimensions = imageSize(imageBuffer);
-      const url = await toUrl(ctx, session, imageBuffer);
-      const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})`;
-      if (
-        !config.isTextToImageConversionEnabled &&
-        isQQOfficialRobotMarkdownTemplateEnabled &&
-        session.platform === "qq"
-      ) {
-        return sendMessage(
-          session,
-          md,
-          `结束游戏 ${
-            gameInfo.gameMode === "宝可兜" ? `拼音速查表 ` : ``
-          }查询进度 ？？未知图腾 猜测`,
-          2
-        );
-      }
-      return;
-      // .action
+      //         if (
+      //           !config.isTextToImageConversionEnabled &&
+      //           isQQOfficialRobotMarkdownTemplateEnabled &&
+      //           session.platform === "qq"
+      //         ) {
+      //           let dimensions = imageSize(imageBuffer);
+      //           const url = await toUrl(ctx, session, imageBuffer);
+      //           const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})
+      // 很遗憾，你们没有猜出来！${challengeMessage}
+      // 但没关系~下次加油哇！
+      // ${gameDuration}${answerInfo}${processedResult}`;
+      //           return await sendMessage(
+      //             session,
+      //             md,
+      //             `改名 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode} ？？未知图腾`,
+      //             2
+      //           );
+      //         }
+      //         return await sendMessage(
+      //           session,
+      //           message,
+      //           `改名 排行榜 查询玩家记录 开始游戏 再来一把`,
+      //           2
+      //         );
+      //       }
+      //       // 继续
+      //       await setGuessRunningStatus(channelId, false);
+      //       let dimensions = imageSize(imageBuffer);
+      //       const url = await toUrl(ctx, session, imageBuffer);
+      //       const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})`;
+      //       if (
+      //         !config.isTextToImageConversionEnabled &&
+      //         isQQOfficialRobotMarkdownTemplateEnabled &&
+      //         session.platform === "qq"
+      //       ) {
+      //         return sendMessage(
+      //           session,
+      //           md,
+      //           `结束游戏 ${
+      //             gameInfo.gameMode === "宝可兜" ? `拼音速查表 ` : ``
+      //           }查询进度 ？？未知图腾 猜测`,
+      //           2
+      //         );
+      //       }
+      //       return;
+      //       // .action
     });
 
-  ctx.command("玩法介绍", "玩法介绍").action(async ({ session }) => {
-    const md = `
-# 宝可猜名
-      
----
-## 宝可兜
-      
-- 格子数为待猜的宝可梦的名字字数，当你猜一个后，在名字上面会出现拼音，绿色即为正确，黄色为位置不对，灰色为当前名字里没有这个拼音。
-      
-## 宝可影
-      
-- 格子数为待猜的宝可梦的名字字数，当你猜一个后，会有重叠的笔画出现，笔画越接近，颜色越深（黑色或是灰色）。当笔画完全正确，则是绿色.
-      
-> 奖励：VIP将多获得5000的当日金币获取上限。3周目为积分0-500不等并且会获得一个未知图腾，用来召唤雷吉奇卡斯 。1、2周目为金币0-7500不等。
-`;
-    await sendMarkdown(ctx, md, session);
-  });
-  // 查询进度 jd* cxjd*
-  ctx.command("查询进度", "查询当前游戏进度").action(async ({ session }) => {
-    let { channelId, userId, username, user, timestamp } = session;
-    // 更新玩家记录表中的用户名
-    username = await getSessionUserName(session);
-    await updateNameInPlayerRecord(session, userId, username);
-    const gameInfo = await getGameInfo(channelId);
-    // 未开始
-    if (!gameInfo.isStarted) {
-      return await sendMessage(
-        session,
-        `<@${session.userId}>\n游戏还没开始呢~\n开始后再来查询进度吧！`,
-        `改名 开始游戏`
-      );
-    }
-    // 返回信息
-    const {
-      correctLetters,
-      presentLetters,
-      isHardMode,
-      gameMode,
-      guessWordLength,
-      absentLetters,
-      isAbsurd,
-      isChallengeMode,
-      targetWord,
-      wordlesNum,
-      isUltraHardMode,
-      presentLettersWithIndex,
-      correctPinyinsWithIndex,
-      presentPinyins,
-      presentPinyinsWithIndex,
-      absentPinyins,
-      absentTones,
-      presentTonesWithIndex,
-      correctTonesWithIndex,
-      presentTones,
-    } = gameInfo;
-    const usernameMention = `<@${session.userId}>`;
-    const inputLengthMessage = `待猜${
-      gameMode === "宝可兜" || gameMode === "宝可影"
-        ? "名称"
-        : gameMode === "Numberle"
-        ? "数字"
-        : gameMode === "Math"
-        ? "数学方程式"
-        : "单词"
-    }的长度为：【${guessWordLength}】`;
-    const extraGameInfo =
-      wordlesNum > 1 ? `\n${await processExtraGameInfos(channelId)}` : "";
-    const gameDuration = calculateGameDuration(
-      Number(gameInfo.timestamp),
-      timestamp
-    );
-    const progressInfo = `当前${gameDuration}\n当前进度：【${correctLetters.join(
-      ""
-    )}】`;
+  // ctx.command("玩法介绍", "玩法介绍").action(async ({ session }) => {
+  //     const md = `
+  // # 宝可猜名
 
-    const presentInfo =
-      presentLetters.length !== 0 ? `\n包含：【${presentLetters}】` : "";
-    const absentInfo =
-      absentLetters.length !== 0 ? `\n不包含：【${absentLetters}】` : "";
-    const presentWithIndexInfo =
-      presentLettersWithIndex.length !== 0
-        ? `\n位置排除：【${presentLettersWithIndex.join(", ")}】`
-        : "";
+  // ---
+  // ## 宝可兜
 
-    const pinyinsCorrectInfo =
-      correctPinyinsWithIndex.length !== 0
-        ? `\n正确拼音：【${correctPinyinsWithIndex.join(", ")}】`
-        : "";
-    const pinyinsPresentInfo =
-      presentPinyins.length !== 0
-        ? `\n包含拼音：【${presentPinyins.join(", ")}】`
-        : "";
-    const pinyinsAbsentInfo =
-      absentPinyins.length !== 0
-        ? `\n不包含拼音：【${absentPinyins.join(", ")}】`
-        : "";
-    const pinyinsPresentWithIndexInfo =
-      presentPinyinsWithIndex.length !== 0
-        ? `\n拼音位置排除：【${presentPinyinsWithIndex.join(", ")}】`
-        : "";
+  // - 格子数为待猜的宝可梦的名字字数，当你猜一个后，在名字上面会出现拼音，绿色即为正确，黄色为位置不对，灰色为当前名字里没有这个拼音。
 
-    const tonesCorrectInfo =
-      correctTonesWithIndex.length !== 0
-        ? `\n正确声调：【${correctTonesWithIndex.join(", ")}】`
-        : "";
-    const tonesPresentInfo =
-      presentTones.length !== 0
-        ? `\n包含声调：【${presentTones.join(", ")}】`
-        : "";
-    const tonesAbsentInfo =
-      absentTones.length !== 0
-        ? `\n不包含声调：【${absentTones.join(", ")}】`
-        : "";
-    const tonesPresentWithIndexInfo =
-      presentTonesWithIndex.length !== 0
-        ? `\n声调位置排除：【${presentTonesWithIndex.join(", ")}】`
-        : "";
+  // ## 宝可影
 
-    const progressMessage = `${progressInfo}${presentInfo}${absentInfo}${presentWithIndexInfo}${pinyinsCorrectInfo}${pinyinsPresentInfo}${pinyinsAbsentInfo}${pinyinsPresentWithIndexInfo}${tonesCorrectInfo}${tonesPresentInfo}${tonesAbsentInfo}${tonesPresentWithIndexInfo}${extraGameInfo}`;
+  // - 格子数为待猜的宝可梦的名字字数，当你猜一个后，会有重叠的笔画出现，笔画越接近，颜色越深（黑色或是灰色）。当笔画完全正确，则是绿色.
 
-    const timeDifferenceInSeconds =
-      (timestamp - Number(gameInfo.timestamp)) / 1000;
-    let message = `${usernameMention}\n当前游戏模式为：【${gameMode}${
-      wordlesNum > 1 ? `（x${wordlesNum}）` : ""
-    }${isHardMode ? `（${isUltraHardMode ? "超" : ""}困难）` : ""}${
-      isAbsurd ? `（变态${isChallengeMode ? "挑战" : ""}）` : ""
-    }】${isChallengeMode ? `\n目标单词为：【${targetWord}】` : ""}`;
-    if (config.enableWordGuessTimeLimit) {
-      message += `\n剩余作答时间：【${timeDifferenceInSeconds}】秒`;
-    }
-    message += `\n${inputLengthMessage}\n${progressMessage}`;
+  // > 奖励：VIP将多获得5000的当日金币获取上限。3周目为积分0-500不等并且会获得一个未知图腾，用来召唤雷吉奇卡斯 。1、2周目为金币0-7500不等。
+  // `;
+  //     await sendMarkdown(ctx, md, session);
+  //   });
+  //   // 查询进度 jd* cxjd*
+  //   ctx.command("查询进度", "查询当前游戏进度").action(async ({ session }) => {
+  //     let { channelId, userId, username, user, timestamp } = session;
+  //     // 更新玩家记录表中的用户名
+  //     username = await getSessionUserName(session);
+  //     await updateNameInPlayerRecord(session, userId, username);
+  //     const gameInfo = await getGameInfo(channelId);
+  //     // 未开始
+  //     if (!gameInfo.isStarted) {
+  //       return await sendMessage(
+  //         session,
+  //         `<@${session.userId}>\n游戏还没开始呢~\n开始后再来查询进度吧！`,
+  //         `改名 开始游戏`
+  //       );
+  //     }
+  //     // 返回信息
+  //     const {
+  //       correctLetters,
+  //       presentLetters,
+  //       isHardMode,
+  //       gameMode,
+  //       guessWordLength,
+  //       absentLetters,
+  //       isAbsurd,
+  //       isChallengeMode,
+  //       targetWord,
+  //       wordlesNum,
+  //       isUltraHardMode,
+  //       presentLettersWithIndex,
+  //       correctPinyinsWithIndex,
+  //       presentPinyins,
+  //       presentPinyinsWithIndex,
+  //       absentPinyins,
+  //       absentTones,
+  //       presentTonesWithIndex,
+  //       correctTonesWithIndex,
+  //       presentTones,
+  //     } = gameInfo;
+  //     const usernameMention = `<@${session.userId}>`;
+  //     const inputLengthMessage = `待猜${
+  //       gameMode === "宝可兜" || gameMode === "宝可影"
+  //         ? "名称"
+  //         : gameMode === "Numberle"
+  //         ? "数字"
+  //         : gameMode === "Math"
+  //         ? "数学方程式"
+  //         : "单词"
+  //     }的长度为：【${guessWordLength}】`;
+  //     const extraGameInfo =
+  //       wordlesNum > 1 ? `\n${await processExtraGameInfos(channelId)}` : "";
+  //     const gameDuration = calculateGameDuration(
+  //       Number(gameInfo.timestamp),
+  //       timestamp
+  //     );
+  //     const progressInfo = `当前${gameDuration}\n当前进度：【${correctLetters.join(
+  //       ""
+  //     )}】`;
 
-    return await sendMessage(session, message, `猜测`);
+  //     const presentInfo =
+  //       presentLetters.length !== 0 ? `\n包含：【${presentLetters}】` : "";
+  //     const absentInfo =
+  //       absentLetters.length !== 0 ? `\n不包含：【${absentLetters}】` : "";
+  //     const presentWithIndexInfo =
+  //       presentLettersWithIndex.length !== 0
+  //         ? `\n位置排除：【${presentLettersWithIndex.join(", ")}】`
+  //         : "";
 
-    // .action
-  });
-  // pyscb* pysc*
-  ctx.command("拼音速查表", "查看拼音速查表").action(async ({ session }) => {
-    let { channelId, userId, username } = session;
-    // 更新玩家记录表中的用户名
-    username = await getSessionUserName(session);
-    await updateNameInPlayerRecord(session, userId, username);
-    let gameInfo: any = await getGameInfo(channelId);
+  //     const pinyinsCorrectInfo =
+  //       correctPinyinsWithIndex.length !== 0
+  //         ? `\n正确拼音：【${correctPinyinsWithIndex.join(", ")}】`
+  //         : "";
+  //     const pinyinsPresentInfo =
+  //       presentPinyins.length !== 0
+  //         ? `\n包含拼音：【${presentPinyins.join(", ")}】`
+  //         : "";
+  //     const pinyinsAbsentInfo =
+  //       absentPinyins.length !== 0
+  //         ? `\n不包含拼音：【${absentPinyins.join(", ")}】`
+  //         : "";
+  //     const pinyinsPresentWithIndexInfo =
+  //       presentPinyinsWithIndex.length !== 0
+  //         ? `\n拼音位置排除：【${presentPinyinsWithIndex.join(", ")}】`
+  //         : "";
 
-    if (!gameInfo.isStarted || gameInfo.gameMode !== "宝可兜") {
-      const imageBuffer = await generateHandlePinyinsImage(defaultPinyinsHtml);
-      return sendMessage(
-        session,
-        h.image(imageBuffer, `image/${config.imageType}`),
-        ``
-      );
-    }
-    const wordlesNum = gameInfo.wordlesNum;
-    // 生成 html 字符串
-    let imageBuffers: Buffer[] = [];
-    let imageBuffer: Buffer = Buffer.from("initial value", "utf-8");
-    for (let wordleIndex = 1; wordleIndex < wordlesNum + 1; wordleIndex++) {
-      if (wordleIndex > 1) {
-        gameInfo = await getGameInfo2(channelId, wordleIndex);
-      }
-      const { presentPinyins, correctPinyinsWithIndex, absentPinyins } =
-        gameInfo;
-      const correctPinyins: string[] = removeIndexFromPinyins(
-        correctPinyinsWithIndex
-      );
-      if (gameInfo.gameMode === "宝可兜") {
-        const $ = load(defaultPinyinsHtml);
+  //     const tonesCorrectInfo =
+  //       correctTonesWithIndex.length !== 0
+  //         ? `\n正确声调：【${correctTonesWithIndex.join(", ")}】`
+  //         : "";
+  //     const tonesPresentInfo =
+  //       presentTones.length !== 0
+  //         ? `\n包含声调：【${presentTones.join(", ")}】`
+  //         : "";
+  //     const tonesAbsentInfo =
+  //       absentTones.length !== 0
+  //         ? `\n不包含声调：【${absentTones.join(", ")}】`
+  //         : "";
+  //     const tonesPresentWithIndexInfo =
+  //       presentTonesWithIndex.length !== 0
+  //         ? `\n声调位置排除：【${presentTonesWithIndex.join(", ")}】`
+  //         : "";
 
-        $("div").each((index, element) => {
-          const text = $(element).text();
-          if (correctPinyins.includes(text)) {
-            $(element).attr("class", "text-ok");
-          } else if (presentPinyins.includes(text)) {
-            $(element).attr("class", "text-mis");
-          } else if (absentPinyins.includes(text)) {
-            $(element).attr("class", "op30");
-          }
-        });
+  //     const progressMessage = `${progressInfo}${presentInfo}${absentInfo}${presentWithIndexInfo}${pinyinsCorrectInfo}${pinyinsPresentInfo}${pinyinsAbsentInfo}${pinyinsPresentWithIndexInfo}${tonesCorrectInfo}${tonesPresentInfo}${tonesAbsentInfo}${tonesPresentWithIndexInfo}${extraGameInfo}`;
 
-        const modifiedHTML = $.html();
-        imageBuffer = await generateHandlePinyinsImage(modifiedHTML);
-      }
-      imageBuffers.push(imageBuffer);
-    }
-    if (wordlesNum > 1) {
-      const htmlImgString = generateImageTags(imageBuffers);
-      imageBuffer = await generateWordlesImage(htmlImgString);
-    }
-    let dimensions = imageSize(imageBuffer);
-    const url = await toUrl(ctx, session, imageBuffer);
-    const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})`;
-    await sendMessage(session, md, ``);
-  });
+  //     const timeDifferenceInSeconds =
+  //       (timestamp - Number(gameInfo.timestamp)) / 1000;
+  //     let message = `${usernameMention}\n当前游戏模式为：【${gameMode}${
+  //       wordlesNum > 1 ? `（x${wordlesNum}）` : ""
+  //     }${isHardMode ? `（${isUltraHardMode ? "超" : ""}困难）` : ""}${
+  //       isAbsurd ? `（变态${isChallengeMode ? "挑战" : ""}）` : ""
+  //     }】${isChallengeMode ? `\n目标单词为：【${targetWord}】` : ""}`;
+  //     if (config.enableWordGuessTimeLimit) {
+  //       message += `\n剩余作答时间：【${timeDifferenceInSeconds}】秒`;
+  //     }
+  //     message += `\n${inputLengthMessage}\n${progressMessage}`;
 
-  // 结束猜名 s* js*
-  ctx.command("结束猜名", "结束游戏").action(async ({ session }) => {
-    const [player]: Pokebattle[] = await ctx.database.get(
-      "pokebattle",
-      session.userId
-    );
-    if (!player) {
-      await session.execute("签到");
-      return;
-    }
-    let { channelId, userId, username, timestamp } = session;
-    // 更新玩家记录表中的用户名
-    username = await getSessionUserName(session);
-    await updateNameInPlayerRecord(session, userId, username);
-    // 游戏状态
-    const gameInfo = await getGameInfo(channelId);
-    if (!gameInfo.isStarted) {
-      return await sendMessage(
-        session,
-        `<@${session.userId}>\n游戏还没开始哦~怎么结束呐？`,
-        `改名 开始游戏`
-      );
-    }
-    // 玩家记录输
-    await updatePlayerRecordsLose(channelId, gameInfo);
-    // 结束猜名
-    const processedResult: string =
-      gameInfo.wordlesNum > 1
-        ? `\n${await processExtraGameRecords(channelId)}`
-        : "";
-    await endGame(channelId);
-    const duration = calculateGameDuration(
-      Number(gameInfo.timestamp),
-      timestamp
-    );
-    const message = `<@${
-      session.userId
-    }>\n由于您执行了操作：【结束】\n游戏已结束！\n${duration}${
-      gameInfo.isAbsurd ? "" : `\n${generateGameEndMessage(gameInfo)}`
-    }${processedResult}`;
-    await sendMessage(
-      session,
-      message,
-      `改名 玩法介绍 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode}`,
-      2
-    );
-    // .action
-  });
+  //     return await sendMessage(session, message, `猜测`);
+
+  //     // .action
+  //   });
+  //   // pyscb* pysc*
+  //   ctx.command("拼音速查表", "查看拼音速查表").action(async ({ session }) => {
+  //     let { channelId, userId, username } = session;
+  //     // 更新玩家记录表中的用户名
+  //     username = await getSessionUserName(session);
+  //     await updateNameInPlayerRecord(session, userId, username);
+  //     let gameInfo: any = await getGameInfo(channelId);
+
+  //     if (!gameInfo.isStarted || gameInfo.gameMode !== "宝可兜") {
+  //       const imageBuffer = await generateHandlePinyinsImage(defaultPinyinsHtml);
+  //       return sendMessage(
+  //         session,
+  //         h.image(imageBuffer, `image/${config.imageType}`),
+  //         ``
+  //       );
+  //     }
+  //     const wordlesNum = gameInfo.wordlesNum;
+  //     // 生成 html 字符串
+  //     let imageBuffers: Buffer[] = [];
+  //     let imageBuffer: Buffer = Buffer.from("initial value", "utf-8");
+  //     for (let wordleIndex = 1; wordleIndex < wordlesNum + 1; wordleIndex++) {
+  //       if (wordleIndex > 1) {
+  //         gameInfo = await getGameInfo2(channelId, wordleIndex);
+  //       }
+  //       const { presentPinyins, correctPinyinsWithIndex, absentPinyins } =
+  //         gameInfo;
+  //       const correctPinyins: string[] = removeIndexFromPinyins(
+  //         correctPinyinsWithIndex
+  //       );
+  //       if (gameInfo.gameMode === "宝可兜") {
+  //         const $ = load(defaultPinyinsHtml);
+
+  //         $("div").each((index, element) => {
+  //           const text = $(element).text();
+  //           if (correctPinyins.includes(text)) {
+  //             $(element).attr("class", "text-ok");
+  //           } else if (presentPinyins.includes(text)) {
+  //             $(element).attr("class", "text-mis");
+  //           } else if (absentPinyins.includes(text)) {
+  //             $(element).attr("class", "op30");
+  //           }
+  //         });
+
+  //         const modifiedHTML = $.html();
+  //         imageBuffer = await generateHandlePinyinsImage(modifiedHTML);
+  //       }
+  //       imageBuffers.push(imageBuffer);
+  //     }
+  //     if (wordlesNum > 1) {
+  //       const htmlImgString = generateImageTags(imageBuffers);
+  //       imageBuffer = await generateWordlesImage(htmlImgString);
+  //     }
+  //     let dimensions = imageSize(imageBuffer);
+  //     const url = await toUrl(ctx, session, imageBuffer);
+  //     const md = `![img#${dimensions.width}px #${dimensions.height}px](${url})`;
+  //     await sendMessage(session, md, ``);
+  //   });
+
+  //   // 结束猜名 s* js*
+  //   ctx.command("结束猜名", "结束游戏").action(async ({ session }) => {
+  //     const [player]: Pokebattle[] = await ctx.database.get(
+  //       "pokebattle",
+  //       session.userId
+  //     );
+  //     if (!player) {
+  //       await session.execute("签到");
+  //       return;
+  //     }
+  //     let { channelId, userId, username, timestamp } = session;
+  //     // 更新玩家记录表中的用户名
+  //     username = await getSessionUserName(session);
+  //     await updateNameInPlayerRecord(session, userId, username);
+  //     // 游戏状态
+  //     const gameInfo = await getGameInfo(channelId);
+  //     if (!gameInfo.isStarted) {
+  //       return await sendMessage(
+  //         session,
+  //         `<@${session.userId}>\n游戏还没开始哦~怎么结束呐？`,
+  //         `改名 开始游戏`
+  //       );
+  //     }
+  //     // 玩家记录输
+  //     await updatePlayerRecordsLose(channelId, gameInfo);
+  //     // 结束猜名
+  //     const processedResult: string =
+  //       gameInfo.wordlesNum > 1
+  //         ? `\n${await processExtraGameRecords(channelId)}`
+  //         : "";
+  //     await endGame(channelId);
+  //     const duration = calculateGameDuration(
+  //       Number(gameInfo.timestamp),
+  //       timestamp
+  //     );
+  //     const message = `<@${
+  //       session.userId
+  //     }>\n由于您执行了操作：【结束】\n游戏已结束！\n${duration}${
+  //       gameInfo.isAbsurd ? "" : `\n${generateGameEndMessage(gameInfo)}`
+  //     }${processedResult}`;
+  //     await sendMessage(
+  //       session,
+  //       message,
+  //       `改名 玩法介绍 排行榜 查询玩家记录 开始游戏 再来一把${gameInfo.gameMode}`,
+  //       2
+  //     );
+  //     // .action
+  //   });
 
   // hs*
   function replaceSymbols(message: string): string {
@@ -2700,886 +2700,886 @@ ${gameDuration}${answerInfo}${processedResult}`;
     return result;
   }
 
-  async function getSessionUserName(session: any): Promise<string> {
-    const [player]: Pokebattle[] = await ctx.database.get(
-      "pokebattle",
-      session.userId
-    );
-    let sessionUserName = player?.name ? player.name : "玩家";
-
-    if (isQQOfficialRobotMarkdownTemplateEnabled && session.platform === "qq") {
-      let userRecord = await ctx.database.get("p_wordle_player_records", {
-        userId: session.userId,
-      });
-
-      if (userRecord.length === 0) {
-        await ctx.database.create("p_wordle_player_records", {
-          userId: session.userId,
-          username: sessionUserName,
-        });
-
-        userRecord = await ctx.database.get("p_wordle_player_records", {
-          userId: session.userId,
-        });
-      }
-      sessionUserName = player.name;
-    }
-
-    return sessionUserName;
-  }
-
-  async function generateHandlePinyinsImage(pinyinsHtml: string) {
-    const browser = ctx.puppeteer.browser;
-    const context = await browser.createBrowserContext();
-    const page = await context.newPage();
-    await page.setViewport({ width: 420, height: 570, deviceScaleFactor: 1 });
-    const filePath = path
-      .join(dirname, "./pokedle/src/emptyHtml.html")
-      .replace(/\\/g, "/");
-    await page.goto("file://" + filePath);
-
-    const html = `<html lang="en" class="${
-      config.isDarkThemeEnabled ? "dark" : ""
-    }" style="--vh: 6.04px;">
-    <head>
-        <meta charset="UTF-8">
-        <title>宝可兜 - 汉字 Wordle</title>
-        <link rel="stylesheet" href="./assets/宝可兜/handle.css">
-    </head>
-    <body>
-        <div id="app" data-v-app="">
-            <main font-sans="" text="center gray-700 dark:gray-300" select-none="" class=""><!---->
-                <div fixed="" z-40="" class="bottom-0 left-0 right-0 top-0">
-                    <div class="bg-base left-0 right-0 top-0 bottom-0 absolute transition-opacity duration-500 ease-out opacity-50"></div>
-                    <div class="bg-base border-base absolute transition-all duration-200 ease-out max-w-screen max-h-screen overflow-auto scrolls top-0 left-0 right-0 border-b"
-                         style="">
-                        <div p8="" pt4="" flex="~ col center" relative=""><p text-xl="" font-serif="" mb8=""><b>拼音速查表</b></p>
-                            <div grid="~ cols-[1fr_3fr] gap-x-10 gap-y-4" font-mono="" font-light="">
-                                <div text-center="">声母</div>
-                                <div text-center="">韵母</div>
-                                    ${pinyinsHtml}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </body>
-</html>`;
-
-    await page.setContent(html, { waitUntil: "load" });
-    const imageBuffer = await page.screenshot({
-      fullPage: true,
-      type: config.imageType,
-    });
-    await page.close();
-    await context.close();
-
-    return imageBuffer;
-  }
-
-  async function processExtraGameInfos(channelId: string): Promise<string> {
-    const extraGameInfos: ExtraGameRecord[] = await ctx.database.get(
-      "p_extra_wordle_game_records",
-      { channelId }
-    );
-
-    return extraGameInfos
-      .map(
-        ({
-          correctLetters,
-          presentLetters,
-          absentLetters,
-          presentLettersWithIndex,
-          presentPinyinsWithIndex,
-          correctPinyinsWithIndex,
-          correctTonesWithIndex,
-          presentTonesWithIndex,
-          presentTones,
-          absentTones,
-          absentPinyins,
-          presentPinyins,
-        }) => {
-          const present =
-            presentLetters.length === 0 ? "" : `\n包含：【${presentLetters}】`;
-          const absent =
-            absentLetters.length === 0 ? "" : `\n不包含：【${absentLetters}】`;
-          const presentWithoutIndex =
-            presentLettersWithIndex.length === 0
-              ? ""
-              : `\n位置排除：【${presentLettersWithIndex.join(", ")}】`;
-
-          const pinyinsCorrectInfo =
-            correctPinyinsWithIndex.length !== 0
-              ? `\n正确拼音：【${correctPinyinsWithIndex.join(", ")}】`
-              : "";
-          const pinyinsPresentInfo =
-            presentPinyins.length !== 0
-              ? `\n包含拼音：【${presentPinyins.join(", ")}】`
-              : "";
-          const pinyinsAbsentInfo =
-            absentPinyins.length !== 0
-              ? `\n不包含拼音：【${absentPinyins.join(", ")}】`
-              : "";
-          const pinyinsPresentWithIndexInfo =
-            presentPinyinsWithIndex.length !== 0
-              ? `\n拼音位置排除：【${presentPinyinsWithIndex.join(", ")}】`
-              : "";
-
-          const tonesCorrectInfo =
-            correctTonesWithIndex.length !== 0
-              ? `\n正确声调：【${correctTonesWithIndex.join(", ")}】`
-              : "";
-          const tonesPresentInfo =
-            presentTones.length !== 0
-              ? `\n包含声调：【${presentTones.join(", ")}】`
-              : "";
-          const tonesAbsentInfo =
-            absentTones.length !== 0
-              ? `\n不包含声调：【${absentTones.join(", ")}】`
-              : "";
-          const tonesPresentWithIndexInfo =
-            presentTonesWithIndex.length !== 0
-              ? `\n声调位置排除：【${presentTonesWithIndex.join(", ")}】`
-              : "";
-          return `\n当前进度：【${correctLetters.join(
-            ""
-          )}】${present}${absent}${presentWithoutIndex}${pinyinsCorrectInfo}${pinyinsPresentInfo}${pinyinsAbsentInfo}${pinyinsPresentWithIndexInfo}${tonesCorrectInfo}${tonesPresentInfo}${tonesAbsentInfo}${tonesPresentWithIndexInfo}`;
-        }
-      )
-      .join("\n");
-  }
-
-  async function processExtraGameRecords(channelId: string): Promise<string> {
-    const extraGameInfos: ExtraGameRecord[] = await ctx.database.get(
-      "p_extra_wordle_game_records",
-      { channelId }
-    );
-
-    const resultStrings: string[] = extraGameInfos.map((info) => {
-      // return `\n答案是：【${info.wordGuess}】${info.pinyin === '' ? '' : `\n拼音为：【${info.pinyin}】`}\n释义如下：\n${info.wordAnswerChineseDefinition}`
-      return `\n答案是：【${info.wordGuess}】${
-        info.wordAnswerChineseDefinition !== ""
-          ? `${
-              info.pinyin === "" ? "" : `\n拼音为：【${info.pinyin}】`
-            }\n释义如下：\n${replaceEscapeCharacters(
-              info.wordAnswerChineseDefinition
-            )}`
-          : ""
-      }`;
-    });
-
-    return resultStrings.join("\n");
-  }
-
-  async function generateWordlesImage(htmlImgString: string) {
-    const browser = ctx.puppeteer.browser;
-    const context = await browser.createBrowserContext();
-    const page = await context.newPage();
-    await page.setViewport({
-      width: config.compositeImagePageWidth,
-      height: config.compositeImagePageHeight,
-      deviceScaleFactor: 1,
-    });
-    const filePath = path
-      .join(dirname, "./pokedle/src/emptyHtml.html")
-      .replace(/\\/g, "/");
-    await page.goto("file://" + filePath);
-
-    const html = `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <style>
-            .image-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .image-container img {
-                max-width: 100%;
-                /*margin-top: 20px;*/
-                /*margin-bottom: 20px;*/
-            }
-        </style>
-        <script>
-            window.onload = function() {
-                var imageContainer = document.querySelector('.image-container');
-                var images = imageContainer.getElementsByTagName('img');
-
-                if (images.length > 4) {
-                    for (var i = 0; i < images.length; i++) {
-                        images[i].style.width = "calc(25% - 15px)";
-                    }
-                } else {
-                    for (var i = 0; i < images.length; i++) {
-                        images[i].style.width = "calc(50% - 10px)";
-                    }
-                }
-            };
-        </script>
-    </head>
-    <body>
-    <div class="image-container">
-    ${htmlImgString}
-    </div>
-    </body>
-    </html>`;
-
-    await page.setContent(html, { waitUntil: "load" });
-    const wordlesImageBuffer = await page.screenshot({
-      fullPage: true,
-      type: config.imageType,
-    });
-    await page.close();
-    await context.close();
-
-    return wordlesImageBuffer;
-  }
-
-  async function generateLetterTilesHtml(
-    wordGuess: string,
-    inputWord: string,
-    channelId: string,
-    wordleIndex: number,
-    gameInfo: GameRecord | ExtraGameRecord
-  ): Promise<string> {
-    const wordHtml: string[] = new Array(inputWord.length);
-    const letterCountMap: { [key: string]: number } = {};
-
-    const correctLetters: string[] = gameInfo.correctLetters;
-    let presentLetters = gameInfo.presentLetters;
-    let absentLetters = gameInfo.absentLetters;
-    let presentLettersWithIndex = gameInfo.presentLettersWithIndex;
-
-    for (const letter of wordGuess) {
-      if (letterCountMap[letter]) {
-        letterCountMap[letter]++;
-      } else {
-        letterCountMap[letter] = 1;
-      }
-    }
-
-    const lowercaseInputWord = inputWord.toLowerCase();
-
-    // 处理 "correct"
-    let htmlIndex = 0;
-    for (let i = 0; i < inputWord.length; i++) {
-      const letter = lowercaseInputWord[i];
-      if (wordGuess[i] === letter) {
-        wordHtml[
-          htmlIndex
-        ] = `<div><div class="Tile-module_tile__UWEHN" data-state="correct">${letter}</div></div>`;
-        letterCountMap[letter]--;
-
-        correctLetters[i] = letter;
-      } else {
-        wordHtml[
-          htmlIndex
-        ] = `<div><div class="Tile-module_tile__UWEHN" data-state="unchecked">${letter}</div></div>`;
-      }
-      htmlIndex++;
-    }
-
-    // 处理其他标记
-    htmlIndex = 0;
-    for (let i = 0; i < inputWord.length; i++) {
-      const letter = lowercaseInputWord[i];
-      if (wordHtml[htmlIndex].includes('data-state="unchecked"')) {
-        if (wordGuess.includes(letter)) {
-          if (letterCountMap[letter] > 0) {
-            wordHtml[htmlIndex] = wordHtml[htmlIndex].replace(
-              'data-state="unchecked"',
-              'data-state="present"'
-            );
-            letterCountMap[letter]--;
-
-            presentLetters += letter;
-            presentLettersWithIndex.push(`${letter}-${i + 1}`);
-          } else {
-            wordHtml[htmlIndex] = wordHtml[htmlIndex].replace(
-              'data-state="unchecked"',
-              'data-state="absent"'
-            );
-            absentLetters += letter;
-          }
-        } else {
-          wordHtml[htmlIndex] = wordHtml[htmlIndex].replace(
-            'data-state="unchecked"',
-            'data-state="absent"'
-          );
-          absentLetters += letter;
-        }
-      }
-      htmlIndex++;
-    }
-    const setWordleGameRecord = async (collection: any, keys: any) => {
-      await ctx.database.set(collection, keys, {
-        correctLetters,
-        presentLetters: uniqueSortedLowercaseLetters(presentLetters),
-        absentLetters: removeLetters(
-          gameInfo.wordGuess,
-          uniqueSortedLowercaseLetters(absentLetters)
-        ),
-        presentLettersWithIndex: mergeDuplicates(presentLettersWithIndex),
-      });
-    };
-    if (wordleIndex === 1) {
-      await setWordleGameRecord("p_wordle_game_records", { channelId });
-    } else {
-      await setWordleGameRecord("p_extra_wordle_game_records", {
-        channelId,
-        wordleIndex,
-      });
-    }
-    return wordHtml.join("\n");
-  }
-
-  async function generateLetterTilesHtmlForCiying(
-    answerIdiom: string,
-    userInputIdiom: string,
-    channelId: string,
-    wordleIndex: number,
-    gameInfo: GameRecord | ExtraGameRecord,
-    isHardMode: boolean
-  ): Promise<string> {
-    const htmlResult: string[] = [
-      `<div class="relative flex items-center">
-<div class="grid grid-cols-4 justify-items-center gap-2 svelte-n2hnfv">`,
-    ];
-    const strokesHtmlCache: string[][] = gameInfo.strokesHtmlCache;
-    const correctLetters: string[] = gameInfo.correctLetters;
-    const previousGuess: string[] = gameInfo.previousGuess;
-    const previousGuessIdioms: string[] = gameInfo.previousGuessIdioms;
-    const defaultModeSettings = {
-      keepShadow: !0,
-      correctThreshold: 0.5,
-      presentThreshold: 1,
-      shiftFactor: 0.7,
-      idiomLimit: 2e3,
-    };
-    const hardModeSettings = {
-      keepShadow: !1,
-      correctThreshold: 0.3,
-      presentThreshold: 1,
-      shiftFactor: 0.7,
-    };
-    const config = isHardMode ? hardModeSettings : defaultModeSettings;
-    for (let i = 0; i < answerIdiom.length; i++) {
-      const compareReslut = compareStrokes(
-        strokesData[answerIdiom[i]],
-        strokesData[userInputIdiom[i]],
-        null,
-        config
-      );
-      compareReslut.match = answerIdiom[i] === userInputIdiom[i];
-      if (compareReslut.match || correctLetters[i] !== "*") {
-        correctLetters[i] = answerIdiom[i];
-        compareReslut.shadows = [];
-        for (const stroke of strokesData[answerIdiom[i]].strokes) {
-          compareReslut.shadows.push({
-            stroke,
-            shiftX: 0,
-            shiftY: 0,
-            distance: 0,
-          });
-        }
-        compareReslut.match = true;
-      }
-      htmlResult.push(` <button class="transition-transform betterhover:hover:scale-y-90">
-                                <div class="flex h-32 w-32 items-center justify-center border-neutral-400 dark:border-neutral-600 ${
-                                  compareReslut.match
-                                    ? "bg-correct"
-                                    : "border-2"
-                                }"
-                                     style="">
-                                    <svg viewBox="0 0 1024 1024" class="h-24 w-24">
-                                        <g transform="scale(1, -1) translate(0, -900)">
-                                        ${
-                                          compareReslut.match ||
-                                          previousGuessIdioms.includes(
-                                            userInputIdiom
-                                          ) ||
-                                          isHardMode
-                                            ? ""
-                                            : strokesHtmlCache[i].join("\n")
-                                        }`);
-
-      // strokesHtmlCache[i].forEach((path, index) => {
-      //   const dAttribute = path.match(/d="([^"]*)"/);
-      //   if (dAttribute) {
-      //     const dValue = dAttribute[1];
-      //
-      //     compareReslut.shadows = compareReslut.shadows.filter(shadow => shadow.stroke !== dValue);
-      //   }
-      // });
-
-      for (let shadow of compareReslut.shadows) {
-        if (!shadow.stroke) {
-          continue;
-        }
-
-        const theStrokePath = `  <path d="${shadow.stroke}"
-                                                  opacity="${
-                                                    (config.presentThreshold -
-                                                      Math.max(
-                                                        shadow.distance,
-                                                        config.correctThreshold
-                                                      )) /
-                                                    (config.presentThreshold -
-                                                      config.correctThreshold)
-                                                  }"
-                                                  transform="translate(${
-                                                    shadow.shiftX
-                                                  }, ${shadow.shiftY})"
-                                                  class="${
-                                                    compareReslut.match
-                                                      ? "fill-white"
-                                                      : shadow.distance === 0
-                                                      ? "fill-correct"
-                                                      : "dark:fill-white"
-                                                  }"></path>
-                                           `;
-        htmlResult.push(theStrokePath);
-        if (!previousGuess.includes(`${userInputIdiom[i]}-${i}`)) {
-          strokesHtmlCache[i].push(theStrokePath);
-        }
-      }
-      htmlResult.push(`</g>
-                                    </svg>
-                                </div>
-                            </button>`);
-    }
-
-    htmlResult.push(`</div>
-</div>`);
-    const userInputIdiomArray = userInputIdiom
-      .split("")
-      .map((char, index) => `${char}-${index}`);
-    userInputIdiomArray.forEach((charIndex) => {
-      if (!previousGuess.includes(charIndex)) {
-        previousGuess.push(charIndex);
-      }
-    });
-    if (!previousGuessIdioms.includes(userInputIdiom)) {
-      previousGuessIdioms.push(userInputIdiom);
-    }
-    const setWordleGameRecord = async (collection: any, keys: any) => {
-      await ctx.database.set(collection, keys, {
-        strokesHtmlCache,
-        correctLetters,
-        previousGuess,
-        previousGuessIdioms,
-      });
-    };
-    if (wordleIndex === 1) {
-      await setWordleGameRecord("p_wordle_game_records", { channelId });
-    } else {
-      await setWordleGameRecord("p_extra_wordle_game_records", {
-        channelId,
-        wordleIndex,
-      });
-    }
-    return htmlResult.join("\n");
-  }
-
-  async function generateLetterTilesHtmlForHandle(
-    answerIdiom: string,
-    userInputIdiom: string,
-    channelId: string,
-    wordleIndex: number,
-    gameInfo: GameRecord | ExtraGameRecord,
-    answerPinyin: string,
-    userInputPinyin: string
-  ) {
-    const correctLetters: string[] = gameInfo.correctLetters;
-    let presentLetters = gameInfo.presentLetters;
-    let absentLetters = gameInfo.absentLetters;
-    let presentLettersWithIndex = gameInfo.presentLettersWithIndex;
-    let correctPinyinsWithIndex = gameInfo.correctPinyinsWithIndex;
-    let presentPinyinsWithIndex = gameInfo.presentPinyinsWithIndex;
-    let absentPinyins = gameInfo.absentPinyins;
-    let correctTonesWithIndex = gameInfo.correctTonesWithIndex;
-    let presentTonesWithIndex = gameInfo.presentTonesWithIndex;
-    let absentTones = gameInfo.absentTones;
-    let presentPinyins = gameInfo.presentPinyins;
-    let presentTones = gameInfo.presentTones;
-
-    interface WordInfo {
-      word: string;
-      pinyin: string[];
-    }
-
-    if (!userInputPinyin) {
-      const userInputIdiomInfo = await getIdiomInfo(userInputIdiom);
-      userInputPinyin = userInputIdiomInfo.pinyin;
-    }
-
-    // 拼音转换 分离音标 string[][]
-    const processedUserInputPinyin = processPinyin(userInputPinyin);
-    const processedAnswerIdiomPinyin = processPinyin(answerPinyin);
-
-    // 总信息
-    const userInputIdiomAllRecords: WordInfo[] = userInputIdiom
-      .split("")
-      .map((char, index) => {
-        const pinyinArray = processedUserInputPinyin[index].map((p) => {
-          const [pinyin, status = ""] = p.split("-");
-          return `${pinyin}-absent${status ? `-${status}-absent` : ""}`;
-        });
-        return { word: `${char}-absent`, pinyin: pinyinArray };
-      });
-
-    // 汉字统计
-    const userInputIdiomCharCount = countCharactersAndIndexes(userInputIdiom);
-    const answerIdiomCharCount = countCharactersAndIndexes(answerIdiom);
-    // 声母、韵母、整体认读音节统计
-    const userInputPinyinOccurrences = processPinyinArray(
-      processedUserInputPinyin
-    );
-    const answerIdiomPinyinOccurrences = processPinyinArray(
-      processedAnswerIdiomPinyin
-    );
-
-    const userInputPinyinAllOccurrences = mergeOccurrences(
-      userInputPinyinOccurrences
-    );
-    const answerIdiomPinyinAllOccurrences = mergeOccurrences(
-      answerIdiomPinyinOccurrences
-    );
-    // 声调统计
-    const userInputTones = countNumericTones(processedUserInputPinyin);
-    const answerIdiomTones = countNumericTones(processedAnswerIdiomPinyin);
-    const answerIdiomTonesCopy = answerIdiomTones;
-
-    for (const char in userInputIdiomCharCount) {
-      if (char in answerIdiomCharCount) {
-        const userInputCharInfo = userInputIdiomCharCount[char];
-        const answerCharInfo = answerIdiomCharCount[char];
-
-        const commonIndexes = userInputCharInfo.indexes.filter((index) =>
-          answerCharInfo.indexes.includes(index)
-        );
-
-        commonIndexes.forEach((index) => {
-          // correct
-          // userInputIdiomAllRecords[index].pinyin = userInputIdiomAllRecords[index].pinyin.map(pinyin => pinyin.replace(/-\w+$/g, '-correct'));
-          userInputIdiomAllRecords[index].word = userInputIdiomAllRecords[
-            index
-          ].word.replace(/-\w+$/g, "-correct");
-          correctLetters[index] =
-            userInputIdiomAllRecords[index].word.split("-")[0];
-          // updateOccurrences(answerIdiomPinyinAllOccurrences, index);
-          // updateOccurrences(userInputPinyinAllOccurrences, index);
-          // updateOccurrences(userInputTones, index);
-          // updateOccurrences(answerIdiomTones, index);
-
-          userInputCharInfo.count -= 1;
-          userInputCharInfo.indexes = userInputCharInfo.indexes.filter(
-            (i) => i !== index
-          );
-
-          answerCharInfo.count -= 1;
-          answerCharInfo.indexes = answerCharInfo.indexes.filter(
-            (i) => i !== index
-          );
-        });
-
-        userInputCharInfo.indexes.forEach((userIndex) => {
-          if (
-            !answerCharInfo.indexes.includes(userIndex) &&
-            answerCharInfo.count > 0
-          ) {
-            // present
-            userInputIdiomAllRecords[userIndex].word = userInputIdiomAllRecords[
-              userIndex
-            ].word.replace(/-\w+$/g, "-present");
-
-            presentLetters +=
-              userInputIdiomAllRecords[userIndex].word.split("-")[0];
-            presentLettersWithIndex.push(
-              `${userInputIdiomAllRecords[userIndex].word.split("-")[0]}-${
-                userIndex + 1
-              }`
-            );
-            answerCharInfo.count -= 1;
-          }
-        });
-      } else {
-        // absent
-        absentLetters += char;
-      }
-    }
-
-    for (const element in userInputPinyinAllOccurrences) {
-      if (element in answerIdiomPinyinAllOccurrences) {
-        const userInputElementInfo = userInputPinyinAllOccurrences[element];
-        const answerElementInfo = answerIdiomPinyinAllOccurrences[element];
-
-        const commonPositions = userInputElementInfo.positions.filter(
-          (position) => answerElementInfo.positions.includes(position)
-        );
-
-        commonPositions.forEach((position) => {
-          // correct
-          const pinyinArray = userInputIdiomAllRecords[position].pinyin
-            .map((pinyin) => {
-              return pinyin.split("-")[0];
-            })
-            .join("");
-
-          const matchIndex = pinyinArray.indexOf(element);
-          if (matchIndex !== -1) {
-            for (let i = matchIndex; i < matchIndex + element.length; i++) {
-              userInputIdiomAllRecords[position].pinyin[i] =
-                userInputIdiomAllRecords[position].pinyin[i].replace(
-                  "absent",
-                  "correct"
-                );
-            }
-          }
-
-          correctPinyinsWithIndex.push(`${element}-${position + 1}`);
-
-          userInputElementInfo.count -= 1;
-          userInputElementInfo.positions =
-            userInputElementInfo.positions.filter((i) => i !== position);
-
-          answerElementInfo.count -= 1;
-          answerElementInfo.positions = answerElementInfo.positions.filter(
-            (i) => i !== position
-          );
-        });
-
-        userInputElementInfo.positions.forEach((userPosition) => {
-          if (
-            !answerElementInfo.positions.includes(userPosition) &&
-            answerElementInfo.count > 0
-          ) {
-            // present
-            const pinyinArray = userInputIdiomAllRecords[userPosition].pinyin
-              .map((pinyin) => {
-                return pinyin.split("-")[0];
-              })
-              .join("");
-
-            const matchIndex = pinyinArray.indexOf(element);
-            if (matchIndex !== -1) {
-              for (let i = matchIndex; i < matchIndex + element.length; i++) {
-                userInputIdiomAllRecords[userPosition].pinyin[i] =
-                  userInputIdiomAllRecords[userPosition].pinyin[i].replace(
-                    "absent",
-                    "present"
-                  );
-              }
-            }
-            presentPinyins.push(element);
-            presentPinyinsWithIndex.push(`${element}-${userPosition + 1}`);
-            answerElementInfo.count -= 1;
-          }
-        });
-      } else {
-        absentPinyins.push(element);
-      }
-    }
-
-    for (const tone in userInputTones) {
-      if (tone in answerIdiomTones) {
-        // correct
-        const userInputToneInfo = userInputTones[tone];
-        const answerToneInfo = answerIdiomTones[tone];
-
-        const commonPositions = userInputToneInfo.positions.filter((position) =>
-          answerToneInfo.positions.includes(position)
-        );
-
-        commonPositions.forEach((position) => {
-          const matchIndex = userInputIdiomAllRecords[
-            position
-          ].pinyin.findIndex((pinyin) => pinyin.includes(`-${tone}-absent`));
-          if (matchIndex !== -1) {
-            userInputIdiomAllRecords[position].pinyin[matchIndex] =
-              userInputIdiomAllRecords[position].pinyin[matchIndex].replace(
-                `-${tone}-absent`,
-                `-${tone}-correct`
-              );
-          }
-          correctTonesWithIndex.push(`第${tone}声-${position + 1}`);
-          userInputToneInfo.count -= 1;
-          userInputToneInfo.positions = userInputToneInfo.positions.filter(
-            (i) => i !== position
-          );
-
-          answerToneInfo.count -= 1;
-          answerToneInfo.positions = answerToneInfo.positions.filter(
-            (i) => i !== position
-          );
-        });
-
-        userInputToneInfo.positions.forEach((userPosition) => {
-          if (
-            !answerToneInfo.positions.includes(userPosition) &&
-            answerToneInfo.count > 0
-          ) {
-            // present
-            const pinyinArray = userInputIdiomAllRecords[userPosition].pinyin;
-            const matchIndex = pinyinArray.findIndex((pinyin) =>
-              pinyin.includes(`-${tone}-absent`)
-            );
-            if (matchIndex !== -1) {
-              userInputIdiomAllRecords[userPosition].pinyin[matchIndex] =
-                pinyinArray[matchIndex].replace(
-                  `-${tone}-absent`,
-                  `-${tone}-present`
-                );
-            }
-            presentTones.push(`第${tone}声`);
-            presentTonesWithIndex.push(`第${tone}声-${userPosition + 1}`);
-            answerToneInfo.count -= 1;
-          }
-        });
-      } else {
-        absentTones.push(`第${tone}声`);
-      }
-    }
-
-    const processedRecords = processAllRecords(userInputIdiomAllRecords);
-
-    const processedRecords2 = transformRecords(processedRecords);
-
-    const htmlResult: string[] = [`<div flex="">`];
-    for (const record of processedRecords2) {
-      const wordValue = record.word.value;
-      const statusMap: { [key: string]: string } = {
-        absent: "op80",
-        present: "text-mis",
-        correct: "text-ok",
-      };
-
-      let wordStatus = record.word.status;
-      wordStatus = statusMap[wordStatus] || wordStatus;
-
-      const statusMap2: { [key: string]: string } = {
-        absent: "op35",
-        present: "text-mis",
-        correct: "text-ok",
-      };
-      const pinyin = record.pinyin;
-      const separatedPinyin = separatePinyin(record);
-      const initial = record.initial;
-      const final = record.final;
-      const toneValue = record.tune.value;
-      const toneStatus = record.tune.status;
-      const tonesPaths = [
-        "0",
-        // 第 1 声
-        '<path d="M3.35 8C2.60442 8 2 8.60442 2 9.35V10.35C2 11.0956 2.60442 11.7 3.35 11.7H17.35C18.0956 11.7 18.7 11.0956 18.7 10.35V9.35C18.7 8.60442 18.0956 8 17.35 8H3.35Z" fill="currentColor"></path>',
-        // 第 2 声
-        '<path d="M16.581 3.71105C16.2453 3.27254 15.6176 3.18923 15.1791 3.52498L3.26924 12.6439C2.83073 12.9796 2.74743 13.6073 3.08318 14.0458L4.29903 15.6338C4.63478 16.0723 5.26244 16.1556 5.70095 15.8199L17.6108 6.70095C18.0493 6.3652 18.1327 5.73754 17.7969 5.29903L16.581 3.71105Z" fill="currentColor"></path>',
-        // 第 3 声
-        '<path d="M1.70711 7.70712C1.31658 7.3166 1.31658 6.68343 1.70711 6.29291L2.41421 5.5858C2.80474 5.19528 3.4379 5.19528 3.82843 5.5858L9.31502 11.0724C9.70555 11.4629 10.3387 11.4629 10.7292 11.0724L16.2158 5.5858C16.6064 5.19528 17.2395 5.19528 17.63 5.5858L18.3372 6.29291C18.7277 6.68343 18.7277 7.3166 18.3372 7.70712L10.7292 15.315C10.3387 15.7056 9.70555 15.7056 9.31502 15.315L1.70711 7.70712Z" fill="currentColor"></path>',
-        // 第 4 声
-        '<path d="M4.12282 3.71105C4.45857 3.27254 5.08623 3.18923 5.52474 3.52498L17.4346 12.6439C17.8731 12.9796 17.9564 13.6073 17.6207 14.0458L16.4048 15.6338C16.0691 16.0723 15.4414 16.1556 15.0029 15.8199L3.09303 6.70095C2.65452 6.3652 2.57122 5.73754 2.90697 5.29903L4.12282 3.71105Z" fill="currentColor"></path>',
-      ];
-      const html: string[] = [
-        `<div w-30="" h-30="" m2="">
-                    <div h-30="" w-30="" border-2="" flex="~ center" relative="" leading-1em="" em="" font-serif=""
-                         class="bg-gray-400/8 border-transparent">
-                        <div absolute="" text-5xl="" leading-1em="" class="${wordStatus} top-12">${wordValue}</div>
-                        <div absolute="" font-mono="" text-center="" left-0="" right-0="" font-100="" flex=""
-                             flex-col="" items-center="" class="top-14px" text-2xl="">
-                            <div relative="" ma="" items-start="" flex="~ x-center">
-                                ${
-                                  separatedPinyin.initials.length > 0
-                                    ? `<div class="${
-                                        statusMap2[
-                                          separatedPinyin.initials[0].status
-                                        ]
-                                      }" mx-1px="">${initial}</div>`
-                                    : ""
-                                }
-<div mx-1px="" flex="">`,
-      ];
-      for (const final of separatedPinyin.finals) {
-        if (!final.isHasTone) {
-          html.push(
-            `<div class="${statusMap2[final.status]}">${final.value}</div>`
-          );
-        } else {
-          html.push(`                  <div relative="">
-                                        <div class="${
-                                          statusMap2[final.status]
-                                        }">${
-            final.value === "i" ? "ı" : final.value
-          }</div>
-                                        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                             class="${
-                                               statusMap2[toneStatus]
-                                             }" absolute="" w="86%" left="8%"
-                                             style="bottom: 1.5rem;">
-                                            ${tonesPaths[toneValue]}
-                                        </svg>
-                                    </div>`);
-        }
-      }
-      html.push(`</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`);
-      htmlResult.push(html.join("\n"));
-    }
-    htmlResult.push(`</div>`);
-
-    const pinyinSet = new Set(
-      Object.keys(answerIdiomPinyinOccurrences.initialsOccurrences).concat(
-        Object.keys(answerIdiomPinyinOccurrences.finalsOccurrences)
-      )
-    );
-
-    const filteredAbsentPinyins = absentPinyins.filter(
-      (pinyin) => !pinyinSet.has(pinyin)
-    );
-    absentTones.forEach((tone, index) => {
-      const toneNumber = tone.match(/\d+/);
-      if (toneNumber) {
-        const key = toneNumber[0];
-        if (answerIdiomTonesCopy[key]) {
-          absentTones.splice(index, 1);
-        }
-      }
-    });
-    const setWordleGameRecord = async (collection: any, keys: any) => {
-      await ctx.database.set(collection, keys, {
-        correctLetters,
-        presentLetters: removeDuplicates(presentLetters),
-        absentLetters: removeLetters(
-          gameInfo.wordGuess,
-          removeDuplicates(absentLetters)
-        ),
-        presentLettersWithIndex: mergeDuplicates(presentLettersWithIndex),
-        correctPinyinsWithIndex: mergeDuplicates(correctPinyinsWithIndex),
-        presentPinyinsWithIndex: mergeDuplicates(presentPinyinsWithIndex),
-        correctTonesWithIndex: mergeDuplicates(correctTonesWithIndex),
-        presentTonesWithIndex: mergeDuplicates(presentTonesWithIndex),
-        presentPinyins: mergeDuplicates(presentPinyins),
-        presentTones: mergeDuplicates(presentTones),
-        absentPinyins: mergeDuplicates(filteredAbsentPinyins),
-        absentTones: mergeDuplicates(absentTones),
-      });
-    };
-    if (wordleIndex === 1) {
-      await setWordleGameRecord("p_wordle_game_records", { channelId });
-    } else {
-      await setWordleGameRecord("p_extra_wordle_game_records", {
-        channelId,
-        wordleIndex,
-      });
-    }
-
-    return htmlResult.join("\n");
-  }
+  // async function getSessionUserName(session: any): Promise<string> {
+  //   const [player]: Pokebattle[] = await ctx.database.get(
+  //     "pokebattle",
+  //     session.userId
+  //   );
+  //   let sessionUserName = player?.name ? player.name : "玩家";
+
+  //   if (isQQOfficialRobotMarkdownTemplateEnabled && session.platform === "qq") {
+  //     let userRecord = await ctx.database.get("p_wordle_player_records", {
+  //       userId: session.userId,
+  //     });
+
+  //     if (userRecord.length === 0) {
+  //       await ctx.database.create("p_wordle_player_records", {
+  //         userId: session.userId,
+  //         username: sessionUserName,
+  //       });
+
+  //       userRecord = await ctx.database.get("p_wordle_player_records", {
+  //         userId: session.userId,
+  //       });
+  //     }
+  //     sessionUserName = player.name;
+  //   }
+
+  //   return sessionUserName;
+  // }
+
+  //   async function generateHandlePinyinsImage(pinyinsHtml: string) {
+  //     const browser = ctx.puppeteer.browser;
+  //     const context = await browser.createBrowserContext();
+  //     const page = await context.newPage();
+  //     await page.setViewport({ width: 420, height: 570, deviceScaleFactor: 1 });
+  //     const filePath = path
+  //       .join(dirname, "./pokedle/src/emptyHtml.html")
+  //       .replace(/\\/g, "/");
+  //     await page.goto("file://" + filePath);
+
+  //     const html = `<html lang="en" class="${
+  //       config.isDarkThemeEnabled ? "dark" : ""
+  //     }" style="--vh: 6.04px;">
+  //     <head>
+  //         <meta charset="UTF-8">
+  //         <title>宝可兜 - 汉字 Wordle</title>
+  //         <link rel="stylesheet" href="./assets/宝可兜/handle.css">
+  //     </head>
+  //     <body>
+  //         <div id="app" data-v-app="">
+  //             <main font-sans="" text="center gray-700 dark:gray-300" select-none="" class=""><!---->
+  //                 <div fixed="" z-40="" class="bottom-0 left-0 right-0 top-0">
+  //                     <div class="bg-base left-0 right-0 top-0 bottom-0 absolute transition-opacity duration-500 ease-out opacity-50"></div>
+  //                     <div class="bg-base border-base absolute transition-all duration-200 ease-out max-w-screen max-h-screen overflow-auto scrolls top-0 left-0 right-0 border-b"
+  //                          style="">
+  //                         <div p8="" pt4="" flex="~ col center" relative=""><p text-xl="" font-serif="" mb8=""><b>拼音速查表</b></p>
+  //                             <div grid="~ cols-[1fr_3fr] gap-x-10 gap-y-4" font-mono="" font-light="">
+  //                                 <div text-center="">声母</div>
+  //                                 <div text-center="">韵母</div>
+  //                                     ${pinyinsHtml}
+  //                             </div>
+  //                         </div>
+  //                     </div>
+  //                 </div>
+  //             </main>
+  //         </div>
+  //     </body>
+  // </html>`;
+
+  //     await page.setContent(html, { waitUntil: "load" });
+  //     const imageBuffer = await page.screenshot({
+  //       fullPage: true,
+  //       type: config.imageType,
+  //     });
+  //     await page.close();
+  //     await context.close();
+
+  //     return imageBuffer;
+  //   }
+
+  //   async function processExtraGameInfos(channelId: string): Promise<string> {
+  //     const extraGameInfos: ExtraGameRecord[] = await ctx.database.get(
+  //       "p_extra_wordle_game_records",
+  //       { channelId }
+  //     );
+
+  //     return extraGameInfos
+  //       .map(
+  //         ({
+  //           correctLetters,
+  //           presentLetters,
+  //           absentLetters,
+  //           presentLettersWithIndex,
+  //           presentPinyinsWithIndex,
+  //           correctPinyinsWithIndex,
+  //           correctTonesWithIndex,
+  //           presentTonesWithIndex,
+  //           presentTones,
+  //           absentTones,
+  //           absentPinyins,
+  //           presentPinyins,
+  //         }) => {
+  //           const present =
+  //             presentLetters.length === 0 ? "" : `\n包含：【${presentLetters}】`;
+  //           const absent =
+  //             absentLetters.length === 0 ? "" : `\n不包含：【${absentLetters}】`;
+  //           const presentWithoutIndex =
+  //             presentLettersWithIndex.length === 0
+  //               ? ""
+  //               : `\n位置排除：【${presentLettersWithIndex.join(", ")}】`;
+
+  //           const pinyinsCorrectInfo =
+  //             correctPinyinsWithIndex.length !== 0
+  //               ? `\n正确拼音：【${correctPinyinsWithIndex.join(", ")}】`
+  //               : "";
+  //           const pinyinsPresentInfo =
+  //             presentPinyins.length !== 0
+  //               ? `\n包含拼音：【${presentPinyins.join(", ")}】`
+  //               : "";
+  //           const pinyinsAbsentInfo =
+  //             absentPinyins.length !== 0
+  //               ? `\n不包含拼音：【${absentPinyins.join(", ")}】`
+  //               : "";
+  //           const pinyinsPresentWithIndexInfo =
+  //             presentPinyinsWithIndex.length !== 0
+  //               ? `\n拼音位置排除：【${presentPinyinsWithIndex.join(", ")}】`
+  //               : "";
+
+  //           const tonesCorrectInfo =
+  //             correctTonesWithIndex.length !== 0
+  //               ? `\n正确声调：【${correctTonesWithIndex.join(", ")}】`
+  //               : "";
+  //           const tonesPresentInfo =
+  //             presentTones.length !== 0
+  //               ? `\n包含声调：【${presentTones.join(", ")}】`
+  //               : "";
+  //           const tonesAbsentInfo =
+  //             absentTones.length !== 0
+  //               ? `\n不包含声调：【${absentTones.join(", ")}】`
+  //               : "";
+  //           const tonesPresentWithIndexInfo =
+  //             presentTonesWithIndex.length !== 0
+  //               ? `\n声调位置排除：【${presentTonesWithIndex.join(", ")}】`
+  //               : "";
+  //           return `\n当前进度：【${correctLetters.join(
+  //             ""
+  //           )}】${present}${absent}${presentWithoutIndex}${pinyinsCorrectInfo}${pinyinsPresentInfo}${pinyinsAbsentInfo}${pinyinsPresentWithIndexInfo}${tonesCorrectInfo}${tonesPresentInfo}${tonesAbsentInfo}${tonesPresentWithIndexInfo}`;
+  //         }
+  //       )
+  //       .join("\n");
+  //   }
+
+  //   async function processExtraGameRecords(channelId: string): Promise<string> {
+  //     const extraGameInfos: ExtraGameRecord[] = await ctx.database.get(
+  //       "p_extra_wordle_game_records",
+  //       { channelId }
+  //     );
+
+  //     const resultStrings: string[] = extraGameInfos.map((info) => {
+  //       // return `\n答案是：【${info.wordGuess}】${info.pinyin === '' ? '' : `\n拼音为：【${info.pinyin}】`}\n释义如下：\n${info.wordAnswerChineseDefinition}`
+  //       return `\n答案是：【${info.wordGuess}】${
+  //         info.wordAnswerChineseDefinition !== ""
+  //           ? `${
+  //               info.pinyin === "" ? "" : `\n拼音为：【${info.pinyin}】`
+  //             }\n释义如下：\n${replaceEscapeCharacters(
+  //               info.wordAnswerChineseDefinition
+  //             )}`
+  //           : ""
+  //       }`;
+  //     });
+
+  //     return resultStrings.join("\n");
+  //   }
+
+  //   async function generateWordlesImage(htmlImgString: string) {
+  //     const browser = ctx.puppeteer.browser;
+  //     const context = await browser.createBrowserContext();
+  //     const page = await context.newPage();
+  //     await page.setViewport({
+  //       width: config.compositeImagePageWidth,
+  //       height: config.compositeImagePageHeight,
+  //       deviceScaleFactor: 1,
+  //     });
+  //     const filePath = path
+  //       .join(dirname, "./pokedle/src/emptyHtml.html")
+  //       .replace(/\\/g, "/");
+  //     await page.goto("file://" + filePath);
+
+  //     const html = `<!DOCTYPE html>
+  //     <html lang="en">
+  //     <head>
+  //         <style>
+  //             .image-container {
+  //                 display: flex;
+  //                 flex-wrap: wrap;
+  //                 gap: 20px;
+  //                 justify-content: space-between;
+  //                 align-items: center;
+  //             }
+  //             .image-container img {
+  //                 max-width: 100%;
+  //                 /*margin-top: 20px;*/
+  //                 /*margin-bottom: 20px;*/
+  //             }
+  //         </style>
+  //         <script>
+  //             window.onload = function() {
+  //                 var imageContainer = document.querySelector('.image-container');
+  //                 var images = imageContainer.getElementsByTagName('img');
+
+  //                 if (images.length > 4) {
+  //                     for (var i = 0; i < images.length; i++) {
+  //                         images[i].style.width = "calc(25% - 15px)";
+  //                     }
+  //                 } else {
+  //                     for (var i = 0; i < images.length; i++) {
+  //                         images[i].style.width = "calc(50% - 10px)";
+  //                     }
+  //                 }
+  //             };
+  //         </script>
+  //     </head>
+  //     <body>
+  //     <div class="image-container">
+  //     ${htmlImgString}
+  //     </div>
+  //     </body>
+  //     </html>`;
+
+  //     await page.setContent(html, { waitUntil: "load" });
+  //     const wordlesImageBuffer = await page.screenshot({
+  //       fullPage: true,
+  //       type: config.imageType,
+  //     });
+  //     await page.close();
+  //     await context.close();
+
+  //     return wordlesImageBuffer;
+  //   }
+
+  //   async function generateLetterTilesHtml(
+  //     wordGuess: string,
+  //     inputWord: string,
+  //     channelId: string,
+  //     wordleIndex: number,
+  //     gameInfo: GameRecord | ExtraGameRecord
+  //   ): Promise<string> {
+  //     const wordHtml: string[] = new Array(inputWord.length);
+  //     const letterCountMap: { [key: string]: number } = {};
+
+  //     const correctLetters: string[] = gameInfo.correctLetters;
+  //     let presentLetters = gameInfo.presentLetters;
+  //     let absentLetters = gameInfo.absentLetters;
+  //     let presentLettersWithIndex = gameInfo.presentLettersWithIndex;
+
+  //     for (const letter of wordGuess) {
+  //       if (letterCountMap[letter]) {
+  //         letterCountMap[letter]++;
+  //       } else {
+  //         letterCountMap[letter] = 1;
+  //       }
+  //     }
+
+  //     const lowercaseInputWord = inputWord.toLowerCase();
+
+  //     // 处理 "correct"
+  //     let htmlIndex = 0;
+  //     for (let i = 0; i < inputWord.length; i++) {
+  //       const letter = lowercaseInputWord[i];
+  //       if (wordGuess[i] === letter) {
+  //         wordHtml[
+  //           htmlIndex
+  //         ] = `<div><div class="Tile-module_tile__UWEHN" data-state="correct">${letter}</div></div>`;
+  //         letterCountMap[letter]--;
+
+  //         correctLetters[i] = letter;
+  //       } else {
+  //         wordHtml[
+  //           htmlIndex
+  //         ] = `<div><div class="Tile-module_tile__UWEHN" data-state="unchecked">${letter}</div></div>`;
+  //       }
+  //       htmlIndex++;
+  //     }
+
+  //     // 处理其他标记
+  //     htmlIndex = 0;
+  //     for (let i = 0; i < inputWord.length; i++) {
+  //       const letter = lowercaseInputWord[i];
+  //       if (wordHtml[htmlIndex].includes('data-state="unchecked"')) {
+  //         if (wordGuess.includes(letter)) {
+  //           if (letterCountMap[letter] > 0) {
+  //             wordHtml[htmlIndex] = wordHtml[htmlIndex].replace(
+  //               'data-state="unchecked"',
+  //               'data-state="present"'
+  //             );
+  //             letterCountMap[letter]--;
+
+  //             presentLetters += letter;
+  //             presentLettersWithIndex.push(`${letter}-${i + 1}`);
+  //           } else {
+  //             wordHtml[htmlIndex] = wordHtml[htmlIndex].replace(
+  //               'data-state="unchecked"',
+  //               'data-state="absent"'
+  //             );
+  //             absentLetters += letter;
+  //           }
+  //         } else {
+  //           wordHtml[htmlIndex] = wordHtml[htmlIndex].replace(
+  //             'data-state="unchecked"',
+  //             'data-state="absent"'
+  //           );
+  //           absentLetters += letter;
+  //         }
+  //       }
+  //       htmlIndex++;
+  //     }
+  //     const setWordleGameRecord = async (collection: any, keys: any) => {
+  //       await ctx.database.set(collection, keys, {
+  //         correctLetters,
+  //         presentLetters: uniqueSortedLowercaseLetters(presentLetters),
+  //         absentLetters: removeLetters(
+  //           gameInfo.wordGuess,
+  //           uniqueSortedLowercaseLetters(absentLetters)
+  //         ),
+  //         presentLettersWithIndex: mergeDuplicates(presentLettersWithIndex),
+  //       });
+  //     };
+  //     if (wordleIndex === 1) {
+  //       await setWordleGameRecord("p_wordle_game_records", { channelId });
+  //     } else {
+  //       await setWordleGameRecord("p_extra_wordle_game_records", {
+  //         channelId,
+  //         wordleIndex,
+  //       });
+  //     }
+  //     return wordHtml.join("\n");
+  //   }
+
+  //   async function generateLetterTilesHtmlForCiying(
+  //     answerIdiom: string,
+  //     userInputIdiom: string,
+  //     channelId: string,
+  //     wordleIndex: number,
+  //     gameInfo: GameRecord | ExtraGameRecord,
+  //     isHardMode: boolean
+  //   ): Promise<string> {
+  //     const htmlResult: string[] = [
+  //       `<div class="relative flex items-center">
+  // <div class="grid grid-cols-4 justify-items-center gap-2 svelte-n2hnfv">`,
+  //     ];
+  //     const strokesHtmlCache: string[][] = gameInfo.strokesHtmlCache;
+  //     const correctLetters: string[] = gameInfo.correctLetters;
+  //     const previousGuess: string[] = gameInfo.previousGuess;
+  //     const previousGuessIdioms: string[] = gameInfo.previousGuessIdioms;
+  //     const defaultModeSettings = {
+  //       keepShadow: !0,
+  //       correctThreshold: 0.5,
+  //       presentThreshold: 1,
+  //       shiftFactor: 0.7,
+  //       idiomLimit: 2e3,
+  //     };
+  //     const hardModeSettings = {
+  //       keepShadow: !1,
+  //       correctThreshold: 0.3,
+  //       presentThreshold: 1,
+  //       shiftFactor: 0.7,
+  //     };
+  //     const config = isHardMode ? hardModeSettings : defaultModeSettings;
+  //     for (let i = 0; i < answerIdiom.length; i++) {
+  //       const compareReslut = compareStrokes(
+  //         strokesData[answerIdiom[i]],
+  //         strokesData[userInputIdiom[i]],
+  //         null,
+  //         config
+  //       );
+  //       compareReslut.match = answerIdiom[i] === userInputIdiom[i];
+  //       if (compareReslut.match || correctLetters[i] !== "*") {
+  //         correctLetters[i] = answerIdiom[i];
+  //         compareReslut.shadows = [];
+  //         for (const stroke of strokesData[answerIdiom[i]].strokes) {
+  //           compareReslut.shadows.push({
+  //             stroke,
+  //             shiftX: 0,
+  //             shiftY: 0,
+  //             distance: 0,
+  //           });
+  //         }
+  //         compareReslut.match = true;
+  //       }
+  //       htmlResult.push(` <button class="transition-transform betterhover:hover:scale-y-90">
+  //                                 <div class="flex h-32 w-32 items-center justify-center border-neutral-400 dark:border-neutral-600 ${
+  //                                   compareReslut.match
+  //                                     ? "bg-correct"
+  //                                     : "border-2"
+  //                                 }"
+  //                                      style="">
+  //                                     <svg viewBox="0 0 1024 1024" class="h-24 w-24">
+  //                                         <g transform="scale(1, -1) translate(0, -900)">
+  //                                         ${
+  //                                           compareReslut.match ||
+  //                                           previousGuessIdioms.includes(
+  //                                             userInputIdiom
+  //                                           ) ||
+  //                                           isHardMode
+  //                                             ? ""
+  //                                             : strokesHtmlCache[i].join("\n")
+  //                                         }`);
+
+  //       // strokesHtmlCache[i].forEach((path, index) => {
+  //       //   const dAttribute = path.match(/d="([^"]*)"/);
+  //       //   if (dAttribute) {
+  //       //     const dValue = dAttribute[1];
+  //       //
+  //       //     compareReslut.shadows = compareReslut.shadows.filter(shadow => shadow.stroke !== dValue);
+  //       //   }
+  //       // });
+
+  //       for (let shadow of compareReslut.shadows) {
+  //         if (!shadow.stroke) {
+  //           continue;
+  //         }
+
+  //         const theStrokePath = `  <path d="${shadow.stroke}"
+  //                                                   opacity="${
+  //                                                     (config.presentThreshold -
+  //                                                       Math.max(
+  //                                                         shadow.distance,
+  //                                                         config.correctThreshold
+  //                                                       )) /
+  //                                                     (config.presentThreshold -
+  //                                                       config.correctThreshold)
+  //                                                   }"
+  //                                                   transform="translate(${
+  //                                                     shadow.shiftX
+  //                                                   }, ${shadow.shiftY})"
+  //                                                   class="${
+  //                                                     compareReslut.match
+  //                                                       ? "fill-white"
+  //                                                       : shadow.distance === 0
+  //                                                       ? "fill-correct"
+  //                                                       : "dark:fill-white"
+  //                                                   }"></path>
+  //                                            `;
+  //         htmlResult.push(theStrokePath);
+  //         if (!previousGuess.includes(`${userInputIdiom[i]}-${i}`)) {
+  //           strokesHtmlCache[i].push(theStrokePath);
+  //         }
+  //       }
+  //       htmlResult.push(`</g>
+  //                                     </svg>
+  //                                 </div>
+  //                             </button>`);
+  //     }
+
+  //     htmlResult.push(`</div>
+  // </div>`);
+  //     const userInputIdiomArray = userInputIdiom
+  //       .split("")
+  //       .map((char, index) => `${char}-${index}`);
+  //     userInputIdiomArray.forEach((charIndex) => {
+  //       if (!previousGuess.includes(charIndex)) {
+  //         previousGuess.push(charIndex);
+  //       }
+  //     });
+  //     if (!previousGuessIdioms.includes(userInputIdiom)) {
+  //       previousGuessIdioms.push(userInputIdiom);
+  //     }
+  //     const setWordleGameRecord = async (collection: any, keys: any) => {
+  //       await ctx.database.set(collection, keys, {
+  //         strokesHtmlCache,
+  //         correctLetters,
+  //         previousGuess,
+  //         previousGuessIdioms,
+  //       });
+  //     };
+  //     if (wordleIndex === 1) {
+  //       await setWordleGameRecord("p_wordle_game_records", { channelId });
+  //     } else {
+  //       await setWordleGameRecord("p_extra_wordle_game_records", {
+  //         channelId,
+  //         wordleIndex,
+  //       });
+  //     }
+  //     return htmlResult.join("\n");
+  //   }
+
+  //   async function generateLetterTilesHtmlForHandle(
+  //     answerIdiom: string,
+  //     userInputIdiom: string,
+  //     channelId: string,
+  //     wordleIndex: number,
+  //     gameInfo: GameRecord | ExtraGameRecord,
+  //     answerPinyin: string,
+  //     userInputPinyin: string
+  //   ) {
+  //     const correctLetters: string[] = gameInfo.correctLetters;
+  //     let presentLetters = gameInfo.presentLetters;
+  //     let absentLetters = gameInfo.absentLetters;
+  //     let presentLettersWithIndex = gameInfo.presentLettersWithIndex;
+  //     let correctPinyinsWithIndex = gameInfo.correctPinyinsWithIndex;
+  //     let presentPinyinsWithIndex = gameInfo.presentPinyinsWithIndex;
+  //     let absentPinyins = gameInfo.absentPinyins;
+  //     let correctTonesWithIndex = gameInfo.correctTonesWithIndex;
+  //     let presentTonesWithIndex = gameInfo.presentTonesWithIndex;
+  //     let absentTones = gameInfo.absentTones;
+  //     let presentPinyins = gameInfo.presentPinyins;
+  //     let presentTones = gameInfo.presentTones;
+
+  //     interface WordInfo {
+  //       word: string;
+  //       pinyin: string[];
+  //     }
+
+  //     if (!userInputPinyin) {
+  //       const userInputIdiomInfo = await getIdiomInfo(userInputIdiom);
+  //       userInputPinyin = userInputIdiomInfo.pinyin;
+  //     }
+
+  //     // 拼音转换 分离音标 string[][]
+  //     const processedUserInputPinyin = processPinyin(userInputPinyin);
+  //     const processedAnswerIdiomPinyin = processPinyin(answerPinyin);
+
+  //     // 总信息
+  //     const userInputIdiomAllRecords: WordInfo[] = userInputIdiom
+  //       .split("")
+  //       .map((char, index) => {
+  //         const pinyinArray = processedUserInputPinyin[index].map((p) => {
+  //           const [pinyin, status = ""] = p.split("-");
+  //           return `${pinyin}-absent${status ? `-${status}-absent` : ""}`;
+  //         });
+  //         return { word: `${char}-absent`, pinyin: pinyinArray };
+  //       });
+
+  //     // 汉字统计
+  //     const userInputIdiomCharCount = countCharactersAndIndexes(userInputIdiom);
+  //     const answerIdiomCharCount = countCharactersAndIndexes(answerIdiom);
+  //     // 声母、韵母、整体认读音节统计
+  //     const userInputPinyinOccurrences = processPinyinArray(
+  //       processedUserInputPinyin
+  //     );
+  //     const answerIdiomPinyinOccurrences = processPinyinArray(
+  //       processedAnswerIdiomPinyin
+  //     );
+
+  //     const userInputPinyinAllOccurrences = mergeOccurrences(
+  //       userInputPinyinOccurrences
+  //     );
+  //     const answerIdiomPinyinAllOccurrences = mergeOccurrences(
+  //       answerIdiomPinyinOccurrences
+  //     );
+  //     // 声调统计
+  //     const userInputTones = countNumericTones(processedUserInputPinyin);
+  //     const answerIdiomTones = countNumericTones(processedAnswerIdiomPinyin);
+  //     const answerIdiomTonesCopy = answerIdiomTones;
+
+  //     for (const char in userInputIdiomCharCount) {
+  //       if (char in answerIdiomCharCount) {
+  //         const userInputCharInfo = userInputIdiomCharCount[char];
+  //         const answerCharInfo = answerIdiomCharCount[char];
+
+  //         const commonIndexes = userInputCharInfo.indexes.filter((index) =>
+  //           answerCharInfo.indexes.includes(index)
+  //         );
+
+  //         commonIndexes.forEach((index) => {
+  //           // correct
+  //           // userInputIdiomAllRecords[index].pinyin = userInputIdiomAllRecords[index].pinyin.map(pinyin => pinyin.replace(/-\w+$/g, '-correct'));
+  //           userInputIdiomAllRecords[index].word = userInputIdiomAllRecords[
+  //             index
+  //           ].word.replace(/-\w+$/g, "-correct");
+  //           correctLetters[index] =
+  //             userInputIdiomAllRecords[index].word.split("-")[0];
+  //           // updateOccurrences(answerIdiomPinyinAllOccurrences, index);
+  //           // updateOccurrences(userInputPinyinAllOccurrences, index);
+  //           // updateOccurrences(userInputTones, index);
+  //           // updateOccurrences(answerIdiomTones, index);
+
+  //           userInputCharInfo.count -= 1;
+  //           userInputCharInfo.indexes = userInputCharInfo.indexes.filter(
+  //             (i) => i !== index
+  //           );
+
+  //           answerCharInfo.count -= 1;
+  //           answerCharInfo.indexes = answerCharInfo.indexes.filter(
+  //             (i) => i !== index
+  //           );
+  //         });
+
+  //         userInputCharInfo.indexes.forEach((userIndex) => {
+  //           if (
+  //             !answerCharInfo.indexes.includes(userIndex) &&
+  //             answerCharInfo.count > 0
+  //           ) {
+  //             // present
+  //             userInputIdiomAllRecords[userIndex].word = userInputIdiomAllRecords[
+  //               userIndex
+  //             ].word.replace(/-\w+$/g, "-present");
+
+  //             presentLetters +=
+  //               userInputIdiomAllRecords[userIndex].word.split("-")[0];
+  //             presentLettersWithIndex.push(
+  //               `${userInputIdiomAllRecords[userIndex].word.split("-")[0]}-${
+  //                 userIndex + 1
+  //               }`
+  //             );
+  //             answerCharInfo.count -= 1;
+  //           }
+  //         });
+  //       } else {
+  //         // absent
+  //         absentLetters += char;
+  //       }
+  //     }
+
+  //     for (const element in userInputPinyinAllOccurrences) {
+  //       if (element in answerIdiomPinyinAllOccurrences) {
+  //         const userInputElementInfo = userInputPinyinAllOccurrences[element];
+  //         const answerElementInfo = answerIdiomPinyinAllOccurrences[element];
+
+  //         const commonPositions = userInputElementInfo.positions.filter(
+  //           (position) => answerElementInfo.positions.includes(position)
+  //         );
+
+  //         commonPositions.forEach((position) => {
+  //           // correct
+  //           const pinyinArray = userInputIdiomAllRecords[position].pinyin
+  //             .map((pinyin) => {
+  //               return pinyin.split("-")[0];
+  //             })
+  //             .join("");
+
+  //           const matchIndex = pinyinArray.indexOf(element);
+  //           if (matchIndex !== -1) {
+  //             for (let i = matchIndex; i < matchIndex + element.length; i++) {
+  //               userInputIdiomAllRecords[position].pinyin[i] =
+  //                 userInputIdiomAllRecords[position].pinyin[i].replace(
+  //                   "absent",
+  //                   "correct"
+  //                 );
+  //             }
+  //           }
+
+  //           correctPinyinsWithIndex.push(`${element}-${position + 1}`);
+
+  //           userInputElementInfo.count -= 1;
+  //           userInputElementInfo.positions =
+  //             userInputElementInfo.positions.filter((i) => i !== position);
+
+  //           answerElementInfo.count -= 1;
+  //           answerElementInfo.positions = answerElementInfo.positions.filter(
+  //             (i) => i !== position
+  //           );
+  //         });
+
+  //         userInputElementInfo.positions.forEach((userPosition) => {
+  //           if (
+  //             !answerElementInfo.positions.includes(userPosition) &&
+  //             answerElementInfo.count > 0
+  //           ) {
+  //             // present
+  //             const pinyinArray = userInputIdiomAllRecords[userPosition].pinyin
+  //               .map((pinyin) => {
+  //                 return pinyin.split("-")[0];
+  //               })
+  //               .join("");
+
+  //             const matchIndex = pinyinArray.indexOf(element);
+  //             if (matchIndex !== -1) {
+  //               for (let i = matchIndex; i < matchIndex + element.length; i++) {
+  //                 userInputIdiomAllRecords[userPosition].pinyin[i] =
+  //                   userInputIdiomAllRecords[userPosition].pinyin[i].replace(
+  //                     "absent",
+  //                     "present"
+  //                   );
+  //               }
+  //             }
+  //             presentPinyins.push(element);
+  //             presentPinyinsWithIndex.push(`${element}-${userPosition + 1}`);
+  //             answerElementInfo.count -= 1;
+  //           }
+  //         });
+  //       } else {
+  //         absentPinyins.push(element);
+  //       }
+  //     }
+
+  //     for (const tone in userInputTones) {
+  //       if (tone in answerIdiomTones) {
+  //         // correct
+  //         const userInputToneInfo = userInputTones[tone];
+  //         const answerToneInfo = answerIdiomTones[tone];
+
+  //         const commonPositions = userInputToneInfo.positions.filter((position) =>
+  //           answerToneInfo.positions.includes(position)
+  //         );
+
+  //         commonPositions.forEach((position) => {
+  //           const matchIndex = userInputIdiomAllRecords[
+  //             position
+  //           ].pinyin.findIndex((pinyin) => pinyin.includes(`-${tone}-absent`));
+  //           if (matchIndex !== -1) {
+  //             userInputIdiomAllRecords[position].pinyin[matchIndex] =
+  //               userInputIdiomAllRecords[position].pinyin[matchIndex].replace(
+  //                 `-${tone}-absent`,
+  //                 `-${tone}-correct`
+  //               );
+  //           }
+  //           correctTonesWithIndex.push(`第${tone}声-${position + 1}`);
+  //           userInputToneInfo.count -= 1;
+  //           userInputToneInfo.positions = userInputToneInfo.positions.filter(
+  //             (i) => i !== position
+  //           );
+
+  //           answerToneInfo.count -= 1;
+  //           answerToneInfo.positions = answerToneInfo.positions.filter(
+  //             (i) => i !== position
+  //           );
+  //         });
+
+  //         userInputToneInfo.positions.forEach((userPosition) => {
+  //           if (
+  //             !answerToneInfo.positions.includes(userPosition) &&
+  //             answerToneInfo.count > 0
+  //           ) {
+  //             // present
+  //             const pinyinArray = userInputIdiomAllRecords[userPosition].pinyin;
+  //             const matchIndex = pinyinArray.findIndex((pinyin) =>
+  //               pinyin.includes(`-${tone}-absent`)
+  //             );
+  //             if (matchIndex !== -1) {
+  //               userInputIdiomAllRecords[userPosition].pinyin[matchIndex] =
+  //                 pinyinArray[matchIndex].replace(
+  //                   `-${tone}-absent`,
+  //                   `-${tone}-present`
+  //                 );
+  //             }
+  //             presentTones.push(`第${tone}声`);
+  //             presentTonesWithIndex.push(`第${tone}声-${userPosition + 1}`);
+  //             answerToneInfo.count -= 1;
+  //           }
+  //         });
+  //       } else {
+  //         absentTones.push(`第${tone}声`);
+  //       }
+  //     }
+
+  //     const processedRecords = processAllRecords(userInputIdiomAllRecords);
+
+  //     const processedRecords2 = transformRecords(processedRecords);
+
+  //     const htmlResult: string[] = [`<div flex="">`];
+  //     for (const record of processedRecords2) {
+  //       const wordValue = record.word.value;
+  //       const statusMap: { [key: string]: string } = {
+  //         absent: "op80",
+  //         present: "text-mis",
+  //         correct: "text-ok",
+  //       };
+
+  //       let wordStatus = record.word.status;
+  //       wordStatus = statusMap[wordStatus] || wordStatus;
+
+  //       const statusMap2: { [key: string]: string } = {
+  //         absent: "op35",
+  //         present: "text-mis",
+  //         correct: "text-ok",
+  //       };
+  //       const pinyin = record.pinyin;
+  //       const separatedPinyin = separatePinyin(record);
+  //       const initial = record.initial;
+  //       const final = record.final;
+  //       const toneValue = record.tune.value;
+  //       const toneStatus = record.tune.status;
+  //       const tonesPaths = [
+  //         "0",
+  //         // 第 1 声
+  //         '<path d="M3.35 8C2.60442 8 2 8.60442 2 9.35V10.35C2 11.0956 2.60442 11.7 3.35 11.7H17.35C18.0956 11.7 18.7 11.0956 18.7 10.35V9.35C18.7 8.60442 18.0956 8 17.35 8H3.35Z" fill="currentColor"></path>',
+  //         // 第 2 声
+  //         '<path d="M16.581 3.71105C16.2453 3.27254 15.6176 3.18923 15.1791 3.52498L3.26924 12.6439C2.83073 12.9796 2.74743 13.6073 3.08318 14.0458L4.29903 15.6338C4.63478 16.0723 5.26244 16.1556 5.70095 15.8199L17.6108 6.70095C18.0493 6.3652 18.1327 5.73754 17.7969 5.29903L16.581 3.71105Z" fill="currentColor"></path>',
+  //         // 第 3 声
+  //         '<path d="M1.70711 7.70712C1.31658 7.3166 1.31658 6.68343 1.70711 6.29291L2.41421 5.5858C2.80474 5.19528 3.4379 5.19528 3.82843 5.5858L9.31502 11.0724C9.70555 11.4629 10.3387 11.4629 10.7292 11.0724L16.2158 5.5858C16.6064 5.19528 17.2395 5.19528 17.63 5.5858L18.3372 6.29291C18.7277 6.68343 18.7277 7.3166 18.3372 7.70712L10.7292 15.315C10.3387 15.7056 9.70555 15.7056 9.31502 15.315L1.70711 7.70712Z" fill="currentColor"></path>',
+  //         // 第 4 声
+  //         '<path d="M4.12282 3.71105C4.45857 3.27254 5.08623 3.18923 5.52474 3.52498L17.4346 12.6439C17.8731 12.9796 17.9564 13.6073 17.6207 14.0458L16.4048 15.6338C16.0691 16.0723 15.4414 16.1556 15.0029 15.8199L3.09303 6.70095C2.65452 6.3652 2.57122 5.73754 2.90697 5.29903L4.12282 3.71105Z" fill="currentColor"></path>',
+  //       ];
+  //       const html: string[] = [
+  //         `<div w-30="" h-30="" m2="">
+  //                     <div h-30="" w-30="" border-2="" flex="~ center" relative="" leading-1em="" em="" font-serif=""
+  //                          class="bg-gray-400/8 border-transparent">
+  //                         <div absolute="" text-5xl="" leading-1em="" class="${wordStatus} top-12">${wordValue}</div>
+  //                         <div absolute="" font-mono="" text-center="" left-0="" right-0="" font-100="" flex=""
+  //                              flex-col="" items-center="" class="top-14px" text-2xl="">
+  //                             <div relative="" ma="" items-start="" flex="~ x-center">
+  //                                 ${
+  //                                   separatedPinyin.initials.length > 0
+  //                                     ? `<div class="${
+  //                                         statusMap2[
+  //                                           separatedPinyin.initials[0].status
+  //                                         ]
+  //                                       }" mx-1px="">${initial}</div>`
+  //                                     : ""
+  //                                 }
+  // <div mx-1px="" flex="">`,
+  //       ];
+  //       for (const final of separatedPinyin.finals) {
+  //         if (!final.isHasTone) {
+  //           html.push(
+  //             `<div class="${statusMap2[final.status]}">${final.value}</div>`
+  //           );
+  //         } else {
+  //           html.push(`                  <div relative="">
+  //                                         <div class="${
+  //                                           statusMap2[final.status]
+  //                                         }">${
+  //             final.value === "i" ? "ı" : final.value
+  //           }</div>
+  //                                         <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
+  //                                              class="${
+  //                                                statusMap2[toneStatus]
+  //                                              }" absolute="" w="86%" left="8%"
+  //                                              style="bottom: 1.5rem;">
+  //                                             ${tonesPaths[toneValue]}
+  //                                         </svg>
+  //                                     </div>`);
+  //         }
+  //       }
+  //       html.push(`</div>
+  //                             </div>
+  //                         </div>
+  //                     </div>
+  //                 </div>`);
+  //       htmlResult.push(html.join("\n"));
+  //     }
+  //     htmlResult.push(`</div>`);
+
+  //     const pinyinSet = new Set(
+  //       Object.keys(answerIdiomPinyinOccurrences.initialsOccurrences).concat(
+  //         Object.keys(answerIdiomPinyinOccurrences.finalsOccurrences)
+  //       )
+  //     );
+
+  //     const filteredAbsentPinyins = absentPinyins.filter(
+  //       (pinyin) => !pinyinSet.has(pinyin)
+  //     );
+  //     absentTones.forEach((tone, index) => {
+  //       const toneNumber = tone.match(/\d+/);
+  //       if (toneNumber) {
+  //         const key = toneNumber[0];
+  //         if (answerIdiomTonesCopy[key]) {
+  //           absentTones.splice(index, 1);
+  //         }
+  //       }
+  //     });
+  //     const setWordleGameRecord = async (collection: any, keys: any) => {
+  //       await ctx.database.set(collection, keys, {
+  //         correctLetters,
+  //         presentLetters: removeDuplicates(presentLetters),
+  //         absentLetters: removeLetters(
+  //           gameInfo.wordGuess,
+  //           removeDuplicates(absentLetters)
+  //         ),
+  //         presentLettersWithIndex: mergeDuplicates(presentLettersWithIndex),
+  //         correctPinyinsWithIndex: mergeDuplicates(correctPinyinsWithIndex),
+  //         presentPinyinsWithIndex: mergeDuplicates(presentPinyinsWithIndex),
+  //         correctTonesWithIndex: mergeDuplicates(correctTonesWithIndex),
+  //         presentTonesWithIndex: mergeDuplicates(presentTonesWithIndex),
+  //         presentPinyins: mergeDuplicates(presentPinyins),
+  //         presentTones: mergeDuplicates(presentTones),
+  //         absentPinyins: mergeDuplicates(filteredAbsentPinyins),
+  //         absentTones: mergeDuplicates(absentTones),
+  //       });
+  //     };
+  //     if (wordleIndex === 1) {
+  //       await setWordleGameRecord("p_wordle_game_records", { channelId });
+  //     } else {
+  //       await setWordleGameRecord("p_extra_wordle_game_records", {
+  //         channelId,
+  //         wordleIndex,
+  //       });
+  //     }
+
+  //     return htmlResult.join("\n");
+  //   }
 
   async function setGuessRunningStatus(
     channelId: string,
@@ -3592,382 +3592,382 @@ ${gameDuration}${answerInfo}${processedResult}`;
     );
   }
 
-  async function endGame(channelId: string) {
-    await Promise.all([
-      ctx.database.remove("p_wordle_gaming_player_records", { channelId }),
-      ctx.database.remove("p_wordle_game_records", { channelId }),
-      ctx.database.remove("p_extra_wordle_game_records", { channelId }),
-      await setGuessRunningStatus(channelId, false),
-    ]);
-  }
+  //   async function endGame(channelId: string) {
+  //     await Promise.all([
+  //       ctx.database.remove("p_wordle_gaming_player_records", { channelId }),
+  //       ctx.database.remove("p_wordle_game_records", { channelId }),
+  //       ctx.database.remove("p_extra_wordle_game_records", { channelId }),
+  //       await setGuessRunningStatus(channelId, false),
+  //     ]);
+  //   }
 
-  async function updatePlayerRecordsLose(
-    channelId: string,
-    gameInfo: GameRecord
-  ) {
-    const gamingPlayers: GamingPlayer[] = await ctx.database.get(
-      "p_wordle_gaming_player_records",
-      { channelId }
-    );
+  //   async function updatePlayerRecordsLose(
+  //     channelId: string,
+  //     gameInfo: GameRecord
+  //   ) {
+  //     const gamingPlayers: GamingPlayer[] = await ctx.database.get(
+  //       "p_wordle_gaming_player_records",
+  //       { channelId }
+  //     );
 
-    for (const player of gamingPlayers) {
-      const gameMode = gameInfo.gameMode;
-      const [playerInfo] = await ctx.database.get("p_wordle_player_records", {
-        userId: player.userId,
-      });
-      if (!playerInfo || !playerInfo.stats.hasOwnProperty(gameMode)) {
-        continue;
-      }
-      const updatedLose = playerInfo.lose + 1;
-      playerInfo.stats[gameMode].lose += 1;
+  //     for (const player of gamingPlayers) {
+  //       const gameMode = gameInfo.gameMode;
+  //       const [playerInfo] = await ctx.database.get("p_wordle_player_records", {
+  //         userId: player.userId,
+  //       });
+  //       if (!playerInfo || !playerInfo.stats.hasOwnProperty(gameMode)) {
+  //         continue;
+  //       }
+  //       const updatedLose = playerInfo.lose + 1;
+  //       playerInfo.stats[gameMode].lose += 1;
 
-      if (gameInfo.gameMode === "宝可影") {
-        if (gameInfo.wordlesNum === 1) {
-          if (gameInfo.isHardMode) {
-            playerInfo.extraCiyingRankInfo.loseIn1HardMode += 1;
-          } else {
-            playerInfo.extraCiyingRankInfo.loseIn1Mode += 1;
-          }
-        } else if (gameInfo.wordlesNum >= 2 && gameInfo.wordlesNum <= 4) {
-          const extraCiyingRankInfoKey = `loseIn${gameInfo.wordlesNum}Mode`;
-          playerInfo.extraCiyingRankInfo[extraCiyingRankInfoKey] += 1;
-        }
-      }
+  //       if (gameInfo.gameMode === "宝可影") {
+  //         if (gameInfo.wordlesNum === 1) {
+  //           if (gameInfo.isHardMode) {
+  //             playerInfo.extraCiyingRankInfo.loseIn1HardMode += 1;
+  //           } else {
+  //             playerInfo.extraCiyingRankInfo.loseIn1Mode += 1;
+  //           }
+  //         } else if (gameInfo.wordlesNum >= 2 && gameInfo.wordlesNum <= 4) {
+  //           const extraCiyingRankInfoKey = `loseIn${gameInfo.wordlesNum}Mode`;
+  //           playerInfo.extraCiyingRankInfo[extraCiyingRankInfoKey] += 1;
+  //         }
+  //       }
 
-      const updateData = {
-        stats: playerInfo.stats,
-        lose: updatedLose,
-      };
+  //       const updateData = {
+  //         stats: playerInfo.stats,
+  //         lose: updatedLose,
+  //       };
 
-      if (gameInfo.gameMode === "宝可影") {
-        updateData["extraCiyingRankInfo"] = playerInfo.extraCiyingRankInfo;
-      }
+  //       if (gameInfo.gameMode === "宝可影") {
+  //         updateData["extraCiyingRankInfo"] = playerInfo.extraCiyingRankInfo;
+  //       }
 
-      await ctx.database.set(
-        "p_wordle_player_records",
-        { userId: player.userId },
-        updateData
-      );
-    }
-  }
+  //       await ctx.database.set(
+  //         "p_wordle_player_records",
+  //         { userId: player.userId },
+  //         updateData
+  //       );
+  //     }
+  //   }
 
-  async function updatePlayerRecordsWin(
-    channelId: string,
-    gameInfo: GameRecord
-  ) {
-    const gamingPlayers: GamingPlayer[] = await ctx.database.get(
-      "p_wordle_gaming_player_records",
-      { channelId }
-    );
+  //   async function updatePlayerRecordsWin(
+  //     channelId: string,
+  //     gameInfo: GameRecord
+  //   ) {
+  //     const gamingPlayers: GamingPlayer[] = await ctx.database.get(
+  //       "p_wordle_gaming_player_records",
+  //       { channelId }
+  //     );
 
-    for (const player of gamingPlayers) {
-      const gameMode = gameInfo.gameMode;
-      const [playerInfo] = await ctx.database.get("p_wordle_player_records", {
-        userId: player.userId,
-      });
-      if (!playerInfo || !playerInfo.stats.hasOwnProperty(gameMode)) {
-        continue;
-      }
-      const updatedWin = playerInfo.win + 1;
-      playerInfo.stats[gameMode].win += 1;
+  //     for (const player of gamingPlayers) {
+  //       const gameMode = gameInfo.gameMode;
+  //       const [playerInfo] = await ctx.database.get("p_wordle_player_records", {
+  //         userId: player.userId,
+  //       });
+  //       if (!playerInfo || !playerInfo.stats.hasOwnProperty(gameMode)) {
+  //         continue;
+  //       }
+  //       const updatedWin = playerInfo.win + 1;
+  //       playerInfo.stats[gameMode].win += 1;
 
-      if (gameInfo.gameMode === "宝可影") {
-        if (gameInfo.wordlesNum === 1) {
-          if (gameInfo.isHardMode) {
-            playerInfo.extraCiyingRankInfo.winIn1HardMode += 1;
-          } else {
-            playerInfo.extraCiyingRankInfo.winIn1Mode += 1;
-          }
-        } else if (gameInfo.wordlesNum >= 2 && gameInfo.wordlesNum <= 4) {
-          const extraCiyingRankInfoKey = `winIn${gameInfo.wordlesNum}Mode`;
-          playerInfo.extraCiyingRankInfo[extraCiyingRankInfoKey] += 1;
-        }
-      }
+  //       if (gameInfo.gameMode === "宝可影") {
+  //         if (gameInfo.wordlesNum === 1) {
+  //           if (gameInfo.isHardMode) {
+  //             playerInfo.extraCiyingRankInfo.winIn1HardMode += 1;
+  //           } else {
+  //             playerInfo.extraCiyingRankInfo.winIn1Mode += 1;
+  //           }
+  //         } else if (gameInfo.wordlesNum >= 2 && gameInfo.wordlesNum <= 4) {
+  //           const extraCiyingRankInfoKey = `winIn${gameInfo.wordlesNum}Mode`;
+  //           playerInfo.extraCiyingRankInfo[extraCiyingRankInfoKey] += 1;
+  //         }
+  //       }
 
-      const updateData = {
-        stats: playerInfo.stats,
-        win: updatedWin,
-      };
+  //       const updateData = {
+  //         stats: playerInfo.stats,
+  //         win: updatedWin,
+  //       };
 
-      if (gameInfo.gameMode === "宝可影") {
-        updateData["extraCiyingRankInfo"] = playerInfo.extraCiyingRankInfo;
-      }
+  //       if (gameInfo.gameMode === "宝可影") {
+  //         updateData["extraCiyingRankInfo"] = playerInfo.extraCiyingRankInfo;
+  //       }
 
-      await ctx.database.set(
-        "p_wordle_player_records",
-        { userId: player.userId },
-        updateData
-      );
-    }
-  }
+  //       await ctx.database.set(
+  //         "p_wordle_player_records",
+  //         { userId: player.userId },
+  //         updateData
+  //       );
+  //     }
+  //   }
 
-  async function generateImageForCiying(
-    gridHtml: string,
-    rowNum: number
-  ): Promise<Buffer> {
-    const browser = ctx.puppeteer.browser;
-    const context = await browser.createBrowserContext();
-    const page = await context.newPage();
-    await page.setViewport({
-      width: 688,
-      height: 140 * rowNum,
-      deviceScaleFactor: 1,
-    });
-    const filePath = path
-      .join(dirname, "./pokedle/src/emptyHtml.html")
-      .replace(/\\/g, "/");
-    await page.goto("file://" + filePath);
+  //   async function generateImageForCiying(
+  //     gridHtml: string,
+  //     rowNum: number
+  //   ): Promise<Buffer> {
+  //     const browser = ctx.puppeteer.browser;
+  //     const context = await browser.createBrowserContext();
+  //     const page = await context.newPage();
+  //     await page.setViewport({
+  //       width: 688,
+  //       height: 140 * rowNum,
+  //       deviceScaleFactor: 1,
+  //     });
+  //     const filePath = path
+  //       .join(dirname, "./pokedle/src/emptyHtml.html")
+  //       .replace(/\\/g, "/");
+  //     await page.goto("file://" + filePath);
 
-    const html = `<html lang="zh" class="h-full ${
-      config.isDarkThemeEnabled ? "dark" : ""
-    }">
-<head>
-    <meta charset="UTF-8">
-    <title>宝可影</title>
-    <link rel="stylesheet" href="./assets/宝可影/ciying.css">
-        <style>
-        .container {
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-    </style>
-</head>
+  //     const html = `<html lang="zh" class="h-full ${
+  //       config.isDarkThemeEnabled ? "dark" : ""
+  //     }">
+  // <head>
+  //     <meta charset="UTF-8">
+  //     <title>宝可影</title>
+  //     <link rel="stylesheet" href="./assets/宝可影/ciying.css">
+  //         <style>
+  //         .container {
+  //             padding-top: 10px;
+  //             padding-bottom: 10px;
+  //         }
+  //     </style>
+  // </head>
 
-<body class="h-full overflow-y-hidden dark:bg-neutral-900 dark:text-white">
-<div class="container">
+  // <body class="h-full overflow-y-hidden dark:bg-neutral-900 dark:text-white">
+  // <div class="container">
 
-<div class="flex h-full w-full flex-col">
+  // <div class="flex h-full w-full flex-col">
 
-    <div class="relative flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
-        <div class="flex h-full items-center justify-center overflow-y-auto">
-            <div class="max-h-full">
-                <div class="grid grid-rows-5 gap-2 py-2">
-${gridHtml}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
+  //     <div class="relative flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
+  //         <div class="flex h-full items-center justify-center overflow-y-auto">
+  //             <div class="max-h-full">
+  //                 <div class="grid grid-rows-5 gap-2 py-2">
+  // ${gridHtml}
+  //                 </div>
+  //             </div>
+  //         </div>
+  //     </div>
+  // </div>
+  // </div>
 
-</body>
-</html>`;
+  // </body>
+  // </html>`;
 
-    await page.setContent(html, { waitUntil: "load" });
-    const imageBuffer = await page.screenshot({
-      fullPage: true,
-      type: config.imageType,
-    });
-    await page.close();
-    await context.close();
+  //     await page.setContent(html, { waitUntil: "load" });
+  //     const imageBuffer = await page.screenshot({
+  //       fullPage: true,
+  //       type: config.imageType,
+  //     });
+  //     await page.close();
+  //     await context.close();
 
-    return imageBuffer;
-  }
+  //     return imageBuffer;
+  //   }
 
-  async function generateImageForHandle(gridHtml: string): Promise<Buffer> {
-    const browser = ctx.puppeteer.browser;
-    const context = await browser.createBrowserContext();
-    const page = await context.newPage();
-    await page.setViewport({ width: 688, height: 731, deviceScaleFactor: 1 });
-    const filePath = path
-      .join(dirname, "./pokedle/src/emptyHtml.html")
-      .replace(/\\/g, "/");
-    await page.goto("file://" + filePath);
+  //   async function generateImageForHandle(gridHtml: string): Promise<Buffer> {
+  //     const browser = ctx.puppeteer.browser;
+  //     const context = await browser.createBrowserContext();
+  //     const page = await context.newPage();
+  //     await page.setViewport({ width: 688, height: 731, deviceScaleFactor: 1 });
+  //     const filePath = path
+  //       .join(dirname, "./pokedle/src/emptyHtml.html")
+  //       .replace(/\\/g, "/");
+  //     await page.goto("file://" + filePath);
 
-    const html = `<html lang="en" class="${
-      config.isDarkThemeEnabled ? "dark" : ""
-    }" style="--vh: 7.55px;">
-<head>
-    <meta charset="UTF-8">
-    <title>宝可兜 - 汉字 Wordle</title>
-    <link rel="stylesheet" href="./assets/宝可兜/handle.css">
-    <style>
-        .container {
-            padding-top: 30px;
-            padding-bottom: 30px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <main font-sans="" text="center gray-700 dark:gray-300" select-none="" class="${
-      config.isHighContrastThemeEnabled ? "colorblind" : ""
-    }">
-        <div flex="~ col" items-center="">
-           ${gridHtml}
-        </div>
-    </main>
-</div>
-</body>
-</html>`;
+  //     const html = `<html lang="en" class="${
+  //       config.isDarkThemeEnabled ? "dark" : ""
+  //     }" style="--vh: 7.55px;">
+  // <head>
+  //     <meta charset="UTF-8">
+  //     <title>宝可兜 - 汉字 Wordle</title>
+  //     <link rel="stylesheet" href="./assets/宝可兜/handle.css">
+  //     <style>
+  //         .container {
+  //             padding-top: 30px;
+  //             padding-bottom: 30px;
+  //         }
+  //     </style>
+  // </head>
+  // <body>
+  // <div class="container">
+  //     <main font-sans="" text="center gray-700 dark:gray-300" select-none="" class="${
+  //       config.isHighContrastThemeEnabled ? "colorblind" : ""
+  //     }">
+  //         <div flex="~ col" items-center="">
+  //            ${gridHtml}
+  //         </div>
+  //     </main>
+  // </div>
+  // </body>
+  // </html>`;
 
-    await page.setContent(html, { waitUntil: "load" });
-    const imageBuffer = await page.screenshot({
-      fullPage: true,
-      type: config.imageType,
-    });
-    await page.close();
-    await context.close();
+  //     await page.setContent(html, { waitUntil: "load" });
+  //     const imageBuffer = await page.screenshot({
+  //       fullPage: true,
+  //       type: config.imageType,
+  //     });
+  //     await page.close();
+  //     await context.close();
 
-    return imageBuffer;
-  }
+  //     return imageBuffer;
+  //   }
 
-  async function isPlayerInGame(
-    channelId: string,
-    userId: string
-  ): Promise<boolean> {
-    const getPlayer = await ctx.database.get("p_wordle_gaming_player_records", {
-      channelId,
-      userId,
-    });
-    return getPlayer.length !== 0;
-  }
+  //   async function isPlayerInGame(
+  //     channelId: string,
+  //     userId: string
+  //   ): Promise<boolean> {
+  //     const getPlayer = await ctx.database.get("p_wordle_gaming_player_records", {
+  //       channelId,
+  //       userId,
+  //     });
+  //     return getPlayer.length !== 0;
+  //   }
 
-  async function getGameInfo(channelId: string): Promise<GameRecord> {
-    let gameRecord = await ctx.database.get("p_wordle_game_records", {
-      channelId,
-    });
-    if (gameRecord.length === 0) {
-      await ctx.database.create("p_wordle_game_records", {
-        channelId,
-        isStarted: false,
-      });
-      gameRecord = await ctx.database.get("p_wordle_game_records", {
-        channelId,
-      });
-    }
-    return gameRecord[0];
-  }
+  //   async function getGameInfo(channelId: string): Promise<GameRecord> {
+  //     let gameRecord = await ctx.database.get("p_wordle_game_records", {
+  //       channelId,
+  //     });
+  //     if (gameRecord.length === 0) {
+  //       await ctx.database.create("p_wordle_game_records", {
+  //         channelId,
+  //         isStarted: false,
+  //       });
+  //       gameRecord = await ctx.database.get("p_wordle_game_records", {
+  //         channelId,
+  //       });
+  //     }
+  //     return gameRecord[0];
+  //   }
 
-  async function getGameInfo2(
-    channelId: string,
-    wordleIndex: number
-  ): Promise<ExtraGameRecord> {
-    const gameRecord = await ctx.database.get("p_extra_wordle_game_records", {
-      channelId,
-      wordleIndex,
-    });
-    return gameRecord[0];
-  }
+  //   async function getGameInfo2(
+  //     channelId: string,
+  //     wordleIndex: number
+  //   ): Promise<ExtraGameRecord> {
+  //     const gameRecord = await ctx.database.get("p_extra_wordle_game_records", {
+  //       channelId,
+  //       wordleIndex,
+  //     });
+  //     return gameRecord[0];
+  //   }
 
-  async function updateNameInPlayerRecord(
-    session,
-    userId: string,
-    username: string
-  ): Promise<void> {
-    const userRecord = await ctx.database.get("p_wordle_player_records", {
-      userId,
-    });
+  //   async function updateNameInPlayerRecord(
+  //     session,
+  //     userId: string,
+  //     username: string
+  //   ): Promise<void> {
+  //     const userRecord = await ctx.database.get("p_wordle_player_records", {
+  //       userId,
+  //     });
 
-    let isChange = false;
+  //     let isChange = false;
 
-    if (userRecord.length === 0) {
-      await ctx.database.create("p_wordle_player_records", {
-        userId,
-        username,
-      });
-      return;
-    }
+  //     if (userRecord.length === 0) {
+  //       await ctx.database.create("p_wordle_player_records", {
+  //         userId,
+  //         username,
+  //       });
+  //       return;
+  //     }
 
-    const existingRecord = userRecord[0];
+  //     const existingRecord = userRecord[0];
 
-    if (
-      username !== existingRecord.username &&
-      !(isQQOfficialRobotMarkdownTemplateEnabled && session.platform === "qq")
-    ) {
-      existingRecord.username = username;
-      isChange = true;
-    }
+  //     if (
+  //       username !== existingRecord.username &&
+  //       !(isQQOfficialRobotMarkdownTemplateEnabled && session.platform === "qq")
+  //     ) {
+  //       existingRecord.username = username;
+  //       isChange = true;
+  //     }
 
-    const keys = ["Lewdle", "宝可兜", "Numberle", "Math", "宝可影"];
+  //     const keys = ["Lewdle", "宝可兜", "Numberle", "Math", "宝可影"];
 
-    keys.forEach((key) => {
-      if (
-        !existingRecord.stats[key] ||
-        !existingRecord.stats.hasOwnProperty(key)
-      ) {
-        existingRecord.stats[key] = { win: 0, lose: 0 };
-        isChange = true;
-      }
-      if (!existingRecord.fastestGuessTime[key]) {
-        existingRecord.fastestGuessTime[key] = 0;
-        isChange = true;
-      }
-    });
+  //     keys.forEach((key) => {
+  //       if (
+  //         !existingRecord.stats[key] ||
+  //         !existingRecord.stats.hasOwnProperty(key)
+  //       ) {
+  //         existingRecord.stats[key] = { win: 0, lose: 0 };
+  //         isChange = true;
+  //       }
+  //       if (!existingRecord.fastestGuessTime[key]) {
+  //         existingRecord.fastestGuessTime[key] = 0;
+  //         isChange = true;
+  //       }
+  //     });
 
-    if (isChange) {
-      await ctx.database.set(
-        "p_wordle_player_records",
-        { userId },
-        {
-          username: existingRecord.username,
-          stats: existingRecord.stats,
-          fastestGuessTime: existingRecord.fastestGuessTime,
-        }
-      );
-    }
-  }
+  //     if (isChange) {
+  //       await ctx.database.set(
+  //         "p_wordle_player_records",
+  //         { userId },
+  //         {
+  //           username: existingRecord.username,
+  //           stats: existingRecord.stats,
+  //           fastestGuessTime: existingRecord.fastestGuessTime,
+  //         }
+  //       );
+  //     }
+  //   }
 
   let sentMessages = [];
   const msgSeqMap: { [msgId: string]: number } = {};
 
-  async function sendMessage(
-    session: any,
-    message: any,
-    markdownCommands: string,
-    numberOfMessageButtonsPerRow?: number,
-    isButton?: boolean
-  ): Promise<void> {
-    isButton = isButton || false;
-    numberOfMessageButtonsPerRow =
-      numberOfMessageButtonsPerRow || config.numberOfMessageButtonsPerRow;
-    const { bot, channelId } = session;
-    let messageId;
-    let isPushMessageId = false;
-    if (isQQOfficialRobotMarkdownTemplateEnabled && session.platform === "qq") {
-      const msgSeq = msgSeqMap[session.messageId] || 10;
-      msgSeqMap[session.messageId] = msgSeq + 100;
-      const buttons = await createButtons(session, markdownCommands);
+  // async function sendMessage(
+  //   session: any,
+  //   message: any,
+  //   markdownCommands: string,
+  //   numberOfMessageButtonsPerRow?: number,
+  //   isButton?: boolean
+  // ): Promise<void> {
+  //   isButton = isButton || false;
+  //   numberOfMessageButtonsPerRow =
+  //     numberOfMessageButtonsPerRow || config.numberOfMessageButtonsPerRow;
+  //   const { bot, channelId } = session;
+  //   let messageId;
+  //   let isPushMessageId = false;
+  //   if (isQQOfficialRobotMarkdownTemplateEnabled && session.platform === "qq") {
+  //     const msgSeq = msgSeqMap[session.messageId] || 10;
+  //     msgSeqMap[session.messageId] = msgSeq + 100;
+  //     const buttons = await createButtons(session, markdownCommands);
 
-      const rows = [];
-      let row = { buttons: [] };
-      buttons.forEach((button, index) => {
-        row.buttons.push(button);
-        if (
-          row.buttons.length === 5 ||
-          index === buttons.length - 1 ||
-          row.buttons.length === numberOfMessageButtonsPerRow
-        ) {
-          rows.push(row);
-          row = { buttons: [] };
-        }
-      });
-      const kb = {
-        keyboard: {
-          content: {
-            rows: rows.slice(0, 5),
-          },
-        },
-      };
-      const result = await await sendMarkdown(ctx, message, session, kb);
+  //     const rows = [];
+  //     let row = { buttons: [] };
+  //     buttons.forEach((button, index) => {
+  //       row.buttons.push(button);
+  //       if (
+  //         row.buttons.length === 5 ||
+  //         index === buttons.length - 1 ||
+  //         row.buttons.length === numberOfMessageButtonsPerRow
+  //       ) {
+  //         rows.push(row);
+  //         row = { buttons: [] };
+  //       }
+  //     });
+  //     const kb = {
+  //       keyboard: {
+  //         content: {
+  //           rows: rows.slice(0, 5),
+  //         },
+  //       },
+  //     };
+  //     const result = await await sendMarkdown(ctx, message, session, kb);
 
-      messageId = result.id;
-    } else {
-      [messageId] = await session.send(message);
-    }
+  //     messageId = result.id;
+  //   } else {
+  //     [messageId] = await session.send(message);
+  //   }
 
-    if (config.retractDelay === 0) return;
-    if (!isPushMessageId) {
-      sentMessages.push(messageId);
-    }
+  //   if (config.retractDelay === 0) return;
+  //   if (!isPushMessageId) {
+  //     sentMessages.push(messageId);
+  //   }
 
-    if (sentMessages.length > 1) {
-      const oldestMessageId = sentMessages.shift();
-      setTimeout(async () => {
-        await bot.deleteMessage(channelId, oldestMessageId);
-      }, config.retractDelay * 1000);
-    }
-  }
+  //   if (sentMessages.length > 1) {
+  //     const oldestMessageId = sentMessages.shift();
+  //     setTimeout(async () => {
+  //       await bot.deleteMessage(channelId, oldestMessageId);
+  //     }, config.retractDelay * 1000);
+  //   }
+  // }
 
   interface ChatCompletion {
     id: string;
