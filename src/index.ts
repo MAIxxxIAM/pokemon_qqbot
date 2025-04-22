@@ -75,20 +75,6 @@ export const inject = {
 export const usage = ``;
 
 export interface Config {
-  isDarkThemeEnabled: boolean;
-  isHighContrastThemeEnabled: boolean;
-  maxSimultaneousGuesses: number;
-  compositeImagePageWidth: number;
-  compositeImagePageHeight: number;
-  enableWordGuessTimeLimit: boolean;
-  wordGuessTimeLimitInSeconds: number;
-  retractDelay: number;
-  imageType: "png" | "jpeg" | "webp";
-  isTextToImageConversionEnabled: boolean;
-  isEnableQQOfficialRobotMarkdownTemplate: boolean;
-  customTemplateId: string;
-  key: string;
-  numberOfMessageButtonsPerRow: number;
   指令使用日志: boolean;
   QQ官方使用MD: boolean;
   签到获得个数: number;
@@ -121,7 +107,6 @@ export interface Config {
   Region: string;
   SecretId: string;
   SecretKey: string;
-  GroupID: string;
 }
 
 export const Config = Schema.intersect([
@@ -201,11 +186,10 @@ export const Config = Schema.intersect([
     Schema.object({}),
   ]),
   Schema.object({
-    Bucket: Schema.string().required(),
+    Bucket: Schema.string(),
     Region: Schema.string().default("ap-guangzhou"),
-    SecretId: Schema.string().role("secret").required(),
-    SecretKey: Schema.string().role("secret").required(),
-    GroupID: Schema.string().required().description("任意群的GroupID"),
+    SecretId: Schema.string().role("secret"),
+    SecretKey: Schema.string().role("secret"),
   }),
 ]);
 
