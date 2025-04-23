@@ -279,7 +279,7 @@ export async function apply(ctx: Context) {
       if (cardData.routmap.type !== RouteNodeType.Shop)
         return `当前地图无法探索该事件`;
       const shop: ShopItem[] =
-        cardData.routmap?.shopItem?.length < 3
+        cardData.routmap?.shopItem?.length < 3 || !cardData.routmap?.shopItem
           ? [getShop(), getShop(), getShop()]
           : cardData.routmap?.shopItem;
       cardData.routmap.shopItem = shop;
