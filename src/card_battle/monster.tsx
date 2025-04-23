@@ -2,9 +2,9 @@ import { pokemonBase } from "../utils/data";
 import { PokemonBase } from "../utils/method";
 import { RouteNodeType } from "./route";
 
-const NormalWild: PokemonBase[] = [];
-const UncommonPokemon: PokemonBase[] = [];
-const Legendary: PokemonBase[] = [];
+let NormalWild: PokemonBase[] = [];
+let UncommonPokemon: PokemonBase[] = [];
+let Legendary: PokemonBase[] = [];
 
 const legendaryPokemonList = [
   "150",
@@ -37,29 +37,37 @@ const legendaryPokemonList = [
   "351",
 ];
 
-for (const p of pokemonBase) {
-  if (p.id == "0") continue;
-  const baseSum = p.att + p.def + p.hp + p.spa + p.spd + p.spe;
-  if (legendaryPokemonList.includes(p.id)) {
-    Legendary.push(p);
-  } else if (baseSum >= 500) {
-    p.att = p.att * 1.1;
-    p.def = p.def * 1.1;
-    p.hp = p.hp * 1.1;
-    p.spa = p.spa * 1.1;
-    p.spd = p.spd * 1.1;
-    p.spe = p.spe * 1.1;
-    UncommonPokemon.push(p);
-  } else {
-    p.att = p.att * 1.5;
-    p.def = p.def * 1.5;
-    p.hp = p.hp * 1.5;
-    p.spa = p.spa * 1.5;
-    p.spd = p.spd * 1.5;
-    p.spe = p.spe * 1.5;
-    NormalWild.push(p);
+const selectPokemon = () => {
+  NormalWild.length = 0;
+  UncommonPokemon.length = 0;
+  Legendary.length = 0;
+  for (const p of pokemonBase) {
+    if (p.id == "0") continue;
+    const baseSum = p.att + p.def + p.hp + p.spa + p.spd + p.spe;
+    if (legendaryPokemonList.includes(p.id)) {
+      Legendary.push({ ...p });
+    } else if (baseSum >= 500) {
+      const up = { ...p };
+      up.att = up.att * 1.1;
+      up.def = up.def * 1.1;
+      up.hp = up.hp * 1.1;
+      up.spa = up.spa * 1.1;
+      up.spd = up.spd * 1.1;
+      up.spe = up.spe * 1.1;
+      UncommonPokemon.push(up);
+    } else {
+      const up = { ...p };
+      up.att = up.att * 1.5;
+      up.def = up.def * 1.5;
+      up.hp = up.hp * 1.5;
+      up.spa = up.spa * 1.5;
+      up.spd = up.spd * 1.5;
+      up.spe = up.spe * 1.5;
+      NormalWild.push(up);
+    }
   }
-}
+};
+selectPokemon();
 
 export function getRandomPokemon(type: RouteNodeType): PokemonBase {
   let pokemon: PokemonBase[] = NormalWild;

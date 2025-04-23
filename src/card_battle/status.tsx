@@ -20,7 +20,7 @@ export class NumbStatusHandler implements StatusHandler {
 
   applyEffect(target: CardCharacter, stacks: number): string | undefined {
     if (target.pokemonCategory.includes("电"))
-      return `麻痹无法对电属性宝可梦生效`;
+      return `,麻痹无法对电属性宝可梦生效`;
     const existing = target.statusEffects.get(this.type);
     if (existing) {
       existing.stacks += stacks;
@@ -45,11 +45,12 @@ export class NumbStatusHandler implements StatusHandler {
   onUseCard(target: CardCharacter, context: CombatContext): string | undefined {
     const effect = target.statusEffects.get(this.type);
     if (!effect) return;
-    const randomNumb = Math.random() <= 0.25;
-    if (!randomNumb) return;
     effect.duration--;
+    const randomNumb = Math.random() <= 0.25;
+    console.log(randomNumb);
+    if (!randomNumb) return;
     let log = `${target.name}麻痹了,本回合无法使用技能`;
-    context.enemyturn = false;
+    target.energy = 0;
     if (effect.duration <= 0) {
       target.statusEffects.delete(this.type);
       log += `${target.name}麻痹效果消失了`;
@@ -80,7 +81,7 @@ export class PoisonStatusHandler implements StatusHandler {
   applyEffect(target: CardCharacter, stacks: number): string | undefined {
     const existing = target.statusEffects.get(this.type);
     if (existing) {
-      existing.stacks += stacks;
+      existing.stacks = Math.max(existing.stacks + stacks, 5);
       existing.duration = Math.max(existing.duration, 3);
     } else {
       target.statusEffects.set(this.type, {
@@ -109,7 +110,7 @@ export class PoisonStatusHandler implements StatusHandler {
     const effect = target.statusEffects.get(this.type);
     if (!effect) return;
 
-    const damage = Math.floor(effect.stacks * 0.05 * target.maxHp);
+    const damage = Math.floor(effect.stacks * 0.02 * target.maxHp);
     target.currentHp -= damage;
     if (target.currentHp < 0) target.currentHp = 0;
     effect.duration--;
@@ -197,7 +198,7 @@ export class StatusEffectMap {
 
   // 验证是否为有效的状态类型
   private isValidStatusType(key: string): key is StatusType {
-    return key === "poison" || key === "strength" || key === "weak";
+    return key === "poison" || key === "numb";
   }
 
   // 从任意数据源恢复

@@ -60,7 +60,7 @@ export async function apply(ctx: Context) {
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted) {
         const md = `你还未深入迷雾,是否进入？
-![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+![img#500px #500px](${config.图片源}/errorimg/unknowtown.webp)`;
         const keybord = {
           keyboard: {
             content: {
@@ -164,7 +164,7 @@ export async function apply(ctx: Context) {
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted) {
         const md = `你还未深入迷雾,是否进入？
-![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+![img#500px #500px](${config.图片源}/errorimg/unknowtown.webp)`;
         const keybord = {
           keyboard: {
             content: {
@@ -249,7 +249,7 @@ export async function apply(ctx: Context) {
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted) {
         const md = `你还未深入迷雾,是否进入？
-![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+![img#500px #333px](${config.图片源}/errorimg/unknowtown.webp)`;
         const keybord = {
           keyboard: {
             content: {
@@ -278,16 +278,14 @@ export async function apply(ctx: Context) {
       }
       if (cardData.routmap.type !== RouteNodeType.Shop)
         return `当前地图无法探索该事件`;
-      const shop: ShopItem[] = !cardData.routmap?.shopItem?.length
-        ? [getShop(), getShop(), getShop()]
-        : cardData.routmap?.shopItem;
-      console.log(shop);
+      const shop: ShopItem[] =
+        cardData.routmap?.shopItem?.length < 3
+          ? [getShop(), getShop(), getShop()]
+          : cardData.routmap?.shopItem;
       cardData.routmap.shopItem = shop;
-      cardData.routmap?.shopItem?.length < 3
-        ? await ctx.database.set("carddata", { id: session.userId }, (row) => ({
-            routmap: cardData.routmap,
-          }))
-        : null;
+      await ctx.database.set("carddata", { id: session.userId }, (row) => ({
+        routmap: cardData.routmap,
+      }));
 
       const md = `你进入了商店,可以购买以下物品：
 
@@ -427,7 +425,7 @@ export async function apply(ctx: Context) {
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted) {
         const md = `你还未深入迷雾,是否进入？
-![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+![img#500px #333px](${config.图片源}/errorimg/unknowtown.webp)`;
         const keybord = {
           keyboard: {
             content: {
@@ -557,6 +555,8 @@ export async function apply(ctx: Context) {
       const md = `你已经进入了新的地图：${selectedNode.type} 
 
 ${"```"}
+
+深入迷雾: ${selectedNode.depth} 层
 ${displayRoute(selectedNode)}
 ${"```"}`;
       await ctx.database.set(
@@ -701,6 +701,8 @@ ${"```"}`;
 当前地图:${newRoutMap.type} 
 
 ${"```"}
+深入迷雾: ${newRoutMap.depth} 层
+
 ${displayRoute(newRoutMap)}
 ${"```"}`;
 
@@ -792,6 +794,8 @@ ${"```"}`;
 ---
 
 ${"```"}
+深入迷雾: ${cardData.routmap.depth} 层
+
 ${cardmap}
 ${"```"}`;
       const keybord = {
@@ -1293,9 +1297,9 @@ ${code}
 
 ---
 
-> ${player.name}：${player.currentHp}/${player.maxHp} 🌟:${player.energy}/${
-      player.maxEnergy
-    } 🛡:${player.armor}
+> ${player.name}：${player.currentHp}/${player.maxHp + player.bonus.Hp} 🌟:${
+      player.energy
+    }/${player.maxEnergy + player.bonus.energy} 🛡:${player.armor}
     `;
   }
 

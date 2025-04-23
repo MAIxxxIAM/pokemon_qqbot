@@ -272,7 +272,11 @@ export class BaseAttckCard extends RougueCard {
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
     if (!target || this.cost > user.energy) return null;
-    const damage = Math.floor(Math.max(user.power.attack * 0.12, 0));
+    const efct =
+      battleType.data[this.cardCategory][target.pokemonCategory[0]] *
+      battleType.data[this.cardCategory][target.pokemonCategory[1]] *
+      (user.pokemonCategory.includes(this.cardCategory) ? 1.5 : 1);
+    const damage = Math.floor(Math.max(user.power.attack * 0.12, 0) * efct);
     if (damage >= target.armor) {
       const realDamage = damage - target.armor;
       target.armor = 0;
@@ -334,7 +338,13 @@ export class BaseSpecialAttackCard extends RougueCard {
   }
   effect(user: CardCharacter, target?: CardCharacter): void | string {
     if (!target || this.cost > user.energy) return null;
-    const damage = Math.floor(Math.max(user.power.specialAttack * 0.12, 0));
+    const efct =
+      battleType.data[this.cardCategory][target.pokemonCategory[0]] *
+      battleType.data[this.cardCategory][target.pokemonCategory[1]] *
+      (user.pokemonCategory.includes(this.cardCategory) ? 1.5 : 1);
+    const damage = Math.floor(
+      Math.max(user.power.specialAttack * 0.12, 0) * efct
+    );
     if (damage >= target.armor) {
       const realDamage = damage - target.armor;
       target.armor = 0;
@@ -539,7 +549,8 @@ export class PoisonCard extends RougueCard {
       "poison",
       poisonList[poison].description,
       poisonList[poison].cost,
-      poisonList[poison].cost - 1
+      poisonList[poison].cost - 1,
+      "毒"
     );
   }
   effect(user: CardCharacter, target: CardCharacter): void | string {
@@ -593,7 +604,13 @@ export class PoisonCard extends RougueCard {
 
 export class NumbCard extends RougueCard {
   constructor() {
-    super("麻痹卡", "numb", "使对手麻痹", 3, CardRarity.Epic);
+    super(
+      "麻痹卡",
+      "numb",
+      "使对手麻痹,降低一半速度,并减少2点能量",
+      3,
+      CardRarity.Epic
+    );
   }
   restor(data: any): RougueCard {
     return Object.assign(new NumbCard(), data);
@@ -609,7 +626,38 @@ export class NumbCard extends RougueCard {
     return `${user.name}使用了[${this.name}]${statusLog}`;
   }
   drawCard(ctx: Context): Promise<Element> {
-    return;
+    let picCard = drawCardCache.get(this.name);
+    if (picCard) return picCard;
+    picCard = (async () => {
+      const icondir = typeDirname(this.cardCategory);
+      const icon = await ctx.canvas.loadImage(icondir);
+      const cardFace = await ctx.canvas.loadImage(cardFaceDir());
+      const attackIcon = await ctx.canvas.loadImage(
+        `${testcanvas}${resolve(
+          dirname,
+          `./assets/img/card`,
+          `${this.type}.png`
+        )}`
+      );
+      return ctx.canvas.render(445, 670, (c) => {
+        c.fillStyle = cardColor[this.rarity];
+        c.fillRect(0, 0, 445, 670);
+        c.drawImage(cardFace, 10, 10, 425, 650);
+        c.drawImage(attackIcon, 222 - 125, 125, 250, 250);
+        c.drawImage(icon, 45, 545, 80, 80);
+        c.font = "bold 30px";
+        c.fillStyle = "#000000";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        wrapText(c, this.description, 220, 480, 300, 30);
+        wrapText(c, this.name, 220, 415, 300, 30);
+        c.font = "bold 80px";
+        c.fillStyle = "#ab8818";
+        c.fillText(this.cost.toString(), 360, 585);
+      });
+    })();
+    drawCardCache.set(this.name, picCard);
+    return picCard;
   }
 }
 
@@ -703,6 +751,10 @@ export enum SkillCardType {
 export class SkillCard extends RougueCard {
   damage: number;
   atttype: SkillCardType;
+  status?: {
+    status: StatusType[];
+    probability: number;
+  };
   constructor(skill?: Skill) {
     if (!skill) skill = new Skill(1);
 
@@ -717,6 +769,9 @@ export class SkillCard extends RougueCard {
     );
     this.atttype = skill.category;
     this.damage = skill.dam;
+    if (skill?.status) {
+      this.status = skill.status;
+    }
   }
   effect(user: CardCharacter, target: CardCharacter): void | string {
     if (!target || this.cost > user.energy) return null;
@@ -741,8 +796,16 @@ export class SkillCard extends RougueCard {
     } else {
       target.armor -= damage;
     }
+    let statusLog = ``;
+    if (this?.status) {
+      const isStatus = Random.bool(this.status.probability);
+      if (isStatus) {
+        const random = Math.floor(Math.random() * this.status.status.length);
+        statusLog = target.addStatusEffect(this.status.status[random], 1);
+      }
+    }
     user.energy -= this.cost;
-    return `${user.name}使用了[${this.name}],造成${efct}倍伤害——${damage}`;
+    return `${user.name}使用了[${this.name}],造成${efct}倍伤害——${damage}${statusLog}`;
   }
   restor(data: any): SkillCard {
     return Object.assign(new SkillCard(new Skill(1)), data);

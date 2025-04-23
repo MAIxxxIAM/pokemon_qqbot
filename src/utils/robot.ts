@@ -1,9 +1,11 @@
+import { Random } from "koishi";
 import { Pokebattle } from "..";
 import { Skill } from "../battle";
 import { CardItem } from "../card_battle/type";
 import { PokemonList } from "../model";
 import { Trainer } from "../trainer/type";
-import { PokemonBase } from "./method";
+import { skills } from "./data";
+import { getType, PokemonBase } from "./method";
 import pokemonCal from "./pokemon";
 
 export class Robot implements Pokebattle {
@@ -137,12 +139,12 @@ export class CardRobot implements Pokebattle {
       this.monster_1
     );
     this.skill = Math.floor(Math.random() * 537) + 1;
-    this.skillSlot = [
-      new Skill(Math.floor(Math.random() * 150) + 1),
-      new Skill(Math.floor(Math.random() * 150) + 150),
-      new Skill(Math.floor(Math.random() * 150) + 300),
-      new Skill(Math.floor(Math.random() * (537 - 450)) + 450),
-    ];
+    const selectSkills = skills.skills.filter(
+      (skill) =>
+        skill.type == getType(this.monster_1)[0] ||
+        skill.type == getType(this.monster_1)[1]
+    );
+    this.skillSlot = Random.pick(selectSkills, 4);
     this.trainer = ["robot"];
     this.battleTimes = 30;
     this.battleToTrainer = 30;

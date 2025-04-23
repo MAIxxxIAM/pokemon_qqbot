@@ -905,10 +905,10 @@ export async function toUrl(ctx, session, img_base64) {
   //   return url
   // } catch (e) {
 
-  if (ctx.get("server.temp")?.upload) {
-    const url = await ctx.get("server.temp").upload(img);
-    return url.replace(/_/g, "%5F");
-  }
+  // if (ctx.get("server.temp")?.upload) {
+  //   const url = await ctx.get("server.temp").upload(img);
+  //   return url.replace(/_/g, "%5F");
+  // }
   let urls = `${config.图片源}/errorimg/error.webp`;
   let iscos = false;
   for (let i = 0; i < 5; i++) {
