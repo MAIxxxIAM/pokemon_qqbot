@@ -81,7 +81,7 @@ export class PoisonStatusHandler implements StatusHandler {
   applyEffect(target: CardCharacter, stacks: number): string | undefined {
     const existing = target.statusEffects.get(this.type);
     if (existing) {
-      existing.stacks = Math.max(existing.stacks + stacks, 5);
+      existing.stacks = Math.min(existing.stacks + stacks, 5);
       existing.duration = Math.max(existing.duration, 3);
     } else {
       target.statusEffects.set(this.type, {
