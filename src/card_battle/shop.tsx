@@ -53,7 +53,7 @@ export function getShopItem(
   player: Pokebattle,
   cardPlayer: CardPlayer
 ): string {
-  const cost = 10000 / itemMenu[item].cost;
+  const cost = itemMenu[item].cost;
   if (player.coin < cost) {
     return undefined;
   }
