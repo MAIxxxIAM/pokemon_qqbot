@@ -168,14 +168,14 @@ export class RouteGenerator {
     text: string;
   } {
     let log = [];
-    if (player?.activeBuffs.length > 0) {
-      player.activeBuffs.forEach((buff) => {
-        buff.duration--;
-        if (buff.duration == 0) {
-          log = [buff.removeBuff(player), ...log];
-        }
-      });
-    }
+
+    player.activeBuffs.forEach((buff) => {
+      buff.duration--;
+      if (buff.duration == 0) {
+        log = [buff.removeBuff(player), ...log];
+      }
+    });
+
     node.depth++;
 
     if (node.depth >= this.maxAllowedDepth - 1) {

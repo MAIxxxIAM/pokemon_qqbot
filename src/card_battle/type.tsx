@@ -14,7 +14,7 @@ import {
   StatusSystem,
   statusSystems,
 } from "./status";
-import { BuffConfig, BuffFactory } from "./buff";
+import { BuffConfig, BuffFactory, BuffManagerSystem } from "./buff";
 import { RouteNodeType } from "./route";
 
 const cardFaceDir = () =>
@@ -121,8 +121,8 @@ export class CardPlayer implements CardCharacter {
   };
   currentHand: RougueCard[];
   statusEffects = new StatusEffectMap();
-  activeBuffs: BuffConfig[] = [];
-  rewardBuffs: BuffConfig[] = [];
+  activeBuffs = new BuffManagerSystem();
+  rewardBuffs = new BuffManagerSystem();
 
   constructor(
     players: Pokebattle,
@@ -192,7 +192,7 @@ export class CardPlayer implements CardCharacter {
   drawHand(size: number): RougueCard[] {
     size = size + this.bonus.handsize;
     if (this.deck.length < size) {
-      this.deck = Random.shuffle(this.discardPile);
+      this.deck = Random.shuffle([...this.deck, ...this.discardPile]);
     }
     const hand = this.deck.splice(0, size);
     this.discardPile.push(...hand);
@@ -230,27 +230,30 @@ export class CardPlayer implements CardCharacter {
     return statusLog.join("\n");
   }
   addBuff(buff: BuffConfig, isReward = false): string {
-    //探索事件 true 怪物战斗奖励false
-    (isReward ? this.rewardBuffs : this.activeBuffs).push(buff);
-    const log = buff.applyBuff(this, isReward);
-    return log;
+    // 探索事件 true，怪物战斗奖励 false
+    const buffList: BuffManagerSystem = isReward
+      ? this.rewardBuffs
+      : this.activeBuffs;
+    const existing = buffList.get(buff.id);
+    if (existing) {
+      return existing.levelUp(this) ?? "";
+    }
+    buffList.set(buff.id, buff);
+    return buffList.get(buff.id)?.applyBuff(this, isReward) ?? "";
   }
   removeBuff(buff: BuffConfig): string {
-    const index = this.activeBuffs.indexOf(buff);
-    if (index !== -1) {
-      this.activeBuffs = this.activeBuffs.filter((_, i) => i !== index);
-      return buff.removeBuff(this);
+    const buffList = this.activeBuffs.get(buff.id);
+    if (buffList) {
+      buffList.removeBuff(this);
+      this.activeBuffs.delete(buff.id);
+      return `${this.name}失去了${buff.name}的效果`;
     }
-    return undefined;
+    return `${this.name}没有${buff.name}的效果`;
   }
   restor() {
     this.statusEffects = new StatusEffectMap(this.statusEffects);
-    this.activeBuffs.forEach((buff, index) => {
-      this.activeBuffs[index] = BuffFactory.restoreBuff(buff);
-    });
-    this.rewardBuffs.forEach((buff, index) => {
-      this.rewardBuffs[index] = BuffFactory.restoreBuff(buff);
-    });
+    this.activeBuffs = new BuffManagerSystem(this.activeBuffs);
+    this.rewardBuffs = new BuffManagerSystem(this.rewardBuffs);
     this.currentHand = this.currentHand?.map((c) => {
       const CardCtor = CardClassMap[c.type];
       if (!CardCtor) {

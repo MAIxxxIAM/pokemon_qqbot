@@ -19,6 +19,8 @@ export interface BuffConfig {
   maxDuration: number;
   stacks?: number;
   baseValue?: number;
+  isReward?: boolean;
+  v?: number;
   applyBuff?: (target: CardPlayer, isReward?: boolean) => string | undefined;
   removeBuff?: (target: CardPlayer) => string | undefined;
   levelUp?: (target: CardPlayer) => string | undefined;
@@ -54,6 +56,8 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 20,
+    isReward: false,
+    v: 0,
     restor(data) {
       return {
         ...data,
@@ -64,33 +68,25 @@ const buffLiblary: BuffConfig[] = [
       };
     },
     applyBuff(target, isReward = false) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+      this.isReward = isReward;
+      this.v = Math.min(
+        this.baseValue +
+          (this.baseValue * (1 + 0.8 / this.stacks) * this.stacks) /
+            (isReward ? 1 : 2),
         600
       );
-      target.power.attack += v;
-      this.duration = isReward ? -1 : this.maxDuration;
-      return `${target.name}的攻击力提升了${v}点！`;
+      target.power.attack += this.v;
+      this.duration = -1;
+      return `${target.name}的攻击力提升了${this.v}点！`;
     },
     removeBuff(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      target.power.attack -= v;
+      target.power.attack -= this.v;
       return `${target.name}的攻击力恢复原状！`;
     },
     levelUp(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      if (v >= 600) {
-        return undefined;
-      }
-      target.power.attack -= v;
+      target.power.attack -= this.v;
       this.stacks += 1;
-      this.applyBuff(target);
+      this.applyBuff(target, this.isReward);
       return `${target.name}的力量提升效果升级了！`;
     },
   },
@@ -104,6 +100,8 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 20,
+    isReward: false,
+    v: 0,
     restor(data) {
       return {
         ...data,
@@ -114,31 +112,23 @@ const buffLiblary: BuffConfig[] = [
       };
     },
     applyBuff(target, isReward = false) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+      this.isReward = isReward;
+      this.v = Math.min(
+        this.baseValue +
+          (this.baseValue * (1 + 0.8 / this.stacks) * this.stacks) /
+            (isReward ? 1 : 2),
         600
       );
-      target.power.specialAttack += v;
-      this.duration = isReward ? -1 : this.maxDuration;
-      return `${target.name}的特殊攻击力提升了${v}点！`;
+      target.power.specialAttack += this.v;
+      this.duration = -1;
+      return `${target.name}的特殊攻击力提升了${this.v}点！`;
     },
     removeBuff(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      target.power.specialAttack -= v;
+      target.power.specialAttack -= this.v;
       return `${target.name}的特殊攻击力恢复原状！`;
     },
     levelUp(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      if (v >= 600) {
-        return undefined;
-      }
-      target.power.specialAttack -= v;
+      target.power.specialAttack -= this.v;
       this.stacks += 1;
       this.applyBuff(target);
       return `${target.name}的特殊攻击力提升效果升级了！`;
@@ -154,6 +144,8 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 20,
+    isReward: false,
+    v: 0,
     restor(data) {
       return {
         ...data,
@@ -164,31 +156,23 @@ const buffLiblary: BuffConfig[] = [
       };
     },
     applyBuff(target, isReward = false) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+      this.isReward = isReward;
+      this.v = Math.min(
+        this.baseValue +
+          (this.baseValue * (1 + 0.8 / this.stacks) * this.stacks) /
+            (isReward ? 1 : 2),
         600
       );
-      target.power.defense += v;
-      this.duration = isReward ? -1 : this.maxDuration;
-      return `${target.name}的防御力提升了${v}点！`;
+      target.power.defense += this.v;
+      this.duration = -1;
+      return `${target.name}的防御力提升了${this.v}点！`;
     },
     removeBuff(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      target.power.defense -= v;
+      target.power.defense -= this.v;
       return `${target.name}的防御力恢复原状！`;
     },
     levelUp(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      if (v >= 600) {
-        return undefined;
-      }
-      target.power.defense -= v;
+      target.power.defense -= this.v;
       this.stacks += 1;
       this.applyBuff(target);
       return `${target.name}的防御力提升效果升级了！`;
@@ -204,6 +188,8 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 20,
+    isReward: false,
+    v: 0,
     restor(data) {
       return {
         ...data,
@@ -214,31 +200,23 @@ const buffLiblary: BuffConfig[] = [
       };
     },
     applyBuff(target, isReward?) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
+      this.isReward = isReward;
+      this.v = Math.min(
+        this.baseValue +
+          (this.baseValue * (1 + 0.8 / this.stacks) * this.stacks) /
+            (isReward ? 1 : 2),
         600
       );
-      target.power.specialDefense += v;
-      this.duration = isReward ? -1 : this.maxDuration;
-      return `${target.name}的特殊防御力提升了${v}点！`;
+      target.power.specialDefense += this.v;
+      this.duration = -1;
+      return `${target.name}的特殊防御力提升了${this.v}点！`;
     },
     removeBuff(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      target.power.specialDefense -= v;
+      target.power.specialDefense -= this.v;
       return `${target.name}的特殊防御力恢复原状！`;
     },
     levelUp(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (1 + 0.8 / this.stacks) * this.stacks,
-        600
-      );
-      if (v >= 600) {
-        return undefined;
-      }
-      target.power.specialDefense -= v;
+      target.power.specialDefense -= this.v;
       this.stacks += 1;
       this.applyBuff(target);
       return `${target.name}的特殊防御力提升效果升级了！`;
@@ -254,6 +232,8 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 25,
+    isReward: false,
+    v: 0,
     restor(data) {
       return {
         ...data,
@@ -264,31 +244,20 @@ const buffLiblary: BuffConfig[] = [
       };
     },
     applyBuff(target, isReward?) {
-      const v = Math.min(
+      this.v = Math.min(
         this.baseValue + this.baseValue * (this.stacks - 1),
         600
       );
-      target.power.speed += v;
-      this.duration = isReward ? -1 : this.maxDuration;
-      return `${target.name}的速度提升了${v}点！`;
+      target.power.speed += this.v;
+      this.duration = -1;
+      return `${target.name}的速度提升了${this.v}点！`;
     },
     removeBuff(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (this.stacks - 1),
-        600
-      );
-      target.power.speed -= v;
+      target.power.speed -= this.v;
       return `${target.name}的速度恢复原状！`;
     },
     levelUp(target) {
-      const v = Math.min(
-        this.baseValue + this.baseValue * (this.stacks - 1),
-        600
-      );
-      if (v >= 600) {
-        return undefined;
-      }
-      target.power.speed -= v;
+      target.power.speed -= this.v;
       this.stacks += 1;
       this.applyBuff(target);
       return `${target.name}的速度提升效果升级了！`;
@@ -305,6 +274,7 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 1,
+    isReward: false,
     restor(data) {
       return {
         ...data,
@@ -316,7 +286,7 @@ const buffLiblary: BuffConfig[] = [
     },
     applyBuff(target, isReward?) {
       target.bonus.energy += this.baseValue * this.stacks;
-      this.duration = isReward ? -1 : this.maxDuration;
+      this.duration = -1;
       return `${target.name}的能量点数提升了${this.stacks}点！`;
     },
     removeBuff(target) {
@@ -344,6 +314,7 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 1,
+    isReward: false,
     restor(data) {
       return {
         ...data,
@@ -355,7 +326,7 @@ const buffLiblary: BuffConfig[] = [
     },
     applyBuff(target, isReward?) {
       target.bonus.handsize += this.baseValue * this.stacks;
-      this.duration = isReward ? -1 : this.maxDuration;
+      this.duration = -1;
       return `${target.name}的抽取手牌数量提升了${this.stacks}点！`;
     },
     removeBuff(target) {
@@ -383,6 +354,8 @@ const buffLiblary: BuffConfig[] = [
     maxDuration: 4,
     stacks: 1,
     baseValue: 1,
+    isReward: false,
+    v: 0,
     restor(data) {
       return {
         ...data,
@@ -482,6 +455,53 @@ const buffLiblary: BuffConfig[] = [
   //     };
   //   })
 );
+
+export class BuffManagerSystem {
+  private _data: Record<string, BuffConfig> = {};
+
+  constructor(data?: any) {
+    if (data) {
+      this.fromJSON(data);
+    }
+  }
+
+  get(key: string): BuffConfig | undefined {
+    return this._data[key];
+  }
+  set(key: string, value: BuffConfig): this {
+    this._data[key] = value;
+    return this;
+  }
+  clear() {
+    this._data = {};
+  }
+  public forEach(callback: (value: BuffConfig, key: string) => void): void {
+    Object.entries(this._data).forEach(([key, value]) => {
+      callback(value, key as string);
+    });
+  }
+  public has(key: string): boolean {
+    return key in this._data;
+  }
+  public fromJSON(data: any): this {
+    this.clear();
+
+    // 处理已经是 StatusEffectMap 的情况
+    if (data instanceof BuffManagerSystem) {
+      data.forEach((value, key) => {
+        this.set(key, value);
+      });
+      return this;
+    }
+  }
+  public delete(key: string): boolean {
+    if (this.has(key)) {
+      delete this._data[key];
+      return true;
+    }
+    return false;
+  }
+}
 
 export class BuffFactory {
   static restoreBuff(data: any): BuffConfig {

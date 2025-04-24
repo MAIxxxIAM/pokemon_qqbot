@@ -38,13 +38,10 @@ export async function apply(ctx: Context) {
     await ctx.database.set("pokebattle", {}, (row) => ({
       itemBag: [],
     }));
-    return `清空成功,总计${a}条数据`;
+    return `清空成功,总计${a.matched}条数据`;
   });
   ctx.command("结束游戏").action(async ({ session }) => {
     const a = await ctx.database.remove("carddata", { id: session.userId });
-    await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
-      itemBag: [],
-    }));
     return `你已结束当前游戏测试,如有遇到bug,点击面板的反馈按钮进群联系群主`;
   });
 
@@ -386,6 +383,7 @@ export async function apply(ctx: Context) {
         return `购买失败重新购买`;
       }
       const bugLog = getShopItem(shop[itemIndex], player, cardData.player);
+
       if (!bugLog) {
         return `购买失败,扭蛋币不足`;
       }
@@ -835,7 +833,7 @@ ${"```"}`;
       });
       if (!cardData || !player || cardData?.routmap?.isCompleted) {
         const md = `你还未深入迷雾,是否进入？
-![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
+![img#500px #333px](${config.图片源}/errorimg/unknowtown.webp)`;
         const keybord = {
           keyboard: {
             content: {
