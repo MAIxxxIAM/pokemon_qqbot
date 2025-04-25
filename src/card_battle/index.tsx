@@ -10,7 +10,7 @@ import { initType } from "./method";
 import { Robot } from "../utils/robot";
 import { resolve } from "path";
 import { dirname } from "../dirname";
-import { button, sendMarkdown, toUrl } from "../utils/method";
+import { button, getType, sendMarkdown, toUrl } from "../utils/method";
 import {
   displayRoute,
   RouteGenerator,
@@ -123,6 +123,7 @@ export async function apply(ctx: Context) {
           const childRoute = cardData.routmap.children || [];
           cardData.routmap = RouteGenerator.createNode(
             cardData.routmap.depth,
+            player.level,
             RouteNodeType.Combat
           );
           cardData.routmap.children = childRoute;
@@ -546,6 +547,11 @@ export async function apply(ctx: Context) {
               {
                 buttons: [chooseButton[selectedNode.type]],
               },
+              {
+                buttons: [
+                  button(2, "点燃火把", "队伍整备", session.userId, "调整队伍"),
+                ],
+              },
             ],
           },
         },
@@ -556,7 +562,11 @@ ${"```"}
 
 深入迷雾: ${selectedNode.depth} 层
 ${displayRoute(selectedNode)}
-${"```"}`;
+${"```"}
+
+---
+> 提示:火把可以驱散迷雾,方便调整队伍以及技能,在打完首领后,自动获得.
+请在一切调整完成后,再点击点燃火把按钮`;
       await ctx.database.set(
         "carddata",
         { id: session.userId },
@@ -577,6 +587,110 @@ ${"```"}`;
       await sendMarkdown(ctx, md, session, kybd);
     });
 
+  ctx
+    .command("队伍整备")
+    .alias("点燃火把")
+    .action(async ({ session }) => {
+      const [cardData] = await ctx.database.get("carddata", {
+        id: session.userId,
+      });
+      const [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!cardData || !player || cardData?.routmap?.isCompleted) {
+        const md = `你还未深入迷雾,是否进入？
+![img#500px #333px](${config.图片源}/errorimg/unknowtown.webp)`;
+        const keybord = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(
+                      session.isDirect ? 2 : 0,
+                      `开始游戏`,
+                      `cardstard`,
+                      session.userId,
+                      `开始游戏`
+                    ),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, keybord);
+        return;
+      }
+      cardData.player = await initType(cardData.player, CardPlayer, player);
+      const cardplayer = cardData.player;
+      if (cardplayer.configTimes <= 0) {
+        return `当前迷雾浓度过高,无法调整队伍,打败首领后将会在篝火处获取火把`;
+      }
+      const code = "```";
+      const md = `你是否要调整当前队伍?
+
+${code}  
+宝可梦:${cardplayer.aiboName} -> ${player.battlename}
+携带技能卡:
+    ${cardplayer.skill[0].name} -> ${player.skillSlot[0].name}
+    ${cardplayer.skill[1].name} -> ${player.skillSlot[1].name}
+    ${cardplayer.skill[2].name} -> ${player.skillSlot[2].name}
+    ${cardplayer.skill[3].name} -> ${player.skillSlot[3].name}
+属性: ${cardplayer.pokemonCategory.join(" ")} -> ${getType(player.monster_1)}
+${code}
+
+---
+当前可用火把:${cardplayer.configTimes}`;
+      const kbd = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [
+                  button(
+                    session.isDirect ? 2 : 0,
+                    `是`,
+                    `是`,
+                    session.userId,
+                    `是`
+                  ),
+                  button(
+                    session.isDirect ? 2 : 0,
+                    `否`,
+                    `否`,
+                    session.userId,
+                    `否`
+                  ),
+                ],
+              },
+            ],
+          },
+        },
+      };
+      await sendMarkdown(ctx, md, session, kbd);
+      const r = await session.prompt(20000);
+      let content = "";
+      switch (r) {
+        case "是":
+          const log = cardplayer.reconfig(player);
+          cardplayer.configTimes -= 1;
+          content = log;
+          break;
+        case "否":
+          content = `你没有选择驱散周围的迷雾,队伍无法继续调整`;
+          break;
+        default:
+          content = `你没有选择驱散周围的迷雾,队伍无法继续调整`;
+          break;
+      }
+      await ctx.database.set("carddata", { id: session.userId }, (row) => ({
+        player: cardplayer,
+        routmap: cardData.routmap,
+        combatcontext: cardData.combatcontext,
+      }));
+      await session.send(content);
+    });
   ctx
     .command("cardstard", "卡牌对战")
     .alias("开始卡牌")
@@ -601,7 +715,7 @@ ${"```"}`;
       if (player.skillSlot.length < 4) {
         return `技能装备数量不足，请先装备4技能`;
       }
-      if (player.level < 100) {
+      if (player.level < 50) {
         return `等级不足，无法进入该游戏`;
       }
       const newPlayer = new CardPlayer(player);
@@ -761,6 +875,7 @@ ${"```"}`;
       let [player] = await ctx.database.get("pokebattle", {
         id: session.userId,
       });
+
       if (!cardData || !player || cardData?.routmap?.isCompleted) {
         const md = `你还未深入迷雾,是否进入？
 ![img#500px #333px]( ${config.图片源}/errorimg/unknowtown.webp)`;
@@ -966,10 +1081,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
       }
       //玩家逻辑
       if (ident && context.enemyturn == false) {
-        if (
-          cardplayer.energy == cardplayer.maxEnergy &&
-          cardplayer.currentHand.length <= 0
-        ) {
+        if (cardplayer.currentHand.length <= 0) {
           cardplayer.drawHand(5);
         }
         const usecard = cardplayer.useCard(context, ident, cardenemy);
@@ -999,9 +1111,10 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
       switch (whoseWin) {
         case "player":
           if (cardData.routmap.type == RouteNodeType.Boss) {
+            cardplayer.configTimes += 1;
             cardplayer.relax();
             const bossMd = `你在boss战中获得了胜利,点亮了此处的迷雾
-🌟你的血量恢复了🌟
+🌟你的血量恢复了,并取走了一支火把🌟
 ---
 ![img#500px #500px](${await toUrl(
               ctx,
@@ -1067,7 +1180,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           let chooseBuff = Number(await session.prompt(20000));
           chooseBuff = chooseBuff
             ? chooseBuff
-            : Math.floor(Math.random() * rarityBuff.length);
+            : Math.floor(Math.random() * rarityBuff.length) + 1;
           const thisBuff = rarityBuff[chooseBuff - 1];
           const logs = cardData.player.addBuff(thisBuff);
           cardData.routmap.isExplored = true;
@@ -1108,7 +1221,6 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         if (statusStartLog.length > 0) {
           context.logs = [statusStartLog, ...context.logs];
         }
-        console.log(cardenemy.currentHand, cardenemy.energy);
         while (cardenemy.energy > 0 && context.enemyturn == true) {
           let l = cardenemy.act(context);
           if (!l) break;

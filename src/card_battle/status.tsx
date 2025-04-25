@@ -12,6 +12,7 @@ export interface StatusHandler {
     context?: CombatContext
   ): string | undefined;
   onReceiveDamage?(target: CardCharacter): string | undefined;
+  removeEffect?(target: CardCharacter): string | undefined;
   restor(data: Partial<StatusHandler>): StatusHandler;
 }
 
@@ -24,13 +25,16 @@ export class NumbStatusHandler implements StatusHandler {
     const existing = target.statusEffects.get(this.type);
     if (existing) {
       existing.stacks += stacks;
-      existing.duration = Math.max(existing.duration, 3);
+      existing.duration = Math.max(existing.duration, 4);
     } else {
       target.statusEffects.set(this.type, {
         type: this.type,
         stacks,
-        duration: 3,
+        duration: 4,
+        originSpeed: target.power.speed,
+        originEnergy: target.maxEnergy,
       });
+
       target.power.speed = Math.floor(target.power.speed / 2);
       target.energy = Math.max(target.energy - 2, 3);
       target.maxEnergy = Math.max(target.maxEnergy - 2, 3);
@@ -40,28 +44,39 @@ export class NumbStatusHandler implements StatusHandler {
     }`;
   }
   processTurnStart(target: CardCharacter): string | undefined {
-    return undefined;
+    const effect = target.statusEffects.get(this.type);
+    if (!effect) return undefined;
+    const randomNumb = Math.random() <= 0.25;
+    if (!randomNumb) return undefined;
+    let log = `${target.name}麻痹了,本回合无法使用技能`;
+    target.energy = 0;
+    effect.duration--;
+    if (effect.duration <= 0) {
+      log = this.removeEffect(target);
+    }
+
+    return log;
   }
   onUseCard(target: CardCharacter, context: CombatContext): string | undefined {
     const effect = target.statusEffects.get(this.type);
     if (!effect) return;
-    effect.duration--;
+
     const randomNumb = Math.random() <= 0.25;
-    console.log(randomNumb);
-    if (!randomNumb) return;
+    if (!randomNumb) return undefined;
     let log = `${target.name}麻痹了,本回合无法使用技能`;
     target.energy = 0;
-    if (effect.duration <= 0) {
-      target.statusEffects.delete(this.type);
-      log += `${target.name}麻痹效果消失了`;
-      target.power.speed = Math.floor(target.power.speed * 2);
-      target.energy = Math.min(target.energy + 2, target.maxEnergy);
-      target.maxEnergy = Math.min(
-        target.maxEnergy + 2,
-        Math.floor(target.power.speed / 45)
-      );
-    }
-
+    return log;
+  }
+  removeEffect(target: CardCharacter): string | undefined {
+    const effect = target.statusEffects.get(this.type);
+    if (!effect) return undefined;
+    let log = "";
+    target.statusEffects.delete(this.type);
+    log += `${target.name}麻痹效果消失了`;
+    if (effect.originSpeed !== undefined)
+      target.power.speed = effect.originSpeed;
+    if (effect.originEnergy !== undefined)
+      target.maxEnergy = effect.originEnergy;
     return log;
   }
   processTurnEnd(target: CardCharacter): string | undefined {
@@ -88,6 +103,8 @@ export class PoisonStatusHandler implements StatusHandler {
         type: this.type,
         stacks,
         duration: 3,
+        originEnergy: undefined,
+        originSpeed: undefined,
       });
     }
     return `,${target.name}中毒层数叠加至${existing?.stacks || stacks}层！`;
@@ -125,6 +142,9 @@ export class PoisonStatusHandler implements StatusHandler {
   processGlobalTurn() {
     // 处理全场地状态
   }
+  removeEffect(target: CardCharacter): string | undefined {
+    return undefined;
+  }
   restor(data: any): PoisonStatusHandler {
     return Object.assign(new PoisonStatusHandler(), data);
   }
@@ -146,9 +166,9 @@ export class StatusEffectMap {
   // 使用普通对象作为内部存储
   private _data: Record<string, StatusEffect> = {};
 
-  constructor(data?: any) {
+  constructor(target: CardCharacter, data?: any) {
     if (data) {
-      this.fromJSON(data);
+      this.fromJSON(data, target);
     }
   }
 
@@ -174,7 +194,10 @@ export class StatusEffectMap {
     return false;
   }
 
-  public clear(): void {
+  public clear(target: CardCharacter): void {
+    this.forEach((status) => {
+      statusSystems.getHandler(status.type)?.removeEffect(target);
+    });
     this._data = {};
   }
 
@@ -202,8 +225,8 @@ export class StatusEffectMap {
   }
 
   // 从任意数据源恢复
-  public fromJSON(data: any): this {
-    this.clear();
+  public fromJSON(data: any, target: CardCharacter): this {
+    this.clear(target);
 
     // 处理已经是 StatusEffectMap 的情况
     if (data instanceof StatusEffectMap) {

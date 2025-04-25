@@ -16,6 +16,7 @@ import {
 } from "./status";
 import { BuffConfig, BuffFactory, BuffManagerSystem } from "./buff";
 import { RouteNodeType } from "./route";
+import pokemonCal from "../utils/pokemon";
 
 const cardFaceDir = () =>
   `${testcanvas}${resolve(dirname, `./assets/img/card`, `cardface.png`)}`;
@@ -90,6 +91,10 @@ export interface StatusEffect {
   type: StatusType;
   stacks: number;
   duration: number;
+  originAttack?: number;
+  originSpecialAttack?: number;
+  originSpeed?: number;
+  originEnergy?: number;
 }
 
 export abstract class RougueCard {
@@ -109,9 +114,11 @@ export abstract class RougueCard {
 //玩家角色
 
 export class CardPlayer implements CardCharacter {
+  aiboName: string;
   currentHp: number;
   armor = 0;
   energy: number;
+  configTimes = 0;
   bonus: {
     energy: number;
     damage: number;
@@ -120,24 +127,25 @@ export class CardPlayer implements CardCharacter {
     category: string[];
   };
   currentHand: RougueCard[];
-  statusEffects = new StatusEffectMap();
+  statusEffects = new StatusEffectMap(this);
   activeBuffs = new BuffManagerSystem();
   rewardBuffs = new BuffManagerSystem();
 
   constructor(
     players: Pokebattle,
-    public readonly name: string = new PVP(players).name,
-    public readonly maxHp: number = new PVP(players).maxHp,
-    public readonly maxEnergy: number = Math.max(
+    public name: string = new PVP(players).name,
+    public maxHp: number = new PVP(players).maxHp,
+    public maxEnergy: number = Math.max(
       Math.floor(new PVP(players).power.speed / 45),
       1
     ),
-    public readonly power: PokemonPower = new PVP(players).power,
+    public power: PokemonPower = new PVP(players).power,
     public deck: RougueCard[] = CardPool.spawnCard(30, new PVP(players), true),
     public discardPile: RougueCard[] = [],
     public skill: Skill[] = new PVP(players).skill,
     public pokemonCategory: string[] = getType(new PVP(players).monster_1) // private statusSystem: StatusSystem = statusSystems
   ) {
+    this.aiboName = pokemonCal.pokemonlist(new PVP(players).monster_1);
     this.currentHp = maxHp;
     this.energy = maxEnergy;
     this.bonus = {
@@ -180,13 +188,39 @@ export class CardPlayer implements CardCharacter {
       }
     });
   }
+
+  reconfig(players: Pokebattle, bP = new PVP(players)) {
+    if (this.configTimes <= 0)
+      return `当前未知迷雾太过浓重,无法更换宝可梦和技能`;
+    this.name = bP.name;
+    this.maxHp = bP.maxHp;
+    this.maxEnergy = Math.max(Math.floor(bP.power.speed / 45), 1);
+    this.power = bP.power;
+    this.deck = CardPool.spawnCard(30, bP, true);
+    this.discardPile = [];
+    this.skill = bP.skill;
+    this.pokemonCategory = getType(bP.monster_1);
+    this.currentHp = this.maxHp;
+    this.energy = this.maxEnergy;
+    this.bonus.category = this.pokemonCategory;
+    this.rewardBuffs.forEach((buff) => {
+      buff?.reconfig(this);
+    });
+    this.activeBuffs.forEach((buff) => {
+      buff?.reconfig(this);
+    });
+    return `你使用了篝火处点燃的火把驱散了周围的迷雾,换上了${pokemonCal.pokemonlist(
+      bP.monster_1
+    )}以及技能`;
+  }
+
   relax() {
     this.currentHp = this.maxHp + this.bonus.Hp;
   }
   refresh() {
     this.armor = 0;
     this.currentHand = [];
-    this.statusEffects.clear();
+    this.statusEffects.clear(this);
     this.energy = this.maxEnergy + this.bonus.energy;
   }
   drawHand(size: number): RougueCard[] {
@@ -214,7 +248,7 @@ export class CardPlayer implements CardCharacter {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
       const result = statusSystems.getHandler(type)?.processTurnStart(this);
-      if (result) statusLog.push(result);
+      if (result) statusLog = [result, ...statusLog];
     }
 
     return statusLog.join("\n");
@@ -224,7 +258,7 @@ export class CardPlayer implements CardCharacter {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
       const result = statusSystems.getHandler(type)?.processTurnEnd(this);
-      if (result) statusLog.push(result);
+      if (result) statusLog = [result, ...statusLog];
     }
 
     return statusLog.join("\n");
@@ -251,7 +285,7 @@ export class CardPlayer implements CardCharacter {
     return `${this.name}没有${buff.name}的效果`;
   }
   restor() {
-    this.statusEffects = new StatusEffectMap(this.statusEffects);
+    this.statusEffects = new StatusEffectMap(this, this.statusEffects);
     this.activeBuffs = new BuffManagerSystem(this.activeBuffs);
     this.rewardBuffs = new BuffManagerSystem(this.rewardBuffs);
     this.currentHand = this.currentHand?.map((c) => {
@@ -402,6 +436,7 @@ export class BaseArmorCard extends RougueCard {
     super("护甲卡", "defense", "获得一定量的护甲", 3, CardRarity.Common);
   }
   effect(user: CardCharacter, target: CardCharacter): void | string {
+    if (!target || this.cost > user.energy) return null;
     const armors = Math.floor(
       (0.3 * (user.power.defense + user.power.specialDefense)) / 4 +
         0.1 * user.power.speed
@@ -951,6 +986,10 @@ export class CardPool {
       new BaseAttckCard(),
       new BaseSpecialAttackCard(),
       new BaseArmorCard(),
+      new SkillCard(character.skill[0]),
+      new SkillCard(character.skill[1]),
+      new SkillCard(character.skill[2]),
+      new SkillCard(character.skill[3]),
     ];
     deck.push(...guaranteedCards);
     for (let i = 0; i < sizs; i++) {
@@ -1082,7 +1121,7 @@ export class Enemy implements CardCharacter {
   enymyType: WildPokemonType;
   aiStrategy: EnemyAI = new EnemyAI();
   currentHand: RougueCard[];
-  statusEffects = new StatusEffectMap();
+  statusEffects = new StatusEffectMap(this);
   takeCard: RougueCard[];
   bonus: {
     energy: number;
@@ -1150,7 +1189,7 @@ export class Enemy implements CardCharacter {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
       const result = statusSystems.getHandler(type)?.processTurnStart(this);
-      if (result) statusLog.push(result);
+      if (result) statusLog = [result, ...statusLog];
     }
 
     return statusLog.join("\n");
@@ -1160,7 +1199,7 @@ export class Enemy implements CardCharacter {
     let statusLog: string[] = [];
     for (const [type] of this.statusEffects.entries()) {
       const result = statusSystems.getHandler(type)?.processTurnEnd(this);
-      if (result) statusLog.push(result);
+      if (result) statusLog = [result, ...statusLog];
     }
 
     return statusLog.join("\n");
@@ -1216,7 +1255,7 @@ export class Enemy implements CardCharacter {
     return null;
   }
   restor() {
-    this.statusEffects = new StatusEffectMap(this.statusEffects);
+    this.statusEffects = new StatusEffectMap(this, this.statusEffects);
     this.aiStrategy = new EnemyAI().restor(this.aiStrategy);
     this.deck = this.deck?.map((c) => {
       const CardCtor = CardClassMap[c.type];

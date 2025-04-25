@@ -348,9 +348,11 @@ export async function model(ctx: Context) {
     player: {
       type: "json",
       initial: {
+        aiboName: "",
         currentHp: 0,
         armor: 0,
         energy: 0,
+        configTimes: 0,
         bonus: {
           energy: 0,
           damage: 0,
@@ -373,6 +375,7 @@ export async function model(ctx: Context) {
         useCard: () => "",
         takeDamage: () => {},
         relax: () => {},
+        reconfig: () => "",
         refresh: () => {},
         drawHand: () => [],
         discardCard: () => {},

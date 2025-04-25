@@ -95,11 +95,11 @@ export class RouteGenerator {
     return Object.assign(new RouteGenerator(), data);
   }
 
-  static createInitialRoute(): RouteNode {
-    const root = this.createNode(0);
+  static createInitialRoute(level = 100): RouteNode {
+    const root = this.createNode(0, level);
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
-      root.children.push(this.createNode(1));
+      root.children.push(this.createNode(1, level));
     }
 
     return root;
@@ -128,16 +128,24 @@ export class RouteGenerator {
     ][Math.floor(rand * 4)];
   }
 
-  private static generateEnemies(type: RouteNodeType, depth: number): Enemy {
+  private static generateEnemies(
+    type: RouteNodeType,
+    depth: number,
+    l = 100
+  ): Enemy {
     let enemies: Enemy;
     const enemyPower: PokemonBase = getRandomPokemon(type);
-    const enemy = new CardRobot(100, enemyPower, depth);
+    const enemy = new CardRobot(l, enemyPower, depth);
     enemies = new Enemy(enemy, type);
 
     return enemies;
   }
 
-  static createNode(depth: number, e?: RouteNodeType): RouteNode {
+  static createNode(
+    depth: number,
+    l: number = 100,
+    e?: RouteNodeType
+  ): RouteNode {
     const nodeType = e ? e : this.onNodeType(depth);
     const node: RouteNode = {
       type: nodeType,
@@ -152,7 +160,7 @@ export class RouteGenerator {
       nodeType === RouteNodeType.Elite ||
       nodeType === RouteNodeType.Boss
     ) {
-      node.enemies = this.generateEnemies(nodeType, depth);
+      node.enemies = this.generateEnemies(nodeType, depth, l);
     }
 
     return node;
@@ -209,15 +217,25 @@ export class RouteGenerator {
 export function displayRoute(
   node: RouteNode,
   prefix = "",
-  isLast = true
+  isLast = true,
+  boss = true
 ): string {
+  const enemyName = [
+    RouteNodeType.Combat,
+    RouteNodeType.Elite,
+    RouteNodeType.Boss,
+  ].includes(node.type)
+    ? `(${node.enemies.name})`
+    : "";
   const currentLine = prefix + (isLast ? "└─ " : "├─ ");
-  let output = `${currentLine}${getNodeSymbol(node)} ${node.type}\n`;
+  let output = `${currentLine}${getNodeSymbol(node)} ${node.type} ${
+    boss ? enemyName : ""
+  }\n`;
 
   node.children.forEach((child, index) => {
     const isChildLast = index === node.children.length - 1;
     const childPrefix = prefix + (isLast ? "   " : "│  ");
-    output += displayRoute(child, childPrefix, isChildLast);
+    output += displayRoute(child, childPrefix, isChildLast, false);
   });
 
   return output;

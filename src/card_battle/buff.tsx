@@ -22,6 +22,7 @@ export interface BuffConfig {
   isReward?: boolean;
   v?: number;
   applyBuff?: (target: CardPlayer, isReward?: boolean) => string | undefined;
+  reconfig: (target: CardPlayer) => void;
   removeBuff?: (target: CardPlayer) => string | undefined;
   levelUp?: (target: CardPlayer) => string | undefined;
   restor?: (data: any) => BuffConfig;
@@ -65,6 +66,7 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
     },
     applyBuff(target, isReward = false) {
@@ -78,6 +80,9 @@ const buffLiblary: BuffConfig[] = [
       target.power.attack += this.v;
       this.duration = -1;
       return `${target.name}的攻击力提升了${this.v}点！`;
+    },
+    reconfig(target) {
+      target.power.attack += this.v;
     },
     removeBuff(target) {
       target.power.attack -= this.v;
@@ -109,7 +114,11 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
+    },
+    reconfig(target) {
+      target.power.specialAttack += this.v;
     },
     applyBuff(target, isReward = false) {
       this.isReward = isReward;
@@ -153,7 +162,11 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
+    },
+    reconfig(target) {
+      target.power.defense += this.v;
     },
     applyBuff(target, isReward = false) {
       this.isReward = isReward;
@@ -197,7 +210,11 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
+    },
+    reconfig(target) {
+      target.power.specialDefense += this.v;
     },
     applyBuff(target, isReward?) {
       this.isReward = isReward;
@@ -241,7 +258,12 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
+    },
+
+    reconfig(target) {
+      target.power.speed += this.v;
     },
     applyBuff(target, isReward?) {
       this.v = Math.min(
@@ -282,7 +304,11 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
+    },
+    reconfig(target) {
+      return undefined;
     },
     applyBuff(target, isReward?) {
       target.bonus.energy += this.baseValue * this.stacks;
@@ -322,7 +348,11 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
+    },
+    reconfig(target) {
+      return undefined;
     },
     applyBuff(target, isReward?) {
       target.bonus.handsize += this.baseValue * this.stacks;
@@ -363,7 +393,11 @@ const buffLiblary: BuffConfig[] = [
         removeBuff: this.removeBuff,
         levelUp: this.levelUp,
         restor: this.restor,
+        reconfig: this.reconfig,
       };
+    },
+    reconfig(target) {
+      return undefined;
     },
     applyBuff(target: CardPlayer, isReward?) {
       target.deck = [target.currentHand, target.discardPile, target.deck]
