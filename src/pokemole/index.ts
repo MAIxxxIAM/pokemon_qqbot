@@ -75,6 +75,28 @@ ${
             answer: p.name,
             round: 0,
           });
+      const md = `游戏开始,请猜一个任意宝可梦!`;
+      const kbd = {
+        keyboard: {
+          content: {
+            rows: [
+              {
+                buttons: [
+                  button(
+                    2,
+                    "猜测",
+                    "pokemole.g",
+                    session.userId,
+                    "猜测",
+                    false
+                  ),
+                ],
+              },
+            ],
+          },
+        },
+      };
+      await sendMarkdown(ctx, md, session, kbd);
     });
 
   ctx
