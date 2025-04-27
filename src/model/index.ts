@@ -21,6 +21,7 @@ import {
 import { RouteNode, RouteNodeType } from "../card_battle/route";
 import { Robot } from "../utils/robot";
 import { BuffConfig } from "../card_battle/buff";
+import { PokemonInfo } from "../pokemole/type";
 
 //智能体兼容
 
@@ -118,9 +119,19 @@ declare module "koishi" {
     "pokemon.cry": Cry_info;
     pokeEmoji_BOT: pokeEmoji;
     carddata: CardData;
+    pokemole: Pokemole;
   }
 }
 //邀请表
+
+export interface Pokemole {
+  id: string;
+  answer: string;
+  isGameing: boolean;
+  answerList: PokemonInfo[];
+  isOver: boolean;
+  round: number;
+}
 export interface AddGroup {
   id: string;
   count: number;
@@ -324,6 +335,15 @@ export class FusionPokemon {
 }
 
 export async function model(ctx: Context) {
+  ctx.model.extend("pokemole", {
+    id: "string",
+    isGameing: "boolean",
+    answerList: { type: "json", initial: [], nullable: false },
+    answer: "string",
+    isOver: "boolean",
+    round: { type: "unsigned", initial: 0, nullable: false },
+  });
+
   ctx.model.extend("intellegentBody", {
     id: "string",
     message: "json",

@@ -35,6 +35,7 @@ import * as pokedex from "./pokedex/pokedex";
 import * as notice from "./notice/index";
 import * as fishings from "./fishing/index";
 import * as pokeEmoji from "./pokeEmoji/index";
+import * as pokemole from "./pokemole/index";
 import * as formGame from "./farm/index";
 import crypto from "crypto";
 import * as digGame from "./dig_game/index";
@@ -391,6 +392,7 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(trainercmd);
   ctx.plugin(cry_guess);
   ctx.plugin(cardTest);
+  ctx.plugin(pokemole);
 
   if (config.指令使用日志) {
     ctx.on("command/before-execute", ({ session, command }) => {

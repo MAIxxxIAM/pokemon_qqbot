@@ -1005,7 +1005,9 @@ ${"```"}`;
       context.player = cardplayer;
       context.self = cardenemy;
       let RandomPlayer: number;
+      let RandomPlayer2: number;
       let RandomEnemy: number;
+      let RandomBoss: number;
       if ([`跳过`, `continue`].includes(ident)) {
         ident = undefined;
         cardplayer.discardCard();
@@ -1018,6 +1020,12 @@ ${"```"}`;
         cardenemy.drawHand(5);
         RandomPlayer = Math.floor(Math.random() * 6 + 1);
         RandomEnemy = Math.floor(Math.random() * 6 + 1);
+        RandomBoss = Math.floor(Math.random() * 6 + 1);
+        RandomPlayer2 = RandomPlayer;
+        if (cardData.routmap.type == RouteNodeType.Boss) {
+          cardData.player.armor = cardData.player.power.speed;
+          RandomPlayer = RandomBoss + RandomPlayer;
+        }
         context.enemyturn = RandomEnemy <= RandomPlayer ? false : true;
         context.turnCount = 0;
         const code = "```";
@@ -1039,9 +1047,20 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           session,
           `file://${resolve(
             dirname,
-            `./assets/img/card/random${RandomPlayer}.png`
+            `./assets/img/card/random${RandomPlayer2}.png`
           )}`
-        )})`;
+        )})${
+          cardData.routmap.type == RouteNodeType.Boss
+            ? `![img#50px #50px](${await toUrl(
+                ctx,
+                session,
+                `file://${resolve(
+                  dirname,
+                  `./assets/img/card/random${RandomBoss}.png`
+                )}`
+              )})`
+            : ``
+        }`;
         context.logs.push(
           RandomEnemy <= RandomPlayer ? "你取得了先手" : "对方将先手进行出卡"
         );
