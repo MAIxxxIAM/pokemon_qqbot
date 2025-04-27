@@ -85,6 +85,12 @@ ${
       const [channelGame] = await ctx.database.get("pokemole", {
         id: channelId,
       });
+      const [player] = await ctx.database.get("pokebattle", {
+        id: session.userId,
+      });
+      if (!player) {
+        return "请先签到继续注册";
+      }
       if (!channelGame || channelGame.isOver) {
         return "请先开始游戏！";
       }
