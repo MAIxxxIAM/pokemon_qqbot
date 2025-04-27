@@ -139,15 +139,13 @@ ${
         channelGame.isGameing = false;
         channelGame.answerList = [];
         channelGame.round = 0;
+        const nameimg = answerJson.home_images[0].image.split("-");
+        const pokemonName = nameimg[0] + "-" + nameimg[1] + ".png";
         const md = `恭喜你猜对了,奖励5000金币!
 ![img#500px #500px](${await toUrl(
           ctx,
           session,
-          `file://${resolve(
-            dirname,
-            `./pokemole/data/official`,
-            answerJson.home_images[0].image
-          )}`
+          `file://${resolve(dirname, `./pokemole/data/official`, pokemonName)}`
         )})`;
         const kbd = {
           keyboard: {
