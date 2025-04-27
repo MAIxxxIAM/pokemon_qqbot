@@ -1509,6 +1509,17 @@ ${
                         button(2, "卡牌测试", "开始卡牌", session.userId, "bt"),
                       ],
                     },
+                    {
+                      buttons: [
+                        button(
+                          2,
+                          "最新猜宝可梦玩法",
+                          "pokemole.s",
+                          session.userId,
+                          "bt"
+                        ),
+                      ],
+                    },
                   ],
                 },
               },

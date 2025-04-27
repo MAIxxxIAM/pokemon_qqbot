@@ -112,7 +112,7 @@ ${
         channelGame.answerList = [];
         channelGame.round = 0;
         const md = `恭喜你猜对了,奖励5000金币!
-![img#1200px #${40 + 120}px](${await toUrl(
+![img#500px #500px](${await toUrl(
           ctx,
           session,
           `file://${resolve(
