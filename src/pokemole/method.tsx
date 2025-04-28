@@ -250,6 +250,7 @@ export function markSameValues(
   return copyB;
 }
 function jaccard(a: string, b: string): number {
+  if (!a || !b) return 0;
   const setA = new Set(a.split(""));
   const setB = new Set(b.split(""));
   const intersection = new Set([...setA].filter((x) => setB.has(x)));
