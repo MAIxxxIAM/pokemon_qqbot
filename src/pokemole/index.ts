@@ -119,6 +119,9 @@ ${
       await ctx.database.set("pokemole", { id: channelId }, (row) => ({
         isGameing: true,
       }));
+      if (channelGame.isGameing) {
+        return "输入过快了,请稍等!";
+      }
       const p = PokemonData.find((i) => i.name == name);
       if (!p) {
         return "宝可梦不存在！";
@@ -135,17 +138,17 @@ ${
 
       //猜测正确
       if (p.name == channelGame.answer) {
+        const golden = 5000 * channelGame.round * player.vip > 0 ? 1.5 : 1;
         channelGame.isOver = true;
         channelGame.isGameing = false;
         channelGame.answerList = [];
         channelGame.round = 0;
-        const nameimg = answerJson.home_images[0].image.split("-");
-        const pokemonName = nameimg[0] + "-" + nameimg[1] + ".png";
-        const md = `恭喜你猜对了,奖励5000金币!
+        const nameimg = answerJson.forms[0].image;
+        const md = `恭喜你猜对了,奖励${golden}金币!
 ![img#500px #500px](${await toUrl(
           ctx,
           session,
-          `file://${resolve(dirname, `./pokemole/data/official`, pokemonName)}`
+          `file://${resolve(dirname, `./pokemole/data/official`, nameimg)}`
         )})`;
         const kbd = {
           keyboard: {
@@ -172,7 +175,7 @@ ${
           }
         );
         await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
-          gold: $.add(row.gold, 5000),
+          gold: $.add(row.gold, golden),
         }));
         return;
       }
@@ -210,7 +213,29 @@ ${
         channelGame.isOver = true;
         channelGame.isGameing = false;
         channelGame.answerList = [];
-        channelGame.round = 0;
+        channelGame.round = -1;
+        const nameimg = answerJson.forms[0].image;
+        const md = `游戏结束,你没有猜对,正确答案是:
+![img#500px #500px](${await toUrl(
+          ctx,
+          session,
+          `file://${resolve(dirname, `./pokemole/data/official`, nameimg)}`
+        )})`;
+
+        const kbd = {
+          keyboard: {
+            content: {
+              rows: [
+                {
+                  buttons: [
+                    button(2, "继续游戏", "pokemole.s", session.userId, "开始"),
+                  ],
+                },
+              ],
+            },
+          },
+        };
+        await sendMarkdown(ctx, md, session, kbd);
       }
       await ctx.database.set(
         "pokemole",
