@@ -138,7 +138,7 @@ ${
 
       //猜测正确
       if (p.name == channelGame.answer) {
-        const golden = 5000 * channelGame.round * player.vip > 0 ? 1.5 : 1;
+        const golden = 5000 * channelGame.round * (player.vip > 0 ? 1.5 : 1);
         channelGame.isOver = true;
         channelGame.isGameing = false;
         channelGame.answerList = [];
