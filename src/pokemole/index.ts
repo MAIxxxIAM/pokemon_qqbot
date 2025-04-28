@@ -120,7 +120,7 @@ ${
         isGameing: true,
       }));
       if (channelGame.isGameing) {
-        return "输入过快了,请稍等!";
+        return "输入过快了,请稍等!如果出现bug无法继续游戏,@麦麦子后输入 停止猜宝可梦 ";
       }
       const p = PokemonData.find((i) => i.name == name);
       if (!p) {
@@ -259,4 +259,26 @@ ${
     const img = await drawAll(ctx, data);
     return img;
   });
+  ctx
+    .command("pokemole.stop")
+    .alias("停止猜宝可梦")
+    .action(async ({ session }) => {
+      const channelId = session.channelId;
+      const [channelGame] = await ctx.database.get("pokemole", {
+        id: channelId,
+      });
+      if (!channelGame) {
+        return "请先开始游戏！";
+      }
+      if (channelGame.isOver) {
+        return "游戏已经结束！";
+      }
+      await ctx.database.set("pokemole", { id: channelId }, (row) => ({
+        isOver: true,
+        isGameing: false,
+        answerList: [],
+        round: 0,
+      }));
+      return "游戏已经结束！正确答案是 : " + channelGame.answer;
+    });
 }
