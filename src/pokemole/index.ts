@@ -61,7 +61,7 @@ ${
       const p = PokemonData[Math.floor(Math.random() * PokemonData.length)];
       channelGame
         ? await ctx.database.set("pokemole", { id: channelId }, (row) => ({
-            isGameing: true,
+            isGameing: false,
             isOver: false,
             answerList: [],
             answer: p.name,
