@@ -122,9 +122,9 @@ export function getPokemonInfo(pokemon: PokemonJson): PokemonInfo {
   const [evolu] = pokemon.evolution_chains[0].filter(
     (p) => p.name == pokemon.name
   );
-  const evoluText = ["未进化", "不进化"].includes(evolu.stage)
+  const evoluText = ["未进化", "不进化"].includes(evolu?.stage)
     ? ["未进化/不进化"]
-    : [evolu.stage, evolu?.text ? cutText(evolu.text) : ""];
+    : [evolu?.stage, evolu?.text ? cutText(evolu?.text) : ""];
   const other = LabelData.filter((i) => {
     return i.pokemon.includes(pokemon.name);
   });
@@ -207,12 +207,22 @@ export function markSameValues(
     if (Array.isArray(secA.value) && Array.isArray(secB.value)) {
       // 标记 infoB
       secB.bgColor = secB.value.map((val, idx) => {
+        if (secA.title == `进化`) {
+          const diff = jaccard(val, secA?.value[idx]);
+          if (diff > 0.5) {
+            secB.bgColor[idx] = colors.like;
+          }
+        }
         return secA.value.includes(val)
           ? colors.yes
           : secB.bgColor[idx] || colors.no;
       });
-      [secB.hasArrow] = secB.value.map((val) => {
-        if (["属性", "种族值"].includes(secA.title)) {
+      [secB.hasArrow] = secB.value.map((val, j) => {
+        if ("种族值" == secA.title) {
+          const diff = Math.abs(Number(val) - Number(secA.value[0]));
+          if (diff < 50) {
+            secB.bgColor[0] = colors.like;
+          }
           if (Number(val) > Number(secA.value[0])) {
             return "↓";
           }
@@ -222,6 +232,9 @@ export function markSameValues(
         } else if ("世代" == secA.title) {
           const genA = Gen[secA.value[0] as keyof typeof Gen];
           const genB = Gen[val as keyof typeof Gen];
+          if (Math.abs(genB - genA) < 2) {
+            secB.bgColor[0] = colors.like;
+          }
           if (genB > genA) {
             return "↓";
           }
@@ -234,4 +247,11 @@ export function markSameValues(
     }
   }
   return copyB;
+}
+function jaccard(a: string, b: string): number {
+  const setA = new Set(a.split(""));
+  const setB = new Set(b.split(""));
+  const intersection = new Set([...setA].filter((x) => setB.has(x)));
+  const union = new Set([...setA, ...setB]);
+  return intersection.size / union.size;
 }
