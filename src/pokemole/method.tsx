@@ -232,7 +232,8 @@ export function markSameValues(
         } else if ("世代" == secA.title) {
           const genA = Gen[secA.value[0] as keyof typeof Gen];
           const genB = Gen[val as keyof typeof Gen];
-          if (Math.abs(genB - genA) < 2) {
+          const diff = Math.abs(genB - genA);
+          if (diff < 2 && diff !== 0) {
             secB.bgColor[0] = colors.like;
           }
           if (genB > genA) {

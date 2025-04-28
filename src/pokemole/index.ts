@@ -124,6 +124,9 @@ ${
       }
       const p = PokemonData.find((i) => i.name == name);
       if (!p) {
+        await ctx.database.set("pokemole", { id: channelId }, (row) => ({
+          isGameing: false,
+        }));
         return "宝可梦不存在！";
       }
       const answerJson = PokemonData.find((i) => i.name == channelGame.answer);
@@ -133,6 +136,9 @@ ${
         (i) => i.sections[0].value[0] == p.name
       );
       if (isSame) {
+        await ctx.database.set("pokemole", { id: channelId }, (row) => ({
+          isGameing: false,
+        }));
         return "你已经猜过了！";
       }
 
