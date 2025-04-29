@@ -94,6 +94,8 @@ export class PoisonStatusHandler implements StatusHandler {
   type: StatusType = "poison";
 
   applyEffect(target: CardCharacter, stacks: number): string | undefined {
+    if (target.pokemonCategory.includes("毒"))
+      return `,中毒无法对毒属性宝可梦生效`;
     const existing = target.statusEffects.get(this.type);
     if (existing) {
       existing.stacks = Math.min(existing.stacks + stacks, 5);
@@ -159,6 +161,67 @@ export class StatusSystem {
 
   getHandler(type: StatusType): StatusHandler | undefined {
     return this.handlers.get(type);
+  }
+}
+export class BurnStatusHandler implements StatusHandler {
+  type: StatusType = "burn";
+
+  applyEffect(target: CardCharacter, stacks: number): string | undefined {
+    if (target.pokemonCategory.includes("火"))
+      return `,灼伤无法对火属性宝可梦生效`;
+    const existing = target.statusEffects.get(this.type);
+    if (existing) {
+      existing.stacks = Math.min(existing.stacks + stacks, 5);
+      existing.duration = Math.max(existing.duration, 3);
+    } else {
+      target.statusEffects.set(this.type, {
+        type: this.type,
+        stacks,
+        duration: 3,
+        originEnergy: undefined,
+        originSpeed: undefined,
+      });
+    }
+    return `,${target.name}灼伤层数叠加至${existing?.stacks || stacks}层！`;
+  }
+
+  processTurnStart(target: CardCharacter): string | undefined {
+    const effect = target.statusEffects.get(this.type);
+    if (effect) {
+      return `${target.name}身上的灼伤正在生效...`;
+    }
+  }
+  onUseCard(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+  onReceiveDamage(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+
+  processTurnEnd(target: CardCharacter): string | undefined {
+    const effect = target.statusEffects.get(this.type);
+    if (!effect) return;
+
+    const damage = Math.floor(effect.stacks * 0.02 * target.maxHp);
+    target.currentHp -= damage;
+    if (target.currentHp < 0) target.currentHp = 0;
+    effect.duration--;
+
+    let log = `${target.name}受到${damage}点火焰伤害！`;
+    if (effect.duration <= 0) {
+      target.statusEffects.delete(this.type);
+      log += `${target.name}身上的灼伤消失了`;
+    }
+    return log;
+  }
+  processGlobalTurn() {
+    // 处理全场地状态
+  }
+  removeEffect(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+  restor(data: any): BurnStatusHandler {
+    return Object.assign(new BurnStatusHandler(), data);
   }
 }
 
@@ -267,3 +330,4 @@ export class StatusEffectMap {
 export const statusSystems = new StatusSystem();
 statusSystems.registerHandler(new PoisonStatusHandler());
 statusSystems.registerHandler(new NumbStatusHandler());
+statusSystems.registerHandler(new BurnStatusHandler());

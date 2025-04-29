@@ -122,7 +122,7 @@ export function getPokemonInfo(pokemon: PokemonJson): PokemonInfo {
   const [evolu] = pokemon.evolution_chains[0].filter(
     (p) => p.name == pokemon.name
   );
-  const evoluText = ["未进化", "不进化"].includes(evolu?.stage)
+  const evoluText = ["未进化", "不进化", "幼年"].includes(evolu?.stage)
     ? ["未进化/不进化"]
     : [evolu?.stage, evolu?.text ? cutText(evolu?.text) : ""];
   const other = LabelData.filter((i) => {
@@ -209,7 +209,7 @@ export function markSameValues(
       secB.bgColor = secB.value.map((val, idx) => {
         if (secA.title == `进化`) {
           const diff = jaccard(val, secA?.value[idx]);
-          if (diff > 0.5) {
+          if (diff > 0.3) {
             secB.bgColor[idx] = colors.like;
           }
         }
@@ -220,7 +220,7 @@ export function markSameValues(
       [secB.hasArrow] = secB.value.map((val, j) => {
         if ("种族值" == secA.title) {
           const diff = Math.abs(Number(val) - Number(secA.value[0]));
-          if (diff < 50) {
+          if (diff < 50 && diff !== 0) {
             secB.bgColor[0] = colors.like;
           }
           if (Number(val) > Number(secA.value[0])) {

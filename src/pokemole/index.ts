@@ -1,4 +1,5 @@
 import { $, Context, Schema } from "koishi";
+import crypto from "crypto";
 import {
   LabelData,
   MovesData,
@@ -11,6 +12,7 @@ import { drawAll, getPokemonInfo, markSameValues } from "./method";
 import { button, sendMarkdown, toUrl } from "../utils/method";
 import { dirname } from "../dirname";
 import { resolve } from "path";
+import { legendaryPokemonId } from "..";
 
 export function apply(ctx: Context) {
   ctx
@@ -66,6 +68,7 @@ ${
             answerList: [],
             answer: p.name,
             round: 0,
+            player: [],
           }))
         : await ctx.database.create("pokemole", {
             id: channelId,
@@ -74,6 +77,7 @@ ${
             answerList: [],
             answer: p.name,
             round: 0,
+            player: [],
           });
       const md = `游戏开始,请猜一个任意宝可梦!`;
       const kbd = {
@@ -141,16 +145,33 @@ ${
         }));
         return "你已经猜过了！";
       }
-
+      channelGame.player.includes(session.userId)
+        ? null
+        : channelGame.player.push(session.userId);
       //猜测正确
       if (p.name == channelGame.answer) {
-        const golden = 5000 * channelGame.round * (player.vip > 0 ? 1.5 : 1);
+        const legendaryPokemonRandom = Math.random() * 100;
+        const isEvent = player.lap < 3 || player.level < 90;
+        const noLegendaryPokemon =
+          isEvent ||
+          legendaryPokemonRandom <=
+            99 -
+              (player.cyberMerit * 0.04 +
+                Math.min(7, channelGame.player.length));
+        const golden =
+          5000 * channelGame.round * (player.vip > 0 ? 1.5 : 1) +
+          channelGame.player.length * 500;
         channelGame.isOver = true;
         channelGame.isGameing = false;
         channelGame.answerList = [];
         channelGame.round = 0;
         const nameimg = answerJson.forms[0].image;
-        const md = `恭喜你猜对了,奖励${golden}金币!
+        const md = `恭喜你猜对了,奖励${golden}金币!${
+          noLegendaryPokemon
+            ? ``
+            : `
+<@${session.userId}>请注意，有传说宝可梦接近`
+        }
 ![img#500px #500px](${await toUrl(
           ctx,
           session,
@@ -178,11 +199,24 @@ ${
             isGameing: false,
             answerList: [],
             round: 0,
+            player: [],
           }
         );
         await ctx.database.set("pokebattle", { id: session.userId }, (row) => ({
           gold: $.add(row.gold, golden),
         }));
+        if (!noLegendaryPokemon) {
+          const key = crypto
+            .createHash("md5")
+            .update(session.userId + new Date().getTime())
+            .digest("hex")
+            .toUpperCase();
+          legendaryPokemonId[key] = "350.350";
+          ctx.setTimeout(() => {
+            delete legendaryPokemonId[key];
+          }, 2000);
+          await session.execute(`捕捉宝可梦 ${key}`);
+        }
         return;
       }
       //猜测错误
@@ -220,6 +254,7 @@ ${
         channelGame.isGameing = false;
         channelGame.answerList = [];
         channelGame.round = -1;
+        channelGame.player = [];
         const nameimg = answerJson.forms[0].image;
         const md = `游戏结束,你没有猜对,正确答案是:
 ![img#500px #500px](${await toUrl(
@@ -251,6 +286,7 @@ ${
           isGameing: false,
           answerList: channelGame.answerList,
           round: channelGame.round + 1,
+          player: channelGame.player,
         }
       );
     });
@@ -284,6 +320,7 @@ ${
         isGameing: false,
         answerList: [],
         round: 0,
+        player: [],
       }));
       return "游戏已经结束！正确答案是 : " + channelGame.answer;
     });

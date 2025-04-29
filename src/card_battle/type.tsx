@@ -54,7 +54,7 @@ export type CardType =
   | "armorBreak"
   | "numb";
 
-export type StatusType = "poison" | "numb";
+export type StatusType = "poison" | "numb" | "burn";
 
 export interface CardCharacter {
   name: string;

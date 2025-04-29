@@ -131,6 +131,7 @@ export interface Pokemole {
   answerList: PokemonInfo[];
   isOver: boolean;
   round: number;
+  player: string[];
 }
 export interface AddGroup {
   id: string;
@@ -342,6 +343,7 @@ export async function model(ctx: Context) {
     answer: "string",
     isOver: "boolean",
     round: { type: "unsigned", initial: 0, nullable: false },
+    player: { type: "list", initial: [], nullable: false },
   });
 
   ctx.model.extend("intellegentBody", {
