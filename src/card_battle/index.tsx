@@ -983,12 +983,14 @@ ${"```"}`;
         ].includes(cardData.routmap.type)
       )
         return `当前地图无法战斗`;
+      // console.dir(cardData.routmap.enemies.statusEffects);
       cardData.player = await initType(cardData.player, CardPlayer, player);
       cardData.routmap.enemies = await initType(
         cardData.routmap.enemies,
         Enemy,
         new Robot(100)
       );
+      console.dir(cardData.routmap.enemies.statusEffects);
       if (!cardData?.combatcontext) {
         cardData.combatcontext = {
           player: null,
@@ -1375,6 +1377,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         default:
           break;
       }
+      // console.dir(cardenemy.statusEffects);
       await ctx.database.set(
         "carddata",
         { id: session.userId },

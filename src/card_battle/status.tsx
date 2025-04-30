@@ -284,7 +284,7 @@ export class StatusEffectMap {
 
   // 验证是否为有效的状态类型
   private isValidStatusType(key: string): key is StatusType {
-    return key === "poison" || key === "numb";
+    return key === "poison" || key === "numb" || key === "burn";
   }
 
   // 从任意数据源恢复
