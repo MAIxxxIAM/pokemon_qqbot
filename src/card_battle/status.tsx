@@ -46,30 +46,26 @@ export class NumbStatusHandler implements StatusHandler {
   processTurnStart(target: CardCharacter): string | undefined {
     const effect = target.statusEffects.get(this.type);
     if (!effect) return undefined;
-    const randomNumb = Math.random() <= 0.25;
-    if (!randomNumb) return undefined;
-    let log = `${target.name}麻痹了,本回合无法使用技能`;
-    target.energy = 0;
     effect.duration--;
     if (effect.duration <= 0) {
-      log = this.removeEffect(target);
+      let log = this.removeEffect(target);
+      return log;
     }
-
-    return log;
   }
   onUseCard(target: CardCharacter, context: CombatContext): string | undefined {
     const effect = target.statusEffects.get(this.type);
     if (!effect) return;
 
     const randomNumb = Math.random() <= 0.25;
-    if (!randomNumb) return undefined;
+    // console.log(randomNumb);
+    if (!randomNumb) return;
     let log = `${target.name}麻痹了,本回合无法使用技能`;
     target.energy = 0;
     return log;
   }
   removeEffect(target: CardCharacter): string | undefined {
     const effect = target.statusEffects.get(this.type);
-    if (!effect) return undefined;
+    if (!effect) return;
     let log = "";
     target.statusEffects.delete(this.type);
     log += `${target.name}麻痹效果消失了`;
@@ -87,6 +83,76 @@ export class NumbStatusHandler implements StatusHandler {
   }
   restor(data: Partial<StatusHandler>): StatusHandler {
     return Object.assign(new NumbStatusHandler(), data);
+  }
+}
+
+export class ConfusionStatusHandler implements StatusHandler {
+  type: StatusType = "confusion";
+
+  applyEffect(target: CardCharacter, stacks: number): string | undefined {
+    const existing = target.statusEffects.get(this.type);
+    if (existing) {
+      existing.stacks += stacks;
+      existing.duration = Math.max(existing.duration, 4);
+    } else {
+      target.statusEffects.set(this.type, {
+        type: this.type,
+        stacks,
+        duration: 6,
+        originSpeed: undefined,
+        originEnergy: undefined,
+      });
+    }
+    return `,${target.name}混乱了!`;
+  }
+  processTurnStart(target: CardCharacter): string | undefined {
+    const effect = target.statusEffects.get(this.type);
+    if (!effect) return undefined;
+    return `${target.name}正在混乱`;
+  }
+  onUseCard(target: CardCharacter, context: CombatContext): string | undefined {
+    const effect = target.statusEffects.get(this.type);
+    if (!effect) return;
+
+    const randomConf = Math.random() <= 0.333;
+    // console.log(randomConf);
+    if (!randomConf) return;
+    const damage = Math.floor(
+      ((((2 * 100 + 10) / 250) * target.power.attack) /
+        (1.2 * target.power.defense)) *
+        40 +
+        2
+    );
+    let log = `${target.name}混乱了,本次行动能量减2,并且攻击了自己,造成了${damage}点伤害`;
+    target.currentHp -= damage;
+
+    target.energy = Math.max(0, target.energy - 2);
+    effect.duration--;
+    if (effect.duration <= 0) {
+      log += this.removeEffect(target);
+    }
+    return log;
+  }
+  removeEffect(target: CardCharacter): string | undefined {
+    const effect = target.statusEffects.get(this.type);
+    if (!effect) return;
+    let log = "";
+    target.statusEffects.delete(this.type);
+    log += `,${target.name}混乱效果消失了`;
+    if (effect.originSpeed !== undefined)
+      target.power.speed = effect.originSpeed;
+    if (effect.originEnergy !== undefined)
+      target.maxEnergy = effect.originEnergy;
+    return log;
+  }
+  processTurnEnd(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+  onReceiveDamage?(target: CardCharacter): string | undefined {
+    return undefined;
+  }
+  restor(data: Partial<StatusHandler>): StatusHandler {
+    return Object.assign(new ConfusionStatusHandler(), data);
   }
 }
 
@@ -284,7 +350,12 @@ export class StatusEffectMap {
 
   // 验证是否为有效的状态类型
   private isValidStatusType(key: string): key is StatusType {
-    return key === "poison" || key === "numb" || key === "burn";
+    return (
+      key === "poison" ||
+      key === "numb" ||
+      key === "burn" ||
+      key === "confusion"
+    );
   }
 
   // 从任意数据源恢复
@@ -331,3 +402,4 @@ export const statusSystems = new StatusSystem();
 statusSystems.registerHandler(new PoisonStatusHandler());
 statusSystems.registerHandler(new NumbStatusHandler());
 statusSystems.registerHandler(new BurnStatusHandler());
+statusSystems.registerHandler(new ConfusionStatusHandler());

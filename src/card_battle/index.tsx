@@ -990,7 +990,7 @@ ${"```"}`;
         Enemy,
         new Robot(100)
       );
-      console.dir(cardData.routmap.enemies.statusEffects);
+      // console.dir(cardData.routmap.enemies.statusEffects);
       if (!cardData?.combatcontext) {
         cardData.combatcontext = {
           player: null,
@@ -1015,6 +1015,10 @@ ${"```"}`;
         cardplayer.discardCard();
         cardenemy.discardCard();
         context.enemyturn = true;
+        const statusEndLog = cardplayer.processTurnEnd();
+        if (statusEndLog.length > 0) {
+          context.logs = [statusEndLog, ...context.logs];
+        }
       }
       if (context.logs.length <= 0) {
         ident == undefined;

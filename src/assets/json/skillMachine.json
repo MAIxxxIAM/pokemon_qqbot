@@ -466,7 +466,13 @@
       "category": 3,
       "Dam": 50,
       "hit": 100,
-      "descript": "向对手发送微弱的念力进行攻击。有时会使对手混乱。"
+      "descript": "向对手发送微弱的念力进行攻击。有时会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "48",
@@ -826,7 +832,13 @@
       "category": 3,
       "Dam": 60,
       "hit": 100,
-      "descript": "用水的震动攻击对手。有时会使对手混乱。"
+      "descript": "用水的震动攻击对手。有时会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "86",
@@ -853,7 +865,13 @@
       "category": 3,
       "Dam": 65,
       "hit": 100,
-      "descript": "向对手发射神奇的光线进行攻击。有时会使对手混乱。"
+      "descript": "向对手发射神奇的光线进行攻击。有时会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "89",
@@ -946,7 +964,13 @@
       "category": 1,
       "Dam": 70,
       "hit": 100,
-      "descript": "有节奏地出拳攻击对手。有时会使对手混乱。"
+      "descript": "有节奏地出拳攻击对手。有时会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "98",
@@ -1129,7 +1153,13 @@
       "category": 3,
       "Dam": 75,
       "hit": 100,
-      "descript": "发射神奇的光线进行攻击。有时会使对手混乱。"
+      "descript": "发射神奇的光线进行攻击。有时会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "117",
@@ -1589,7 +1619,13 @@
       "category": 1,
       "Dam": 100,
       "hit": 50,
-      "descript": "使出浑身力气出拳进行攻击。必定会使对手混乱。"
+      "descript": "使出浑身力气出拳进行攻击。必定会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 1
+      }
     },
     {
       "id": "162",
@@ -2711,7 +2747,13 @@
       "category": 3,
       "Dam": 65,
       "hit": 100,
-      "descript": "用非常烦人的，喋喋不休的音波攻击对手。使对手混乱。"
+      "descript": "用非常烦人的，喋喋不休的音波攻击对手。使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 1
+      }
     },
     {
       "id": "280",
@@ -3795,7 +3837,13 @@
       "category": 1,
       "Dam": 90,
       "hit": 85,
-      "descript": "发动猛撞攻击，有时会使对手混乱。是宝可表的秘传招式之一。"
+      "descript": "发动猛撞攻击，有时会使对手混乱。是宝可表的秘传招式之一。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "395",
@@ -4047,7 +4095,13 @@
       "category": 3,
       "Dam": 90,
       "hit": 95,
-      "descript": "喷出烟雾攻击对手。有时会使对手混乱。"
+      "descript": "喷出烟雾攻击对手。有时会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "421",
@@ -4566,7 +4620,13 @@
       "category": 3,
       "Dam": 110,
       "hit": 70,
-      "descript": "用强烈的风席卷对手进行攻击。有时会使对手混乱。"
+      "descript": "用强烈的风席卷对手进行攻击。有时会使对手混乱。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "474",
@@ -4851,7 +4911,13 @@
       "category": 1,
       "Dam": 120,
       "hit": 90,
-      "descript": "将踢起的脚跟往下劈向对手进行攻击。有时会使对手混乱。如果劈偏则自己会受到伤害。"
+      "descript": "将踢起的脚跟往下劈向对手进行攻击。有时会使对手混乱。如果劈偏则自己会受到伤害。",
+      "status": {
+        "status": [
+          "confusion"
+        ],
+        "probability": 0.3
+      }
     },
     {
       "id": "503",

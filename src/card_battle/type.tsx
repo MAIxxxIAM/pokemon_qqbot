@@ -54,7 +54,7 @@ export type CardType =
   | "armorBreak"
   | "numb";
 
-export type StatusType = "poison" | "numb" | "burn";
+export type StatusType = "poison" | "numb" | "burn" | "confusion";
 
 export interface CardCharacter {
   name: string;
@@ -159,22 +159,32 @@ export class CardPlayer implements CardCharacter {
 
   useCard(context: CombatContext, c: string, tar?: CardCharacter) {
     const isNumber = /^\d+$/.test(c);
-    const card = isNumber
-      ? this.currentHand[Number(c) - 1]
-      : this.currentHand.find((card) => card.name === c);
+    let card: RougueCard | undefined;
+    if (isNumber) {
+      const idx = Number(c) - 1;
+      if (idx < 0 || idx >= this.currentHand.length) return null;
+      card = this.currentHand[idx];
+    } else {
+      card = this.currentHand.find((card) => card.name === c);
+    }
     if (!card) return null;
-    let playerLog = card.effect(this, tar);
-    if (!playerLog) return null;
-    context.logs = [playerLog as string, ...context.logs];
+    let playerLog = "";
     this.statusEffects.forEach((effect) => {
-      if (statusSystems.getHandler(effect.type)?.onUseCard(this, context)) {
-        const slogs = statusSystems
-          .getHandler(effect.type)
-          ?.onUseCard(this, context);
-        context.logs = [slogs as string, ...context.logs];
-        playerLog = slogs + "\n" + playerLog;
+      const handler = statusSystems.getHandler(effect.type);
+      const slogs = handler?.onUseCard(this, context);
+      if (slogs) {
+        playerLog = slogs + (playerLog == "" ? "" : "\n") + playerLog;
       }
     });
+    const useCardLog = card.effect(this, tar);
+    if (!useCardLog) {
+      playerLog = "能量不足" + (playerLog == "" ? "" : "\n") + playerLog;
+      context.logs = [playerLog as string, ...context.logs];
+      return playerLog;
+    }
+    playerLog = useCardLog + (playerLog == "" ? "" : "\n") + playerLog;
+    context.logs = [playerLog as string, ...context.logs];
+
     this.currentHand = this.currentHand.filter((c) => c !== card);
     return playerLog;
   }
@@ -1040,6 +1050,14 @@ export class EnemyAI implements AIStrategy {
     const armorTrend = this.calculateArmorTrend();
     const validCards = hand.filter((c) => c.cost <= context.currentEnergy);
     if (validCards.length === 0) return null;
+
+    const getMaxCostCard = (cards: RougueCard[]) =>
+      cards.reduce(
+        (maxCard, currCard) =>
+          currCard.cost > maxCard.cost ? currCard : maxCard,
+        cards[0]
+      );
+
     const attackCard = validCards.filter((c) => c.type === "attack");
     const specialAttackCard = validCards.filter(
       (c) => c.type === "specialattack"
@@ -1051,46 +1069,28 @@ export class EnemyAI implements AIStrategy {
         c.type === "skill" &&
         context.self.pokemonCategory.includes(c.cardCategory)
     );
-    if (armorTrend > 0 && armorBreakCard.length != 0) {
-      return armorBreakCard.reduce(
-        (maxCard, currCard) =>
-          currCard.cost > maxCard.cost ? currCard : maxCard,
-        armorBreakCard[0]
-      );
+
+    if (armorTrend > 0 && armorBreakCard.length) {
+      return getMaxCostCard(armorBreakCard);
     }
-    if (armorCard.length != 0) {
-      return armorCard.reduce(
-        (maxCard, currCard) =>
-          currCard.cost > maxCard.cost ? currCard : maxCard,
-        armorCard[0]
-      );
+    if (armorCard.length) {
+      return getMaxCostCard(armorCard);
     }
     const categoryEffect: number = this.calculateCategory(context);
-    if (categoryEffect >= 1 && skillCard.length != 0) {
-      return skillCard.reduce(
-        (maxCard, currCard) =>
-          currCard.cost > maxCard.cost ? currCard : maxCard,
-        skillCard[0]
-      );
+    if (categoryEffect >= 1 && skillCard.length) {
+      return getMaxCostCard(skillCard);
     }
-    if (attackCard.length != 0) {
-      return context.self.power.attack > context.self.power.specialAttack
-        ? attackCard.reduce(
-            (maxCard, currCard) =>
-              currCard.cost > maxCard.cost ? currCard : maxCard,
-            attackCard[0]
-          )
-        : specialAttackCard.reduce(
-            (maxCard, currCard) =>
-              currCard.cost > maxCard.cost ? currCard : maxCard,
-            specialAttackCard[0]
-          );
+    if (attackCard.length || specialAttackCard.length) {
+      if (
+        context.self.power.attack > context.self.power.specialAttack &&
+        attackCard.length
+      ) {
+        return getMaxCostCard(attackCard);
+      } else if (specialAttackCard.length) {
+        return getMaxCostCard(specialAttackCard);
+      }
     }
-    return validCards.reduce(
-      (maxCard, currCard) =>
-        currCard.cost > maxCard.cost ? currCard : maxCard,
-      validCards[0]
-    );
+    return getMaxCostCard(validCards);
   }
   private calculateArmorTrend(): number {
     // 计算护甲变化趋势
@@ -1227,32 +1227,34 @@ export class Enemy implements CardCharacter {
     this.energy = this.maxEnergy;
   }
   act(context: CombatContext): string | void {
+    // console.log(this.energy);
+    let enemyLog = "";
+    this.statusEffects.forEach((effect) => {
+      const handler = statusSystems.getHandler(effect.type);
+      const slogs = handler?.onUseCard(this, context);
+      if (slogs) {
+        enemyLog = slogs + (enemyLog == "" ? "" : "\n") + enemyLog;
+      }
+    });
     context.currentEnergy = this.energy;
     const selectedCard = this.aiStrategy.selectCard(this.currentHand, context);
+    // console.log(selectedCard);
     if (selectedCard) {
       if (this.energy < selectedCard.cost) return null;
       this.takeCard = [selectedCard, ...this.takeCard];
       context.currentEnergy -= selectedCard.cost;
-      let enemyLog = selectedCard.effect(this, context.player);
-      context.logs = [enemyLog as string, ...context.logs];
+      let useCardEnemyLog = selectedCard.effect(this, context.player);
+      enemyLog = useCardEnemyLog + (enemyLog == "" ? "" : "\n") + enemyLog;
       const index = this.currentHand.indexOf(selectedCard);
       if (index !== -1) {
         this.currentHand.splice(index, 1);
       }
       context.self = this;
       context.player = context.player;
-      this.statusEffects.forEach((effect) => {
-        if (statusSystems.getHandler(effect.type)?.onUseCard(this, context)) {
-          const slogs = statusSystems
-            .getHandler(effect.type)
-            ?.onUseCard(this, context);
-          enemyLog = slogs + "\n" + enemyLog;
-          context.logs = [slogs as string, ...context.logs];
-        }
-      });
-      return enemyLog;
+      // console.log("2", enemyLog);
     }
-    return null;
+    context.logs = [enemyLog as string, ...context.logs];
+    return enemyLog;
   }
   restor() {
     this.statusEffects = new StatusEffectMap(this, this.statusEffects);

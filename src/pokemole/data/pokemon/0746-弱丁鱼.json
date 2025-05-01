@@ -173,13 +173,15 @@
         }
     ],
     "evolution_chains": [
-        {
-            "name": "弱丁鱼",
-            "stage": "不进化",
-            "text": null,
-            "back_text": null,
-            "from": null
-        }
+        [
+            {
+                "name": "弱丁鱼",
+                "stage": "不进化",
+                "text": null,
+                "back_text": null,
+                "from": null
+            }
+        ]
     ],
     "names": {
         "zh_hans": "弱丁鱼",
