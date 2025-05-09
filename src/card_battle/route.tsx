@@ -79,17 +79,13 @@ export class inRouteNode implements RouteNode {
 // 路线生成配置
 const ROUTE_CONFIG = {
   branchRate: 0.3,
-  maxDepth: 20,
+  maxDepth: [20, 30, 40], // 每个难度的最大深度
   bossInterval: 5,
 };
 
 // 路线生成器
 export class RouteGenerator {
-  static maxAllowedDepth: number;
-
-  constructor(maxDepth: number = ROUTE_CONFIG.maxDepth) {
-    RouteGenerator.maxAllowedDepth = maxDepth;
-  }
+  static maxAllowedDepth = [20, 30, 40];
 
   static restore(data: any): RouteGenerator {
     return Object.assign(new RouteGenerator(), data);
@@ -170,7 +166,8 @@ export class RouteGenerator {
 
   static exploreNode(
     node: RouteNode,
-    player?: CardPlayer
+    player?: CardPlayer,
+    lap = 0
   ): {
     status: RouteNodeStatus;
     text: string;
@@ -186,8 +183,8 @@ export class RouteGenerator {
 
     node.depth++;
 
-    if (node.depth >= this.maxAllowedDepth - 1) {
-      log = ["当前已探索完成！", ...log];
+    if (node.depth >= this.maxAllowedDepth[lap] - 1) {
+      log = ["你已完成了迷雾的探索！", ...log];
       node.isCompleted = true;
       return {
         status: RouteNodeStatus.COMPLETED,

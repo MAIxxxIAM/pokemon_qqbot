@@ -36,6 +36,7 @@ import * as notice from "./notice/index";
 import * as fishings from "./fishing/index";
 import * as pokeEmoji from "./pokeEmoji/index";
 import * as pokemole from "./pokemole/index";
+// import * as faketest from "./aigc/index";
 import * as formGame from "./farm/index";
 import crypto from "crypto";
 import * as digGame from "./dig_game/index";
@@ -108,6 +109,7 @@ export interface Config {
   Region: string;
   SecretId: string;
   SecretKey: string;
+  ds_key: string;
 }
 
 export const Config = Schema.intersect([
@@ -191,6 +193,9 @@ export const Config = Schema.intersect([
     Region: Schema.string().default("ap-guangzhou"),
     SecretId: Schema.string().role("secret"),
     SecretKey: Schema.string().role("secret"),
+  }),
+  Schema.object({
+    ds_key: Schema.string(),
   }),
 ]);
 
@@ -393,6 +398,7 @@ export async function apply(ctx, conf: Config) {
   ctx.plugin(cry_guess);
   ctx.plugin(cardTest);
   ctx.plugin(pokemole);
+  // ctx.plugin(faketest);
 
   if (config.指令使用日志) {
     ctx.on("command/before-execute", ({ session, command }) => {

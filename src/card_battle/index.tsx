@@ -27,12 +27,6 @@ import {
 import { getShop, getShopItem, itemMenu, ShopItem } from "./shop";
 
 export async function apply(ctx: Context) {
-  // ctx.command("text1").action(async ({ session }) => {
-  //   const routeGenerator = new RouteGenerator(21);
-
-  //   let gameMap = RouteGenerator.createInitialRoute();
-  //   return await drawPortal(gameMap);
-  // });
   ctx.command("清空测试数据", { authority: 4 }).action(async ({ session }) => {
     const a = await ctx.database.remove("carddata", {});
     await ctx.database.set("pokebattle", {}, (row) => ({
@@ -494,7 +488,7 @@ export async function apply(ctx: Context) {
       );
       const selectedNode = cardData?.routmap?.children[cho - 1];
       if (!selectedNode) return `该地图不存在`;
-      RouteGenerator.exploreNode(selectedNode, cardData.player);
+      RouteGenerator.exploreNode(selectedNode, cardData.player, player.lap - 1);
       cardData.routmap = selectedNode;
       const chooseButton = {
         战斗: button(
@@ -719,7 +713,7 @@ ${code}
         return `等级不足，无法进入该游戏`;
       }
       const newPlayer = new CardPlayer(player);
-      const newRoutMap = RouteGenerator.createInitialRoute();
+      const newRoutMap = RouteGenerator.createInitialRoute(player.level);
       cardData
         ? await ctx.database.set("carddata", { id: session.userId }, (row) => ({
             player: newPlayer,

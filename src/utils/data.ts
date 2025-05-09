@@ -46,6 +46,15 @@ export const berry_food: Food[] = BerryTrees;
 
 import path from "path";
 
+export function toHalfWidth(str: string): string {
+  str = str.replace(/[\uFF01-\uFF5E]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
+  );
+  str = str.replace(/\u3000/g, " ");
+  str = str.replace(/・/g, "·");
+  return str;
+}
+
 const pokemonPath = path.join(dirname, "./pokemole/data/pokemon");
 const movesPath = path.join(dirname, "./pokemole/data/move");
 const labelPath = path.join(dirname, "./pokemole/data/label");
@@ -157,7 +166,13 @@ export interface LabelJson {
   pokemon: string[];
 }
 
-export const PokemonData: PokemonJson[] = Data(pokemonPath);
+export const PokemonData: PokemonJson[] = Data(pokemonPath).map((data) => {
+  data.name = toHalfWidth(data.name);
+  return data;
+});
+
+console.log(PokemonData.filter((d) => d.index == `0788`));
+
 export const MovesData = Data(movesPath);
 export const LabelData: LabelJson[] = Data(labelPath);
 export const AbilitiesData = Data(abilitiesPath);
