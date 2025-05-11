@@ -86,6 +86,7 @@ export async function apply(ctx: Context) {
         await session.execute(`cardgoon`);
         return;
       }
+      const r = RouteGenerator.checkExport(cardData.routmap, player);
       const thisEvent = Random.weightedPick(exporeEventRecord);
       let logs: string[] = [];
       let nextCommand = `cardgoon`;
@@ -145,6 +146,7 @@ export async function apply(ctx: Context) {
         }
       );
       await session.send(logs.join("\n"));
+      await session.send(r.text);
       await session.execute(nextCommand);
     });
   ctx
@@ -283,7 +285,7 @@ ${r.text}`;
       await ctx.database.set("carddata", { id: session.userId }, (row) => ({
         routmap: cardData.routmap,
       }));
-
+      const r = RouteGenerator.checkExport(cardData.routmap, player);
       const md = `你进入了商店,可以购买以下物品：
 
 > PS:当前为测试,所有道具都价格为0,正式上线后会会对数据进行清空
@@ -398,6 +400,7 @@ ${r.text}`;
         }
       );
       await session.send(bugLog);
+      await session.send(r.text);
       await session.execute(`cardgoon`);
     });
 
@@ -1083,7 +1086,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         );
         await sendMarkdown(ctx, startMd, session);
       }
-
+      const r = RouteGenerator.checkExport(cardData.routmap, player);
       //对手先手逻辑
       if (context.enemyturn) {
         cardenemy.discardCard();
@@ -1180,7 +1183,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
               await drawPortal(undefined, rarityBuff)
             ).attrs.src
           );
-          const md = `成功探索了这一层地图
+          const md = `成功探索了这一层地图,${r.text}
 领取你的奖励：
 ![img#500px #333px](${rarityImage})
 
@@ -1326,7 +1329,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
               await drawPortal(undefined, rarityBuff)
             ).attrs.src
           );
-          const md = `你获得了胜利！成功探索了这一层地图
+          const md = `你获得了胜利！成功探索了这一层地图,${r.text}
 领取你的奖励：
 ![img#500px #333px](${rarityImage})
 
