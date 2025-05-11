@@ -58,6 +58,7 @@ export type StatusType = "poison" | "numb" | "burn" | "confusion";
 
 export interface CardCharacter {
   name: string;
+  level: number;
   maxHp: number;
   currentHp: number;
   armor: number;
@@ -134,6 +135,7 @@ export class CardPlayer implements CardCharacter {
   constructor(
     players: Pokebattle,
     public name: string = new PVP(players).name,
+    public level: number = players.level,
     public maxHp: number = new PVP(players).maxHp,
     public maxEnergy: number = Math.max(
       Math.floor(new PVP(players).power.speed / 45),
@@ -1123,6 +1125,7 @@ export class Enemy implements CardCharacter {
   currentHand: RougueCard[];
   statusEffects = new StatusEffectMap(this);
   takeCard: RougueCard[];
+  id?: string;
   bonus: {
     energy: number;
     damage: number;
@@ -1135,6 +1138,7 @@ export class Enemy implements CardCharacter {
     pokemonType: RouteNodeType = RouteNodeType.Combat,
     public readonly name: string = wildPokemon.battlename,
     public readonly maxHp: number = new PVP(wildPokemon).maxHp,
+    public level: number = wildPokemon.level,
     public readonly maxEnergy: number = Math.floor(
       new PVP(wildPokemon).power.speed / 45
     ),
@@ -1144,6 +1148,7 @@ export class Enemy implements CardCharacter {
     public skill: Skill[] = new PVP(wildPokemon).skill,
     public pokemonCategory: string[] = getType(new PVP(wildPokemon).monster_1) // private statusSystem: StatusSystem = statusSystems
   ) {
+    this.id = wildPokemon.monster_1?.split(".")[0];
     this.bonus = {
       energy: 0,
       damage: 0,

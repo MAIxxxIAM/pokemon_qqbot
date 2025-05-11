@@ -387,6 +387,7 @@ export async function model(ctx: Context) {
         activeBuffs: undefined,
         rewardBuffs: undefined,
         name: "",
+        level: 0,
         maxHp: 0,
         maxEnergy: 0,
         power: undefined,

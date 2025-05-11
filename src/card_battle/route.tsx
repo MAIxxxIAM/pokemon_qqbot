@@ -1,4 +1,5 @@
 import { PokemonPower } from "../battle";
+import { Pokebattle } from "../model";
 import { PokemonBase } from "../utils/method";
 import { CardRobot, Robot } from "../utils/robot";
 import { getRandomPokemon } from "./monster";
@@ -31,7 +32,7 @@ export interface RouteNode {
   isCompleted: boolean;
   isExplored: boolean;
 }
-enum RouteNodeStatus {
+export enum RouteNodeStatus {
   UNEXPLORED = "未探索",
   EXPLORED = "已探索",
   COMPLETED = "已完成",
@@ -91,11 +92,11 @@ export class RouteGenerator {
     return Object.assign(new RouteGenerator(), data);
   }
 
-  static createInitialRoute(level = 100): RouteNode {
-    const root = this.createNode(0, level);
+  static createInitialRoute(lap: number, level: number): RouteNode {
+    const root = this.createNode(0, lap, level);
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
-      root.children.push(this.createNode(1, level));
+      root.children.push(this.createNode(1, lap, level));
     }
 
     return root;
@@ -127,10 +128,14 @@ export class RouteGenerator {
   private static generateEnemies(
     type: RouteNodeType,
     depth: number,
-    l = 100
+    lap: number,
+    l = 100,
+    lastEnding = false
   ): Enemy {
     let enemies: Enemy;
-    const enemyPower: PokemonBase = getRandomPokemon(type);
+    // console.log(type, depth, lap, l);
+    const enemyPower: PokemonBase = getRandomPokemon(type, lap, lastEnding);
+    // console.log(enemyPower);
     const enemy = new CardRobot(l, enemyPower, depth);
     enemies = new Enemy(enemy, type);
 
@@ -139,7 +144,9 @@ export class RouteGenerator {
 
   static createNode(
     depth: number,
-    l: number = 100,
+    lap: number,
+    l: number,
+    lastEnding = false,
     e?: RouteNodeType
   ): RouteNode {
     const nodeType = e ? e : this.onNodeType(depth);
@@ -156,13 +163,28 @@ export class RouteGenerator {
       nodeType === RouteNodeType.Elite ||
       nodeType === RouteNodeType.Boss
     ) {
-      node.enemies = this.generateEnemies(nodeType, depth, l);
+      node.enemies = this.generateEnemies(nodeType, depth, lap, l, lastEnding);
     }
 
     return node;
   }
 
   // 探索节点标记枚举
+
+  static checkExport(node: RouteNode, player: Pokebattle) {
+    if (node.depth >= this.maxAllowedDepth[player.lap - 1] - 1) {
+      node.isCompleted = true;
+      node.isExplored = true;
+      return {
+        status: RouteNodeStatus.COMPLETED,
+        text: "你已完成了迷雾的探索！",
+      };
+    }
+    return {
+      status: RouteNodeStatus.UNEXPLORED,
+      text: "探索中...",
+    };
+  }
 
   static exploreNode(
     node: RouteNode,
@@ -185,7 +207,23 @@ export class RouteGenerator {
 
     if (node.depth >= this.maxAllowedDepth[lap] - 1) {
       log = ["你已完成了迷雾的探索！", ...log];
-      node.isCompleted = true;
+      if (lap == 3 && player.level >= 90) {
+        log = ["", ...log];
+        player.refresh();
+        node.children.push(
+          this.createNode(
+            node.depth + 1,
+            lap + 1,
+            player.level,
+            true,
+            RouteNodeType.Boss
+          )
+        );
+        return {
+          status: RouteNodeStatus.UNEXPLORED,
+          text: log.join("\n"),
+        };
+      }
       return {
         status: RouteNodeStatus.COMPLETED,
         text: log.join("\n"),
@@ -202,7 +240,9 @@ export class RouteGenerator {
     player.refresh();
     const childCount = Math.random() > 0.7 ? 3 : 2;
     for (let i = 0; i < childCount; i++) {
-      node.children.push(this.createNode(node.depth + 1));
+      node.children.push(
+        this.createNode(node.depth + 1, lap + 1, player.level)
+      );
     }
     return {
       status: RouteNodeStatus.UNEXPLORED,

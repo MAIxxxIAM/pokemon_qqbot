@@ -5,6 +5,13 @@ import { RouteNodeType } from "./route";
 let NormalWild: PokemonBase[] = [];
 let UncommonPokemon: PokemonBase[] = [];
 let Legendary: PokemonBase[] = [];
+let LastEnding: PokemonBase[] = [];
+
+export enum EventType {
+  "0-4" = 1,
+  "5-10" = 2,
+  "11-16" = 3,
+}
 
 const legendaryPokemonList = [
   "150",
@@ -44,7 +51,16 @@ const selectPokemon = () => {
   for (const p of pokemonBase) {
     if (p.id == "0") continue;
     const baseSum = p.att + p.def + p.hp + p.spa + p.spd + p.spe;
-    if (legendaryPokemonList.includes(p.id)) {
+    if (p.id == "315") {
+      const up = { ...p };
+      up.att = up.att * 1.1;
+      up.def = up.def * 1.1;
+      up.hp = up.hp * 1.1;
+      up.spa = up.spa * 1.1;
+      up.spd = up.spd * 1.1;
+      up.spe = up.spe * 1.1;
+      LastEnding.push(up);
+    } else if (legendaryPokemonList.includes(p.id)) {
       Legendary.push({ ...p });
     } else if (baseSum >= 500) {
       const up = { ...p };
@@ -68,13 +84,22 @@ const selectPokemon = () => {
   }
 };
 selectPokemon();
-
-export function getRandomPokemon(type: RouteNodeType): PokemonBase {
+export function getRandomPokemon(
+  type: RouteNodeType,
+  lap: number,
+  lastEnding: boolean = false
+): PokemonBase {
+  if (lastEnding) {
+    return LastEnding[Math.floor(Math.random() * LastEnding.length)];
+  }
   let pokemon: PokemonBase[] = NormalWild;
   if (type == RouteNodeType.Elite) {
     pokemon = UncommonPokemon;
   } else if (type == RouteNodeType.Boss) {
-    pokemon = Legendary;
+    const pEvent = EventType[lap].split("-");
+    const pS = 0;
+    const pE = Number(pEvent[1]) || 17;
+    pokemon = Legendary.splice(pS, pE);
   }
   const randomIndex = Math.floor(Math.random() * pokemon.length);
   return pokemon[randomIndex];

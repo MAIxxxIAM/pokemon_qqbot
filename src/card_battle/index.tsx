@@ -15,6 +15,7 @@ import {
   displayRoute,
   RouteGenerator,
   RouteNode,
+  RouteNodeStatus,
   RouteNodeType,
 } from "./route";
 import { config, testcanvas } from "..";
@@ -117,7 +118,9 @@ export async function apply(ctx: Context) {
           const childRoute = cardData.routmap.children || [];
           cardData.routmap = RouteGenerator.createNode(
             cardData.routmap.depth,
+            player.lap,
             player.level,
+            false,
             RouteNodeType.Combat
           );
           cardData.routmap.children = childRoute;
@@ -197,6 +200,7 @@ export async function apply(ctx: Context) {
           combatcontext: cardData.combatcontext,
         }
       );
+      const r = RouteGenerator.checkExport(cardData.routmap, player);
       const md = `![img#500px #500px](${await toUrl(
         ctx,
         session,
@@ -207,7 +211,8 @@ export async function apply(ctx: Context) {
 
 > 你在营地休息了一下，已恢复全部${
         cardData.player.maxHp + cardData.player.bonus.Hp
-      }点生命值`;
+      }点生命值
+${r.text}`;
       const keybord = {
         keyboard: {
           content: {
@@ -488,7 +493,11 @@ export async function apply(ctx: Context) {
       );
       const selectedNode = cardData?.routmap?.children[cho - 1];
       if (!selectedNode) return `该地图不存在`;
-      RouteGenerator.exploreNode(selectedNode, cardData.player, player.lap - 1);
+      const exportThis = RouteGenerator.exploreNode(
+        selectedNode,
+        cardData.player,
+        player.lap - 1
+      );
       cardData.routmap = selectedNode;
       const chooseButton = {
         战斗: button(
@@ -550,10 +559,15 @@ export async function apply(ctx: Context) {
           },
         },
       };
-      const md = `你已经进入了新的地图：${selectedNode.type} 
+      const md = `${exportThis.text}
+---
+${
+  exportThis.status == RouteNodeStatus.COMPLETED
+    ? ""
+    : `你已经进入了新的地图：${selectedNode.type}`
+}
 
 ${"```"}
-
 深入迷雾: ${selectedNode.depth} 层
 ${displayRoute(selectedNode)}
 ${"```"}
@@ -713,7 +727,10 @@ ${code}
         return `等级不足，无法进入该游戏`;
       }
       const newPlayer = new CardPlayer(player);
-      const newRoutMap = RouteGenerator.createInitialRoute(player.level);
+      const newRoutMap = RouteGenerator.createInitialRoute(
+        player.lap,
+        player.level
+      );
       cardData
         ? await ctx.database.set("carddata", { id: session.userId }, (row) => ({
             player: newPlayer,

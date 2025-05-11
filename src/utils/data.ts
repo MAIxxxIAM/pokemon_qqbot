@@ -171,7 +171,7 @@ export const PokemonData: PokemonJson[] = Data(pokemonPath).map((data) => {
   return data;
 });
 
-console.log(PokemonData.filter((d) => d.index == `0788`));
+// console.log(PokemonData.filter((d) => d.index == `0788`));
 
 export const MovesData = Data(movesPath);
 export const LabelData: LabelJson[] = Data(labelPath);
