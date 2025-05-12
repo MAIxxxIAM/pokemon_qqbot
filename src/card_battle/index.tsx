@@ -1,4 +1,5 @@
 import { $, Context, Element, h, Random, Session } from "koishi";
+import crypto from "crypto";
 import {
   CardCharacter,
   CardPlayer,
@@ -10,6 +11,7 @@ import { initType } from "./method";
 import { Robot } from "../utils/robot";
 import { resolve } from "path";
 import { dirname } from "../dirname";
+import { legendaryPokemonId } from "..";
 import { button, getType, sendMarkdown, toUrl } from "../utils/method";
 import {
   displayRoute,
@@ -1141,6 +1143,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
         }
       }
       //胜负逻辑
+      let onCatch = false;
       const whoseWin =
         cardenemy.currentHp <= 0
           ? `player`
@@ -1150,6 +1153,9 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
       switch (whoseWin) {
         case "player":
           if (cardData.routmap.type == RouteNodeType.Boss) {
+            if (player.lap > 1 && player.level > 90 && Random.bool(0.15)) {
+              onCatch = true;
+            }
             cardplayer.configTimes += 1;
             cardplayer.relax();
             const bossMd = `你在boss战中获得了胜利,点亮了此处的迷雾
@@ -1233,6 +1239,18 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
             }
           );
           await session.execute(`cardgoon`);
+          if (onCatch) {
+            const key = crypto
+              .createHash("md5")
+              .update(session.userId + new Date().getTime())
+              .digest("hex")
+              .toUpperCase();
+            legendaryPokemonId[key] = `${cardenemy.id}.${cardenemy.id}`;
+            ctx.setTimeout(() => {
+              delete legendaryPokemonId[key];
+            }, 2000);
+            await session.execute(`捕捉宝可梦 ${key}`);
+          }
           return logs;
         case "enemy":
           cardData.routmap.isCompleted = true;
@@ -1321,6 +1339,35 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           : `other`;
       switch (whoseWinLast) {
         case "player":
+          if (cardData.routmap.type == RouteNodeType.Boss) {
+            if (player.lap > 1 && player.level > 90 && Random.bool(0.15)) {
+              onCatch = true;
+            }
+            cardplayer.configTimes += 1;
+            cardplayer.relax();
+            const bossMd = `你在boss战中获得了胜利,点亮了此处的迷雾
+🌟你的血量恢复了,并取走了一支火把🌟
+---
+![img#500px #500px](${await toUrl(
+              ctx,
+              session,
+              `file://${resolve(dirname, `./assets/img/card/篝火.png`)}`
+            )})`;
+            await sendMarkdown(ctx, bossMd, session);
+          } else {
+            cardplayer.currentHp = Math.floor(
+              Math.min(
+                cardplayer.maxHp + cardplayer.bonus.Hp,
+                cardplayer.currentHp +
+                  cardplayer.power.speed *
+                    (0.0005 + cardData.routmap.depth * 0.00005) *
+                    (cardplayer.maxHp + cardplayer.bonus.Hp)
+              )
+            );
+            await session.send(
+              `你击败了迷雾中的宝可梦,迷雾散去,血量恢复至${cardplayer.currentHp}`
+            );
+          }
           const rarityBuff = pickBuff(3);
           const rarityImage = await toUrl(
             ctx,
@@ -1329,21 +1376,23 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
               await drawPortal(undefined, rarityBuff)
             ).attrs.src
           );
-          const md = `你获得了胜利！成功探索了这一层地图,${r.text}
+          const md = `成功探索了这一层地图,${r.text}
 领取你的奖励：
 ![img#500px #333px](${rarityImage})
 
 ---
 > ${rarityBuff.map(
             (item, i) =>
-              `<qqbot-cmd-input text="${i}" show="${item.name}" reference="false" /> ${item.description}`
+              `<qqbot-cmd-input text="${i + 1}" show="${
+                item.name
+              }" reference="false" /> ${item.description}`
           ).join(`
 `)}`;
           const buttons = rarityBuff.map((item, i) => {
             return button(
               session.isDirect ? 2 : 0,
               item.name,
-              String(i),
+              String(i + 1),
               session.userId,
               `${item.name}`
             );
@@ -1363,8 +1412,8 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
           let chooseBuff = Number(await session.prompt(20000));
           chooseBuff = chooseBuff
             ? chooseBuff
-            : Math.floor(Math.random() * rarityBuff.length);
-          const thisBuff = rarityBuff[chooseBuff];
+            : Math.floor(Math.random() * rarityBuff.length) + 1;
+          const thisBuff = rarityBuff[chooseBuff - 1];
           const logs = cardData.player.addBuff(thisBuff);
           cardData.routmap.isExplored = true;
           await ctx.database.set(
@@ -1376,7 +1425,7 @@ ${cardplayer.name} :![img#50px #50px](${await toUrl(
               combatcontext: context,
             }
           );
-          await session.execute(`cardbattle`);
+          await session.execute(`cardgoon`);
           return logs;
         case "enemy":
           cardData.routmap.isCompleted = true;

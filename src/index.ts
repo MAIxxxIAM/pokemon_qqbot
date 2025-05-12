@@ -1512,7 +1512,6 @@ ${
                       buttons: [
                         button(2, "签到", "签到", session.userId, "qd"),
                         button(2, "面板", "查看信息", session.userId, "xx"),
-                        button(2, "卡牌测试", "开始卡牌", session.userId, "bt"),
                       ],
                     },
                     {
@@ -1521,6 +1520,17 @@ ${
                           2,
                           "最新猜宝可梦玩法",
                           "pokemole.s",
+                          session.userId,
+                          "bt"
+                        ),
+                      ],
+                    },
+                    {
+                      buttons: [
+                        button(
+                          2,
+                          "卡牌二测-击败首领有极大概率触发捕捉",
+                          "开始卡牌",
                           session.userId,
                           "bt"
                         ),

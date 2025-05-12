@@ -80,13 +80,13 @@ export class inRouteNode implements RouteNode {
 // 路线生成配置
 const ROUTE_CONFIG = {
   branchRate: 0.3,
-  maxDepth: [20, 30, 40], // 每个难度的最大深度
+  maxDepth: [21, 41, 61], // 每个难度的最大深度
   bossInterval: 5,
 };
 
 // 路线生成器
 export class RouteGenerator {
-  static maxAllowedDepth = [20, 30, 40];
+  static maxAllowedDepth = [21, 41, 61];
 
   static restore(data: any): RouteGenerator {
     return Object.assign(new RouteGenerator(), data);
