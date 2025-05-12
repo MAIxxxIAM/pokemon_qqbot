@@ -2,11 +2,6 @@ import { pokemonBase } from "../utils/data";
 import { PokemonBase } from "../utils/method";
 import { RouteNodeType } from "./route";
 
-let NormalWild: PokemonBase[] = [];
-let UncommonPokemon: PokemonBase[] = [];
-let Legendary: PokemonBase[] = [];
-let LastEnding: PokemonBase[] = [];
-
 export enum EventType {
   "0-4" = 1,
   "5-10" = 2,
@@ -44,10 +39,17 @@ const legendaryPokemonList = [
   "351",
 ];
 
-const selectPokemon = () => {
+// 全局只生成一次
+export const NormalWild: PokemonBase[] = [];
+export const UncommonPokemon: PokemonBase[] = [];
+export const Legendary: PokemonBase[] = [];
+export const LastEnding: PokemonBase[] = [];
+
+function selectPokemon() {
   NormalWild.length = 0;
   UncommonPokemon.length = 0;
   Legendary.length = 0;
+  LastEnding.length = 0;
   for (const p of pokemonBase) {
     if (p.id == "0") continue;
     const baseSum = p.att + p.def + p.hp + p.spa + p.spd + p.spe;
@@ -82,8 +84,11 @@ const selectPokemon = () => {
       NormalWild.push(up);
     }
   }
-};
+}
+
+// 启动时只执行一次
 selectPokemon();
+
 export function getRandomPokemon(
   type: RouteNodeType,
   lap: number,
@@ -99,7 +104,7 @@ export function getRandomPokemon(
     const pEvent = EventType[lap].split("-");
     const pS = 0;
     const pE = Number(pEvent[1]) || 17;
-    pokemon = Legendary.splice(pS, pE);
+    pokemon = Legendary.slice(pS, pE);
   }
   const randomIndex = Math.floor(Math.random() * pokemon.length);
   return pokemon[randomIndex];
