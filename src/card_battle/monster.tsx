@@ -60,7 +60,7 @@ function selectPokemon() {
       up.hp = up.hp * 1.1;
       up.spa = up.spa * 1.1;
       up.spd = up.spd * 1.1;
-      up.spe = up.spe * 1.1;
+      up.spe = up.spe;
       LastEnding.push(up);
     } else if (legendaryPokemonList.includes(p.id)) {
       Legendary.push({ ...p });
@@ -71,7 +71,7 @@ function selectPokemon() {
       up.hp = up.hp * 1.1;
       up.spa = up.spa * 1.1;
       up.spd = up.spd * 1.1;
-      up.spe = up.spe * 1.1;
+      up.spe = up.spe;
       UncommonPokemon.push(up);
     } else {
       const up = { ...p };
@@ -80,7 +80,7 @@ function selectPokemon() {
       up.hp = up.hp * 1.5;
       up.spa = up.spa * 1.5;
       up.spd = up.spd * 1.5;
-      up.spe = up.spe * 1.5;
+      up.spe = up.spe;
       NormalWild.push(up);
     }
   }

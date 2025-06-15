@@ -745,7 +745,6 @@ ${!isEvent && player.cyberMerit < 100 ? "你净化了水质 赛博功德+1" : ""
         if (!player.isMix) {
           return;
         }
-        console.log(d);
         await ctx.database.set(
           "pokebattle",
           { id: isDirect ? d.user_openid : d.group_member_openid },

@@ -783,6 +783,11 @@ ${
         await session.execute("签到");
         return;
       }
+      const timeGet = tiemCache.get(session.userId);
+      if (timeGet) {
+        timeGet();
+        tiemCache.delete(session.userId);
+      }
       const farm = new PlantTree(player.farm);
       farm.triggerEvent();
       const openBerrys = berry_food.filter((berry) => !!berry.type);
@@ -890,7 +895,7 @@ ${
         { isMix: true }
       );
       await sendMarkdown(ctx, md, session, kb);
-      ctx.setTimeout(async () => {
+      const timeRoute = ctx.setTimeout(async () => {
         const [playerOut] = await ctx.database.get(
           "pokebattle",
           session.userId
@@ -901,5 +906,8 @@ ${
             }))
           : null;
       }, 10000);
+      tiemCache.set(session.userId, timeRoute);
     });
 }
+
+let tiemCache: Map<string, () => void> = new Map();
