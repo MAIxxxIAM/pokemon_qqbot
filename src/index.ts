@@ -1526,12 +1526,13 @@ ${
                     },
                     {
                       buttons: [
-                        button(
+                        button(2, "卡牌", "开始卡牌", session.userId, "bt"),
+                        urlbutton(
                           2,
-                          "卡牌二测-击败首领有极大概率触发捕捉",
-                          "开始卡牌",
+                          "✨修仙",
+                          "https://qun.qq.com/qunpro/robot/qunshare?robot_uin=3889015870&robot_appid=102095939",
                           session.userId,
-                          "bt"
+                          "推广"
                         ),
                       ],
                     },
